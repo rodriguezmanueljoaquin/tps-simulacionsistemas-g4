@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Population {
     private int cellsQuantity, boxLength;
@@ -35,11 +36,59 @@ public class Population {
         this.matrix = setMatrix(particles);
     }
 
-    public Pair<Map<Particle, List<Particle>>, Long> getNeighbours(){
+    public Pair<Map<Integer, List<Particle>>, Long> getResults(){
+        return new Pair<>(getNeighbours(), System.currentTimeMillis() - startExecutionTime);
+    }
 
-        Map<Particle, List<Particle>> neighbours = new HashMap<>();
+    private Map<Integer, List<Particle>> getNeighbours(){
 
-        return new Pair<>(neighbours, System.currentTimeMillis() - startExecutionTime);
+        Map<Integer, List<Particle>> neighbours = new HashMap<>();
+
+        List<Particle> newNeighbours;
+
+        for(int i = 0; i<cellsQuantity;i++){
+            for(int j = 0; j<cellsQuantity;j++){
+                 for (Particle particle : matrix.get(i).get(j)){
+                     newNeighbours = getParticleNeighbours(particle);
+                     newNeighbours.forEach( p -> {
+                         neighbours.putIfAbsent(p.getId(),new ArrayList<>());
+                         neighbours.get(p.getId()).add(particle);
+                     });
+                     neighbours.putIfAbsent(particle.getId(),new ArrayList<>());
+                     neighbours.get(particle.getId()).addAll(newNeighbours);
+                 }
+            }
+        }
+
+        return neighbours;
+    }
+
+    private List<Particle> getParticleNeighbours(Particle particle){
+        List<Particle> neighbours = new ArrayList<>();
+        List<Pair<Integer,Integer>> neighbourCells = new ArrayList<>();
+        Pair<Integer,Integer> position = getParticleCellInMatrix(particle);
+
+        //Getting neighbours cells
+        neighbourCells.add(position); //(0,0)
+        neighbourCells.add(new Pair<>(position.getLeft()+1, position.getRight())); //(1,0)
+        neighbourCells.add(new Pair<>(position.getLeft()+1, position.getRight()+1)); //(1,1)
+        neighbourCells.add(new Pair<>(position.getLeft(), position.getRight()+1)); //(0,1)
+        neighbourCells.add(new Pair<>(position.getLeft()-1, position.getRight()+1)); //(-1,1)
+
+        if(!periodicConditions){
+            neighbourCells = neighbourCells.stream().filter(p->p.getLeft()>=0 && p.getRight()>=0 && p.getLeft()<cellsQuantity && p.getRight()<cellsQuantity).collect(Collectors.toList());
+        }else{
+            neighbourCells = neighbourCells.stream().map(p-> p.setNewValues(Math.floorMod(p.getLeft(),cellsQuantity), Math.floorMod(p.getRight(),cellsQuantity))).collect(Collectors.toList());
+        }
+
+        //Get neighbours
+        for(Pair <Integer,Integer> cell : neighbourCells){
+            neighbours.addAll(matrix.get(cell.getLeft()).get(cell.getRight()).stream().filter(p -> !p.equals(particle) && particle.calculateDistanceTo(p)< neighbourRadius)
+                    .collect(Collectors.toList()));
+        }
+
+        return neighbours;
+
     }
 
     private List<List<List<Particle>>> setMatrix(List<Particle> particlesToInsert){

@@ -15,4 +15,25 @@ public class Pair <T,V> {
         return right;
     }
 
+    public void setLeft(T left) {
+        this.left = left;
+    }
+
+    public void setRight(V right) {
+        this.right = right;
+    }
+
+    public Pair<T,V> setNewValues(T left, V right){
+        setLeft(left);
+        setRight(right);
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Pair{" +
+                "left=" + left +
+                ", right=" + right +
+                '}';
+    }
 }

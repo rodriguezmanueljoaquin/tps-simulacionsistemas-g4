@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SimulationExample {
     private static int boxLength;
@@ -22,12 +23,20 @@ public class SimulationExample {
         int boxLength = 5;//TODO: HACER VARIABLE //L
         double neighbourRadius = 0.5; //rc
         int M = 4;
-        
+
 
         List<Particle> particles = createRandomParticles(N,boxLength);
-        Population population = new Population(particles,M,boxLength,neighbourRadius );
+        Population population = new Population(particles,M,boxLength,neighbourRadius,true );
 
         System.out.println(population);
+
+        Pair<Map<Integer, List<Particle>>, Long> results = population.getResults();
+
+        //Neighbours
+        System.out.println(results.getLeft());
+
+        //Execution time
+        System.out.println("Exec time : "+results.getRight());
 
 
     }

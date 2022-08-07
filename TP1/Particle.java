@@ -1,4 +1,4 @@
-
+import java.util.Objects;
 
 public class Particle {
     private static final Double radius = 0.25; // TODO: SACAR A OTRA FILE
@@ -26,6 +26,19 @@ public class Particle {
 
     public Integer getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Particle particle = (Particle) o;
+        return Objects.equals(id, particle.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
