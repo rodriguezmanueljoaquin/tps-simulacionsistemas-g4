@@ -19,11 +19,16 @@ public class SimulationExample {
 
     public static void main(String[] args) {
         int N = 20; //TODO: HACER VARIABLE
-        int boxLength = 5;//TODO: HACER VARIABLE
-        double neighbourRadius = 0.5;
+        int boxLength = 5;//TODO: HACER VARIABLE //L
+        double neighbourRadius = 0.5; //rc
         int M = 4;
+        
 
         List<Particle> particles = createRandomParticles(N,boxLength);
-//        Population population = new Population(particles, )
+        Population population = new Population(particles,M,boxLength,neighbourRadius );
+
+        System.out.println(population);
+
+
     }
 }

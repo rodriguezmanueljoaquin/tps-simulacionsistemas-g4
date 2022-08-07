@@ -1,17 +1,18 @@
 public class Pair <T,V> {
-    private T right;
-    private V left;
+    private T left;
+    private V right;
 
-    public Pair(T right, V left) {
+    public Pair(T left, V right) {
         this.right = right;
         this.left = left;
     }
 
-    public T getRight() {
+    public T getLeft() {
+        return left;
+    }
+
+    public V getRight() {
         return right;
     }
 
-    public V getLeft() {
-        return left;
-    }
 }

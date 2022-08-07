@@ -27,4 +27,14 @@ public class Particle {
     public Integer getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+
+        return "Particle{ position:(" +
+                "x=" + x +
+                ", y=" + y +
+                "), id=" + id +
+                '}';
+    }
 }
