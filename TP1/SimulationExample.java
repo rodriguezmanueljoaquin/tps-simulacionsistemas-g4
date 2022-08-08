@@ -5,9 +5,10 @@ import java.util.stream.Collectors;
 public class SimulationExample {
     static int  N;
     static int  boxLength;
-    static double neighbourRadius = 0.5; //rc
-    static int M = 40;
+    static double neighbourRadius = 0.1; //rc
+    static int cellsQuantity = 40;
     static double time= 0;
+    static boolean periodicConditions = false;
 
 
     private static List<Particle> createRandomParticles(int N, int boxLength) {
@@ -48,38 +49,35 @@ public class SimulationExample {
         AdministrationFile administrationFile = new AdministrationFile();
         administrationFile.generatorFile();
 
-        System.out.println("L/M = " + (double) boxLength/M +"   rc = " + neighbourRadius);
         List<Particle> particles =  processFileParticles();
+        System.out.println("L/M = " + (double) boxLength/ cellsQuantity +"   rc = " + neighbourRadius + "    N = " + particles.size());
+        particles = particles.subList(0,4); //TESTING
         Population population = new Population(particles, neighbourRadius, boxLength);
 
 //        System.out.println(population);
 
         System.out.println("===== CELL INDEX METHOD =====");
 
-        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(M, false);
-
-        //Neighbours
-//        System.out.println(resultsCellIndexMethod.getLeft());
+        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(cellsQuantity, periodicConditions);
 
         //Execution time
         System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
 
+
         System.out.println("===== BRUTE FORCE METHOD =====");
-
-        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(false);
-
-        //Neighbours
-//        System.out.println(resultsCellIndexMethod.getLeft());
+        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(periodicConditions);
 
         //Execution time
         System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
 
+
+//        //Neighbours
+        System.out.println(resultsBruteForceMethod.getLeft());
+        System.out.println(resultsCellIndexMethod.getLeft());
+
         System.out.println("Results are " +
                 ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft()))? "":"not ") +
                 "equal");
-
-//        System.out.println(resultsBruteForceMethod.getLeft());
-//        System.out.println(resultsCellIndexMethod.getLeft());
 
         //Create output file
         createOutputFile(resultsCellIndexMethod.getLeft());

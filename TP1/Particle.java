@@ -7,16 +7,30 @@ public class Particle {
     private static Integer count = 1;
     private final Integer id;
 
-    public Particle(Double x, Double y,double radius) {
+    public Particle(Double x, Double y, double radius) {
         this.x = x;
         this.y = y;
         this.id = count++;
         this.radius = radius;
     }
 
-    Double calculateDistanceTo(Particle other) {
+    public Double calculateDistanceTo(Particle other) {
         return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - 2 * this.radius;
     }
+
+    public Double calculateDistancePeriodicTo(Particle other, int boxLength) {
+        double minDistance = Math.hypot(this.getX() - other.getX(), this.getY() - other.getY());
+
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                minDistance = Math.min(minDistance,
+                        Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength));
+            }
+        }
+
+        return minDistance - this.radius - other.radius;
+    }
+
 
     public Double getX() {
         return x;
@@ -47,8 +61,8 @@ public class Particle {
     public String toString() {
 
         return "Particle{ position:(" +
-                "x=" + Math.floor(x*100)/100 +
-                ", y=" + Math.floor(y*100)/100 +
+                "x=" + Math.floor(x * 100) / 100 +
+                ", y=" + Math.floor(y * 100) / 100 +
                 "), id=" + id +
                 '}';
     }
