@@ -1,13 +1,14 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SimulationExample {
+    static int  N;
+    static int  boxLength;
+    static double neighbourRadius = 0.5; //rc
+    static int M = 40;
+    static double time= 0;
+
 
     private static List<Particle> createRandomParticles(int N, int boxLength) {
         double x, y;
@@ -16,7 +17,7 @@ public class SimulationExample {
         for (int i = 0; i < N; i++) {
             x = Math.random() * boxLength;
             y = Math.random() * boxLength;
-            particles.add(new Particle(x, y));
+            particles.add(new Particle(x, y,0.25));
         }
 
         return particles;
@@ -31,14 +32,21 @@ public class SimulationExample {
     }
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+       /*
         int N = 3000; //TODO: HACER VARIABLE
         int boxLength = 50;//TODO: HACER VARIABLE //L
         double neighbourRadius = 0.5; //rc
         int M = 40;
 
+
         System.out.println("L/M = " + (double) boxLength/M +"   rc = " + neighbourRadius);
 
         List<Particle> particles = createRandomParticles(N, boxLength);
+
+        */
+
+        System.out.println("L/M = " + (double) boxLength/M +"   rc = " + neighbourRadius);
+        List<Particle> particles =  processFileParticles();
         Population population = new Population(particles, neighbourRadius, boxLength);
 
 //        System.out.println(population);
@@ -75,4 +83,33 @@ public class SimulationExample {
 
 
     }
+
+
+
+    public static List<Particle> processFileParticles(){
+        List<Particle> particles = new ArrayList<>();
+        try {
+            Scanner dynamicScanner = new Scanner(new File("Dynamic.txt"));
+            Scanner staticScanner = new Scanner(new File("Static.txt"));
+            time = Double.parseDouble(dynamicScanner.next());
+            N = Integer.parseInt(staticScanner.next());
+            boxLength = Integer.parseInt(staticScanner.next());
+
+
+            while (dynamicScanner.hasNext() && staticScanner.hasNext()) {
+                particles.add(new Particle(Double.valueOf(dynamicScanner.next()),Double.valueOf(dynamicScanner.next()),Double.valueOf(staticScanner.next())));
+            }
+
+            dynamicScanner.close();
+            staticScanner.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return particles;
+
+
+    }
+
+
 }

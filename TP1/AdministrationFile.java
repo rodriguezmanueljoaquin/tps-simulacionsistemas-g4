@@ -1,8 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class AdministrationFile {
 
@@ -17,9 +14,9 @@ public class AdministrationFile {
 
     private void createRandomParticlesFile(BufferedWriter file,int multiple,String format) throws IOException {
         for (int i = 0; i < N; i++) {
-            file.write(String.format(format,Math.random() * multiple));
+            file.write(String.format(Locale.ENGLISH,format,Math.random() * multiple));
             file.write(" ");
-            file.write(String.format(format,Math.random() * multiple));
+            file.write(String.format(Locale.ENGLISH,format,Math.random() * multiple));
             file.newLine();
         }
 
@@ -48,6 +45,7 @@ public class AdministrationFile {
             e.printStackTrace();
         }
     }
+    public void processFiles(){}
 
     public static void main(String[] args) {
         AdministrationFile administrationFile = new AdministrationFile();
