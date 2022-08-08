@@ -45,12 +45,5 @@ public class AdministrationFile {
             e.printStackTrace();
         }
     }
-    public void processFiles(){}
-
-    public static void main(String[] args) {
-        AdministrationFile administrationFile = new AdministrationFile();
-        administrationFile.generatorFile();
-    }
-
 
 }

@@ -45,6 +45,9 @@ public class SimulationExample {
 
         */
 
+        AdministrationFile administrationFile = new AdministrationFile();
+        administrationFile.generatorFile();
+
         System.out.println("L/M = " + (double) boxLength/M +"   rc = " + neighbourRadius);
         List<Particle> particles =  processFileParticles();
         Population population = new Population(particles, neighbourRadius, boxLength);
