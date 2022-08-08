@@ -1,4 +1,4 @@
-public class Pair <T,V> {
+public class Pair<T, V> {
     private T left;
     private V right;
 
@@ -23,7 +23,7 @@ public class Pair <T,V> {
         this.right = right;
     }
 
-    public Pair<T,V> setNewValues(T left, V right){
+    public Pair<T, V> setNewValues(T left, V right) {
         setLeft(left);
         setRight(right);
         return this;

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SimulationExample {
-    private static int boxLength;
 
     private static List<Particle> createRandomParticles(int N, int boxLength) {
         double x, y;
@@ -23,10 +22,10 @@ public class SimulationExample {
         return particles;
     }
 
-    private static void createOutputFile(Map<Integer,Set<Particle>> neighboursMap) throws FileNotFoundException, UnsupportedEncodingException {
+    private static void createOutputFile(Map<Integer, Set<Particle>> neighboursMap) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter("neighbours.txt", "UTF-8");
-        for(Map.Entry<Integer,Set<Particle>> entry : neighboursMap.entrySet()){
-            writer.println("[ Id = "+entry.getKey()+" ; neighbours = "+entry.getValue().stream().map(p -> p.getId().toString()).collect(Collectors.joining(", "))+"]");
+        for (Map.Entry<Integer, Set<Particle>> entry : neighboursMap.entrySet()) {
+            writer.println("[ Id = " + entry.getKey() + " ; neighbours = " + entry.getValue().stream().map(p -> p.getId().toString()).collect(Collectors.joining(", ")) + "]");
         }
         writer.close();
     }
@@ -38,18 +37,18 @@ public class SimulationExample {
         int M = 4;
 
 
-        List<Particle> particles = createRandomParticles(N,boxLength);
-        Population population = new Population(particles,M,boxLength,neighbourRadius,true );
+        List<Particle> particles = createRandomParticles(N, boxLength);
+        Population population = new Population(particles, neighbourRadius, boxLength);
 
         System.out.println(population);
 
-        Pair<Map<Integer, Set<Particle>>, Long> results = population.getResults();
+        Pair<Map<Integer, Set<Particle>>, Long> results = population.getResultsCellIndexMethod(M, false);
 
         //Neighbours
         System.out.println(results.getLeft());
 
         //Execution time
-        System.out.println("Exec time : "+results.getRight());
+        System.out.println("Exec time : " + results.getRight());
 
         //Create output file
         createOutputFile(results.getLeft());

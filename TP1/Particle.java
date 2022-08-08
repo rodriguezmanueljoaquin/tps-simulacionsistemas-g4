@@ -2,9 +2,10 @@ import java.util.Objects;
 
 public class Particle {
     private static final Double radius = 0.25; // TODO: SACAR A OTRA FILE
-    private Double x,y;
+    private final Double x;
+    private final Double y;
     private static Integer count = 1;
-    private Integer id;
+    private final Integer id;
 
     public Particle(Double x, Double y) {
         this.x = x;
@@ -13,7 +14,7 @@ public class Particle {
     }
 
     Double calculateDistanceTo(Particle other) {
-        return  Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - 2 * Particle.radius;
+        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - 2 * Particle.radius;
     }
 
     public Double getX() {
@@ -45,8 +46,8 @@ public class Particle {
     public String toString() {
 
         return "Particle{ position:(" +
-                "x=" + x +
-                ", y=" + y +
+                "x=" + Math.floor(x*100)/100 +
+                ", y=" + Math.floor(y*100)/100 +
                 "), id=" + id +
                 '}';
     }
