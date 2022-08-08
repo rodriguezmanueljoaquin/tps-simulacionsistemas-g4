@@ -31,27 +31,47 @@ public class SimulationExample {
     }
 
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        int N = 20; //TODO: HACER VARIABLE
-        int boxLength = 5;//TODO: HACER VARIABLE //L
+        int N = 3000; //TODO: HACER VARIABLE
+        int boxLength = 50;//TODO: HACER VARIABLE //L
         double neighbourRadius = 0.5; //rc
-        int M = 4;
+        int M = 40;
 
+        System.out.println("L/M = " + (double) boxLength/M +"   rc = " + neighbourRadius);
 
         List<Particle> particles = createRandomParticles(N, boxLength);
         Population population = new Population(particles, neighbourRadius, boxLength);
 
-        System.out.println(population);
+//        System.out.println(population);
 
-        Pair<Map<Integer, Set<Particle>>, Long> results = population.getResultsCellIndexMethod(M, false);
+        System.out.println("===== CELL INDEX METHOD =====");
+
+        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(M, false);
 
         //Neighbours
-        System.out.println(results.getLeft());
+//        System.out.println(resultsCellIndexMethod.getLeft());
 
         //Execution time
-        System.out.println("Exec time : " + results.getRight());
+        System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
+
+        System.out.println("===== BRUTE FORCE METHOD =====");
+
+        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(false);
+
+        //Neighbours
+//        System.out.println(resultsCellIndexMethod.getLeft());
+
+        //Execution time
+        System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
+
+        System.out.println("Results are " +
+                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft()))? "":"not ") +
+                "equal");
+
+//        System.out.println(resultsBruteForceMethod.getLeft());
+//        System.out.println(resultsCellIndexMethod.getLeft());
 
         //Create output file
-        createOutputFile(results.getLeft());
+        createOutputFile(resultsCellIndexMethod.getLeft());
 
 
     }

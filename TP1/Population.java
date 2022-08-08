@@ -15,6 +15,25 @@ public class Population {
         this.boxLength = boxLength;
     }
 
+    public Pair<Map<Integer, Set<Particle>>, Long> getResultsBruteForceMethod(boolean periodicConditions) {
+        return new Pair<>(
+                getNeighboursBruteForceMethod(periodicConditions),
+                System.currentTimeMillis() - startExecutionTime);
+    }
+
+    private Map<Integer, Set<Particle>> getNeighboursBruteForceMethod(boolean periodicConditions) {
+        Map<Integer, Set<Particle>> neighbours = new HashMap<>();
+
+        particles.forEach(particle -> {
+            Set<Particle> particleNeighbours = particles.stream()
+                    .filter(p -> !p.equals(particle) && particle.calculateDistanceTo(p) < neighbourRadius)
+                    .collect(Collectors.toSet());
+            neighbours.put(particle.getId(), particleNeighbours);
+        });
+
+        return neighbours;
+    }
+
     public Pair<Map<Integer, Set<Particle>>, Long> getResultsCellIndexMethod(int cellsQuantity, boolean periodicConditions) {
         return new Pair<>(
                 getNeighboursCellIndexMethod(cellsQuantity, periodicConditions),
