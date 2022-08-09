@@ -26,7 +26,7 @@ public class Population {
 
         particles.forEach(particle -> {
             Set<Particle> particleNeighbours = particles.stream()
-                    .filter(p -> !p.equals(particle) && particle.calculateDistanceTo(p) < neighbourRadius)
+                    .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions))
                     .collect(Collectors.toSet());
             neighbours.put(particle.getId(), particleNeighbours);
         });
@@ -75,20 +75,20 @@ public class Population {
         neighbourCells.add(new Pair<>(position.getLeft(), position.getRight() + 1)); //(0,1)
         neighbourCells.add(new Pair<>(position.getLeft() - 1, position.getRight() + 1)); //(-1,1)
 
-        if (!periodicConditions) {
+        if (periodicConditions) {
             neighbourCells = neighbourCells.stream()
-                    .filter(p -> p.getLeft() >= 0 && p.getRight() >= 0 && p.getLeft() < cellsQuantity && p.getRight() < cellsQuantity)
+                    .map(p -> p.setNewValues(Math.floorMod(p.getLeft(), cellsQuantity), Math.floorMod(p.getRight(), cellsQuantity)))
                     .collect(Collectors.toList());
         } else {
             neighbourCells = neighbourCells.stream()
-                    .map(p -> p.setNewValues(Math.floorMod(p.getLeft(), cellsQuantity), Math.floorMod(p.getRight(), cellsQuantity)))
+                    .filter(p -> p.getLeft() >= 0 && p.getRight() >= 0 && p.getLeft() < cellsQuantity && p.getRight() < cellsQuantity)
                     .collect(Collectors.toList());
         }
 
         //Get neighbours
         for (Pair<Integer, Integer> cell : neighbourCells) {
             neighbours.addAll(matrix.get(cell.getLeft()).get(cell.getRight()).stream()
-                    .filter(p -> !p.equals(particle) && particle.calculateDistanceTo(p) < neighbourRadius)
+                    .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions))
                     .collect(Collectors.toSet()));
         }
 

@@ -3,11 +3,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SimulationExample {
-    static int  N;
-    static int  boxLength;
-    static double neighbourRadius = 0.5; //rc
-    static int M = 40;
-    static double time= 0;
+    static int N;
+    static int boxLength;
+    static double neighbourRadius = 0.1; //rc
+    static int cellsQuantity = 4;
+    static double time = 0;
+    static boolean periodicConditions = false;
+    static double PARTICLE_RADIUS = 0.25;
 
 
     private static List<Particle> createRandomParticles(int N, int boxLength) {
@@ -17,7 +19,7 @@ public class SimulationExample {
         for (int i = 0; i < N; i++) {
             x = Math.random() * boxLength;
             y = Math.random() * boxLength;
-            particles.add(new Particle(x, y,0.25));
+            particles.add(new Particle(x, y, PARTICLE_RADIUS));
         }
 
         return particles;
@@ -48,38 +50,35 @@ public class SimulationExample {
         AdministrationFile administrationFile = new AdministrationFile();
         administrationFile.generatorFile();
 
-        System.out.println("L/M = " + (double) boxLength/M +"   rc = " + neighbourRadius);
-        List<Particle> particles =  processFileParticles();
+        List<Particle> particles = processFileParticles();
+        System.out.println("L/M = " + boxLength + "/" + cellsQuantity + " = " + (double) boxLength / cellsQuantity + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
+        //particles = particles.subList(0, 2); //TESTING
         Population population = new Population(particles, neighbourRadius, boxLength);
 
 //        System.out.println(population);
 
         System.out.println("===== CELL INDEX METHOD =====");
 
-        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(M, false);
-
-        //Neighbours
-//        System.out.println(resultsCellIndexMethod.getLeft());
+        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(cellsQuantity, periodicConditions);
 
         //Execution time
         System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
 
+
         System.out.println("===== BRUTE FORCE METHOD =====");
-
-        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(false);
-
-        //Neighbours
-//        System.out.println(resultsCellIndexMethod.getLeft());
+        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(periodicConditions);
 
         //Execution time
         System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
 
-        System.out.println("Results are " +
-                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft()))? "":"not ") +
-                "equal");
 
-//        System.out.println(resultsBruteForceMethod.getLeft());
-//        System.out.println(resultsCellIndexMethod.getLeft());
+        //Neighbours
+/*        System.out.println(resultsCellIndexMethod.getLeft());
+        System.out.println(resultsBruteForceMethod.getLeft());*/
+
+        System.out.println("Results are " +
+                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft())) ? "" : "not ") +
+                "equal");
 
         //Create output file
         createOutputFile(resultsCellIndexMethod.getLeft());
@@ -88,8 +87,7 @@ public class SimulationExample {
     }
 
 
-
-    public static List<Particle> processFileParticles(){
+    public static List<Particle> processFileParticles() {
         List<Particle> particles = new ArrayList<>();
         try {
             Scanner dynamicScanner = new Scanner(new File("Dynamic.txt"));
