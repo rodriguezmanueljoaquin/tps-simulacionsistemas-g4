@@ -15,7 +15,7 @@ public class Particle {
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - 2 * this.radius;
+        return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - this.radius - other.radius);
     }
 
     public Double calculateDistancePeriodicTo(Particle other, int boxLength) {
@@ -23,12 +23,11 @@ public class Particle {
 
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
-                minDistance = Math.min(minDistance,
-                        Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength));
+                minDistance = Math.min(minDistance, Math.max(0,
+                        Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength) - this.radius - other.radius));
             }
         }
-
-        return minDistance - this.radius - other.radius;
+        return minDistance;
     }
 
 
@@ -42,6 +41,10 @@ public class Particle {
 
     public Integer getId() {
         return id;
+    }
+
+    public Double getRadius() {
+        return radius;
     }
 
     @Override
