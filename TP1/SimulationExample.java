@@ -101,6 +101,7 @@ public class SimulationExample {
 
             while (dynamicScanner.hasNext() && staticScanner.hasNext()) {
                 particles.add(new Particle(Double.valueOf(dynamicScanner.next()),Double.valueOf(dynamicScanner.next()),Double.valueOf(staticScanner.next())));
+                staticScanner.next();
             }
 
             dynamicScanner.close();
