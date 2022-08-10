@@ -77,11 +77,11 @@ public class Population {
 
         if (periodicConditions) {
             neighbourCells = neighbourCells.stream()
-                    .map(p -> p.setNewValues(Math.floorMod(p.getLeft(), cellsQuantity), Math.floorMod(p.getRight(), cellsQuantity)))
+                    .map(cell -> cell.setNewValues(Math.floorMod(cell.getLeft(), cellsQuantity), Math.floorMod(cell.getRight(), cellsQuantity)))
                     .collect(Collectors.toList());
         } else {
             neighbourCells = neighbourCells.stream()
-                    .filter(p -> p.getLeft() >= 0 && p.getRight() >= 0 && p.getLeft() < cellsQuantity && p.getRight() < cellsQuantity)
+                    .filter(cell -> cell.getLeft() >= 0 && cell.getRight() >= 0 && cell.getLeft() < cellsQuantity && cell.getRight() < cellsQuantity)
                     .collect(Collectors.toList());
         }
 
