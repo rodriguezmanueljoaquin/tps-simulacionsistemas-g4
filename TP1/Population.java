@@ -26,7 +26,7 @@ public class Population {
 
         particles.forEach(particle -> {
             Set<Particle> particleNeighbours = particles.stream()
-                    .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions))
+                    .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions, false))
                     .collect(Collectors.toSet());
             neighbours.put(particle.getId(), particleNeighbours);
         });
@@ -88,7 +88,7 @@ public class Population {
         //Get neighbours
         for (Pair<Integer, Integer> cell : neighbourCells) {
             neighbours.addAll(matrix.get(cell.getLeft()).get(cell.getRight()).stream()
-                    .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions))
+                    .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions, true))
                     .collect(Collectors.toSet()));
         }
 
