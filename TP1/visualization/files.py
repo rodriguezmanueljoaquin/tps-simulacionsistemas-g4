@@ -25,7 +25,7 @@ def __readDynamicInputFile(dynamicInputFilePath,particlesDict):
         else:
             if(lineCount!=0):
                 position = line.split()
-                particle = Particle(position[0],position[1])
+                particle = Particle(float(position[0]),float(position[1]))
                 particlesDict[particle.id] = particle
             lineCount += 1
 

@@ -2,6 +2,7 @@ import argparse
 
 
 from files import readInputFiles
+from graph import makeParticlesGraph
 
 def main():
     argsValid = False
@@ -19,21 +20,23 @@ def main():
             staticInputFilePath = args.staticInputFilePath
             dynamicInputFilePath = args.dynamicInputFilePath
             neighboursInputFilePath = args.neighboursInputFilePath
-            particleId = args.particleId
+            particleId = int(args.particleId)
             argsValid = True
     except Exception as e:
         print("Error in command line arguments")
         print(e)
 
     if(argsValid):
+        ##Leemos los archivos de input
         readInputFiles(dynamicInputFilePath,staticInputFilePath,neighboursInputFilePath,particlesDict,neighboursDict,graphPropertiesDict)
-        ##Imprimimos los dict
-        ###Particles
-        print(particlesDict)
-        ###Neighbours
-        print(neighboursDict)
-        ###GraphProperties
-        print(graphPropertiesDict)
+
+        ##Chequeamos que la particula exista
+        if(particlesDict.get(particleId)):
+            ##Imprimimos el grafico
+            makeParticlesGraph(particlesDict,neighboursDict,graphPropertiesDict,particleId)
+        else:
+            print("Particle "+str(particleId)+" does not exist")
+
 
     else:
         print("Invalid command line arguments")
