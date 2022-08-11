@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 
 def makeParticlesGraph(particlesDict,neighboursDict,graphPropertiesDict,particleId):
     L = graphPropertiesDict.get('L')
-    plt.figure(figsize=(L, L))
+    fig = plt.figure()
+    ax = plt.axes(xlim=(0, L), ylim=(0, L), aspect=True)
     
     principalNeighbours = neighboursDict.get(particleId)
 
@@ -11,9 +12,11 @@ def makeParticlesGraph(particlesDict,neighboursDict,graphPropertiesDict,particle
     for id,particle in particlesDict.items():
         x = particle.x
         y = particle.y
+        radius = particle.radius
         particleColor = __getParticleColor(id,particleId,principalNeighbours)
-        plt.scatter(x,y,color=particleColor)
-        plt.annotate(id,(x,y))
+        circle = plt.Circle((x,y),radius,facecolor=particleColor)
+        ax.add_patch(circle)
+        ax.annotate(id,(x,y))
 
     plt.show()
 
@@ -21,7 +24,7 @@ def makeParticlesGraph(particlesDict,neighboursDict,graphPropertiesDict,particle
 def __getParticleColor(currentParticleId,principalParticleId,principalParticleNeighbours):
     
     if(currentParticleId==principalParticleId):
-        return 'green'
+        return 'g'
     if(currentParticleId in principalParticleNeighbours):
-        return 'red'
-    return 'blue'
+        return 'r'
+    return 'b'

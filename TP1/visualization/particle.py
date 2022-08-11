@@ -13,7 +13,7 @@ class Particle:
         return self.id == other.id
 
     def __str__(self):
-        return "{Id="+str(self.id)+";position=("+str(self.x)+";"+str(self.y)+")}"
+        return "{Id="+str(self.id)+";position=("+str(self.x)+";"+str(self.y)+");radius="+str(self.radius)+"}"
 
     def __repr__(self):
         return self.__str__()
