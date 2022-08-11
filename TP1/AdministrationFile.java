@@ -6,8 +6,8 @@ public class AdministrationFile {
     private int particlesQuantity;
 
     public AdministrationFile(){
-        Random random = new Random();
-        particlesQuantity = random.nextInt(Constants.MAX_PARTICLES_QUANTITY - Constants.MIN_PARTICLES_QUANTITY + 1) + Constants.MIN_PARTICLES_QUANTITY; //create random between 10 and 300
+        Random random = new Random(Constants.RANDOM_SEED);
+        particlesQuantity = random.nextInt(Constants.PARTICLES_QUANTITY + 1); //create random between 10 and 300
     }
 
     private void createRandomParticlesFile(BufferedWriter file,double multiple,String format) throws IOException {
