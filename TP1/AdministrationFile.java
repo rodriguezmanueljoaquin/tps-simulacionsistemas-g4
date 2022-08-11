@@ -19,7 +19,7 @@ public class AdministrationFile {
         }
     }
 
-    public void generatorFile(){
+    public void generatorFile(boolean generateStaticFile){
         try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter("Dynamic.txt"));
                 bw.write(String.valueOf(0)); // tiempo = 0
@@ -27,15 +27,17 @@ public class AdministrationFile {
                 createRandomParticlesFile(bw, Constants.BOX_LENGTH, "%6.8e");
                 bw.close();
 
-                bw = new BufferedWriter(new FileWriter("Static.txt"));
-                bw.write(String.valueOf(particlesQuantity));
-                bw.newLine();
-                bw.write(String.valueOf(Constants.BOX_LENGTH));
-                bw.newLine();
-                bw.write(String.valueOf(Constants.NEIGHBOUR_RADIUS));
-                bw.newLine();
-                createRandomParticlesFile(bw, Constants.MAX_PARTICLE_RADIUS, "%.4f");
-                bw.close();
+                if(generateStaticFile){
+                    bw = new BufferedWriter(new FileWriter("Static.txt"));
+                    bw.write(String.valueOf(particlesQuantity));
+                    bw.newLine();
+                    bw.write(String.valueOf(Constants.BOX_LENGTH));
+                    bw.newLine();
+                    bw.write(String.valueOf(Constants.NEIGHBOUR_RADIUS));
+                    bw.newLine();
+                    createRandomParticlesFile(bw, Constants.MAX_PARTICLE_RADIUS, "%.4f");
+                    bw.close();
+                }
         } catch (IOException e) {
             e.printStackTrace();
         }

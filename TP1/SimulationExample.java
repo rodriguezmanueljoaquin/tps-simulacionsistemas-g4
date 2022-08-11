@@ -16,11 +16,11 @@ public class SimulationExample {
     }
 
 
-    public static List<Particle> processFileParticles() {
+    public static List<Particle> processFileParticles(Pair<String,String> filepaths) {
         List<Particle> particles = new ArrayList<>();
         try {
-            Scanner dynamicScanner = new Scanner(new File("Dynamic.txt"));
-            Scanner staticScanner = new Scanner(new File("Static.txt"));
+            Scanner dynamicScanner = new Scanner(new File(filepaths.getRight()));
+            Scanner staticScanner = new Scanner(new File(filepaths.getLeft()));
             time = Double.parseDouble(dynamicScanner.next());
             particlesQuantity = Integer.parseInt(staticScanner.next());
             boxLength = Integer.parseInt(staticScanner.next());
@@ -40,11 +40,38 @@ public class SimulationExample {
         return particles;
     }
 
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        AdministrationFile administrationFile = new AdministrationFile();
-        administrationFile.generatorFile();
+    private static Pair<String,String> getFilepaths(String[] args){
 
-        List<Particle> particles = processFileParticles();
+        Pair<String,String> filepaths;
+
+        switch (args.length) {
+            case 0:
+                filepaths = new Pair<>("Static.txt", "Dynamic.txt");
+                break;
+            case 1:
+                filepaths = new Pair<>(args[0], "Dynamic.txt");
+                break;
+            case 2:
+                filepaths = new Pair<>(args[0], args[1]);
+                break;
+            default:
+                throw new IllegalArgumentException("Only two arguments are allowed!");
+        };
+
+        return filepaths;
+
+    }
+
+    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+
+        Pair<String,String> filepaths = getFilepaths(args);
+
+        if(args.length!=2){
+            AdministrationFile administrationFile = new AdministrationFile();
+            administrationFile.generatorFile(args.length == 0);
+        }
+
+        List<Particle> particles = processFileParticles(filepaths);
         //System.out.println("L/M = " + boxLength + "/" + Constants.CELLS_QUANTITY + " = " + (double) boxLength / Constants.CELLS_QUANTITY + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
         Population population = new Population(particles, Constants.NEIGHBOUR_RADIUS, boxLength);
         if((double) boxLength/ Constants.CELLS_QUANTITY <= Constants.NEIGHBOUR_RADIUS + 2*Constants.MAX_PARTICLE_RADIUS)
