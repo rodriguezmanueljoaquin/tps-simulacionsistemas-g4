@@ -15,37 +15,6 @@ public class SimulationExample {
         writer.close();
     }
 
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
-        AdministrationFile administrationFile = new AdministrationFile();
-        administrationFile.generatorFile();
-
-        List<Particle> particles = processFileParticles();
-        //System.out.println("L/M = " + boxLength + "/" + Constants.CELLS_QUANTITY + " = " + (double) boxLength / Constants.CELLS_QUANTITY + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
-        Population population = new Population(particles, Constants.NEIGHBOUR_RADIUS, boxLength);
-
-        System.out.println("===== CELL INDEX METHOD =====");
-        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(Constants.CELLS_QUANTITY, Constants.PERIODIC_CONDITIONS);
-
-        //Execution time
-        System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
-        //System.out.println(resultsCellIndexMethod.getLeft());
-
-
-        System.out.println("===== BRUTE FORCE METHOD =====");
-        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(Constants.PERIODIC_CONDITIONS);
-
-        //Execution time
-        System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
-        //System.out.println(resultsBruteForceMethod.getLeft());
-
-        System.out.println("\nResults are " +
-                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft())) ? "" : "not ") + "equal");
-
-        //Create output file
-        createOutputFile(resultsCellIndexMethod.getLeft(), "cellIndex_neighbours");
-        createOutputFile(resultsBruteForceMethod.getLeft(), "bruteForce_neighbours");
-    }
-
 
     public static List<Particle> processFileParticles() {
         List<Particle> particles = new ArrayList<>();
@@ -70,4 +39,38 @@ public class SimulationExample {
 
         return particles;
     }
+
+    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+        AdministrationFile administrationFile = new AdministrationFile();
+        administrationFile.generatorFile();
+
+        List<Particle> particles = processFileParticles();
+        //System.out.println("L/M = " + boxLength + "/" + Constants.CELLS_QUANTITY + " = " + (double) boxLength / Constants.CELLS_QUANTITY + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
+        Population population = new Population(particles, Constants.NEIGHBOUR_RADIUS, boxLength);
+        if((double) boxLength/ Constants.CELLS_QUANTITY <= Constants.NEIGHBOUR_RADIUS + 2*Constants.MAX_PARTICLE_RADIUS)
+            System.out.println("WARNING: Condition L/M > RC + 2*maxParticleRadius is not being fullfilled, the CellIndexMethod may not work correctly");
+
+        System.out.println("===== CELL INDEX METHOD =====");
+        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(Constants.CELLS_QUANTITY, Constants.PERIODIC_CONDITIONS);
+
+        //Execution time
+        System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
+        //System.out.println(resultsCellIndexMethod.getLeft());
+
+
+        System.out.println("===== BRUTE FORCE METHOD =====");
+        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(Constants.PERIODIC_CONDITIONS);
+
+        //Execution time
+        System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
+        //System.out.println(resultsBruteForceMethod.getLeft());
+
+        System.out.println("\nResults are " +
+                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft())) ? "" : "not ") + "equal");
+
+        //Create output file
+        createOutputFile(resultsCellIndexMethod.getLeft(), "cellIndex_neighbours");
+        createOutputFile(resultsBruteForceMethod.getLeft(), "bruteForce_neighbours");
+    }
+
 }
