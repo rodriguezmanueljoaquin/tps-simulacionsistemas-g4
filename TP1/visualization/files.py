@@ -43,8 +43,13 @@ def __readNeighboursInputFile(neighboursInputFilePath,neighboursDict):
             read = False
         else:
             ##Pedimos la particula y sus vecinos correspondientes
-            currentParticleId = int(line.split(";")[0].split("=")[1].strip())
-            neighbours = list(map(int,line.split(";")[1].split("=")[1].replace(']','').split(",")))
+            currentParticleId = int(line.split(";")[0])
+            neighbours = line.split(";")[1].split(",")
+            neighbours[-1] = neighbours[-1].strip()
+            if(len(neighbours)==1 and neighbours[0]==''):
+                neighbours = list()
+            else:
+                neighbours = list(map(int,neighbours))
 
             ##Insertamos en el diccionario
             neighboursDict[currentParticleId] = neighbours

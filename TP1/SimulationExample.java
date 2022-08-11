@@ -13,7 +13,7 @@ public class SimulationExample {
     private static void createOutputFile(Map<Integer, Set<Particle>> neighboursMap) throws FileNotFoundException, UnsupportedEncodingException {
         PrintWriter writer = new PrintWriter("neighbours.txt", "UTF-8");
         for (Map.Entry<Integer, Set<Particle>> entry : neighboursMap.entrySet()) {
-            writer.println("[ Id = " + entry.getKey() + " ; neighbours = " + entry.getValue().stream().map(p -> p.getId().toString()).collect(Collectors.joining(",")) + "]");
+            writer.println(entry.getKey() + ";" + entry.getValue().stream().map(p -> p.getId().toString()).collect(Collectors.joining(",")));
         }
         writer.close();
     }
