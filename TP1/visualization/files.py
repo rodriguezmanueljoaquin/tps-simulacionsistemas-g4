@@ -72,8 +72,6 @@ def __readStaticInputFile(staticInputFilePath,particlesDict,graphPropertiesDict)
                 graphPropertiesDict['N'] = int(line)
             elif(lineCount==1):
                 graphPropertiesDict['L'] = int(line)
-            elif(lineCount==2):
-                graphPropertiesDict['RC'] = float(line)
             else:
                 properties = line.split()
                 particlesDict.get(currentParticleId).setRadius(float(properties[0]))

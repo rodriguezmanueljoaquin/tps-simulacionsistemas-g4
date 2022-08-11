@@ -20,3 +20,11 @@ With the neighbours file created, which are named ´bruteForce_neighbours.txt´ 
 Generalyzing it would be:
 
 ```python visualization.py -s pathToStaticFile -d pathToDynamicFile -n pathToNeighboursFile -p particleId```
+
+An optional parameter can be passed to specify the neighbourhood radius (r<sub>c</sub>). If this one is passed, in the particles graph the neighbourhood perimeter with the current radius will be shown. To execute the program visualization with this parameter, you should run the next instruction:
+
+```python3 visualization.py -s ./../Static.txt -d ./../Dynamic.txt -n ./../cellIndex_neighbours.txt -p 7 -r 0.5```
+
+Generalyzing it would be:
+
+```python visualization.py -s pathToStaticFile -d pathToDynamicFile -n pathToNeighboursFile -p particleId -r neighbourhoodRadius```
