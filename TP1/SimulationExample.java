@@ -5,13 +5,10 @@ import java.util.stream.Collectors;
 public class SimulationExample {
     static int particlesQuantity;
     static int boxLength;
-    static double neighbourRadius = 0.1; //rc // TODO: HACER VARIABLE
-    static int cellsQuantity = 4;
     static double time = 0;
-    static boolean periodicConditions = true; // TODO: HACER VARIABLE
 
-    private static void createOutputFile(Map<Integer, Set<Particle>> neighboursMap) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter("neighbours.txt", "UTF-8");
+    private static void createOutputFile(Map<Integer, Set<Particle>> neighboursMap, String outputName) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter writer = new PrintWriter(outputName + ".txt", "UTF-8");
         for (Map.Entry<Integer, Set<Particle>> entry : neighboursMap.entrySet()) {
             writer.println(entry.getKey() + ";" + entry.getValue().stream().map(p -> p.getId().toString()).collect(Collectors.joining(",")));
         }
@@ -23,15 +20,11 @@ public class SimulationExample {
         administrationFile.generatorFile();
 
         List<Particle> particles = processFileParticles();
-        //System.out.println("L/M = " + boxLength + "/" + cellsQuantity + " = " + (double) boxLength / cellsQuantity + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
-        //particles = particles.subList(0, 2); //TESTING
-        Population population = new Population(particles, neighbourRadius, boxLength);
-
-//        System.out.println(population);
+        //System.out.println("L/M = " + boxLength + "/" + Constants.CELLS_QUANTITY + " = " + (double) boxLength / Constants.CELLS_QUANTITY + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
+        Population population = new Population(particles, Constants.NEIGHBOUR_RADIUS, boxLength);
 
         System.out.println("===== CELL INDEX METHOD =====");
-
-        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(cellsQuantity, periodicConditions);
+        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(Constants.CELLS_QUANTITY, Constants.PERIODIC_CONDITIONS);
 
         //Execution time
         System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
@@ -39,21 +32,18 @@ public class SimulationExample {
 
 
         System.out.println("===== BRUTE FORCE METHOD =====");
-        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(periodicConditions);
+        Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(Constants.PERIODIC_CONDITIONS);
 
         //Execution time
         System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
         //System.out.println(resultsBruteForceMethod.getLeft());
 
-
         System.out.println("\nResults are " +
-                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft())) ? "" : "not ") +
-                "equal");
+                ((resultsBruteForceMethod.getLeft().equals(resultsCellIndexMethod.getLeft())) ? "" : "not ") + "equal");
 
         //Create output file
-        createOutputFile(resultsCellIndexMethod.getLeft());
-
-
+        createOutputFile(resultsCellIndexMethod.getLeft(), "cellIndex_neighbours");
+        createOutputFile(resultsBruteForceMethod.getLeft(), "bruteForce_neighbours");
     }
 
 
@@ -79,9 +69,5 @@ public class SimulationExample {
         }
 
         return particles;
-
-
     }
-
-
 }

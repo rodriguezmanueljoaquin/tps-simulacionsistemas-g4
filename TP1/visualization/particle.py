@@ -27,3 +27,6 @@ class Particle:
     def setProperty(self,property):
         self.property = property
 
+    def getPosition(self):
+        return (self.x,self.y)
+

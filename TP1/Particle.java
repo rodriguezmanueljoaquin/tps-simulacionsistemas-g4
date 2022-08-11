@@ -19,10 +19,10 @@ public class Particle {
     }
 
     public Double calculateDistancePeriodicTo(Particle other, int boxLength, boolean cellIndexOptimized) {
-        double minDistance = 2*boxLength; // la distancia si o si sera mas chica que este valor inicial
+        double minDistance = 2 * boxLength; // la distancia si o si sera mas chica que este valor inicial
 
-        for (int i = cellIndexOptimized? 0:-1; i < 2; i++) {
-            for (int j = cellIndexOptimized? -i:-1; j < 2; j++) {
+        for (int i = cellIndexOptimized ? 0 : -1; i < 2; i++) {
+            for (int j = cellIndexOptimized ? -i : -1; j < 2; j++) {
                 minDistance = Math.min(minDistance, Math.max(0,
                         Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength) - this.radius - other.radius));
             }
@@ -62,7 +62,6 @@ public class Particle {
 
     @Override
     public String toString() {
-
         return "Particle{ position:(" +
                 "x=" + Math.floor(x * 100) / 100 +
                 ", y=" + Math.floor(y * 100) / 100 +

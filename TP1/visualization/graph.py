@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+NEIGHBOURHOOD_RADIUS = 0.5 # DEBERIA LLEGAR POR PARAMETRO?
 
 def makeParticlesGraph(particlesDict,neighboursDict,graphPropertiesDict,particleId):
     L = graphPropertiesDict.get('L')
@@ -10,14 +11,14 @@ def makeParticlesGraph(particlesDict,neighboursDict,graphPropertiesDict,particle
 
 
     for id,particle in particlesDict.items():
-        x = particle.x
-        y = particle.y
-        radius = particle.radius
         particleColor = __getParticleColor(id,particleId,principalNeighbours)
-        circle = plt.Circle((x,y),radius,facecolor=particleColor)
+        circle = plt.Circle(particle.getPosition(),particle.radius,facecolor=particleColor)
         ax.add_patch(circle)
-        ax.annotate(id,(x,y))
-
+        ax.annotate(id, particle.getPosition())
+        if(id == particleId):
+            ax.add_patch(plt.Circle(particle.getPosition(),
+                             radius=particle.radius + graphPropertiesDict.get('RC'),
+                             color='k', linewidth=1, fill=False))
     plt.show()
 
 
