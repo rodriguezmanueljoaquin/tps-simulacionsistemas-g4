@@ -74,7 +74,10 @@ public class SimulationExample {
         List<Particle> particles = processFileParticles(filepaths);
         //System.out.println("L/M = " + boxLength + "/" + Constants.CELLS_QUANTITY + " = " + (double) boxLength / Constants.CELLS_QUANTITY + " > 2*" + PARTICLE_RADIUS + " + rc (rc = " + neighbourRadius + ")    N = " + particles.size());
         Population population = new Population(particles, Constants.NEIGHBOUR_RADIUS, boxLength);
-        if((double) boxLength/ Constants.CELLS_QUANTITY <= Constants.NEIGHBOUR_RADIUS + 2*Constants.MAX_PARTICLE_RADIUS)
+
+        double maxParticleRadius = particles.stream().map(Particle::getRadius).max(Comparator.naturalOrder()).get();
+
+        if((double) boxLength/ Constants.CELLS_QUANTITY <= Constants.NEIGHBOUR_RADIUS + 2*maxParticleRadius)
             System.out.println("WARNING: Condition L/M > RC + 2*maxParticleRadius is not being fullfilled, the CellIndexMethod may not work correctly");
 
         System.out.println("===== CELL INDEX METHOD =====");

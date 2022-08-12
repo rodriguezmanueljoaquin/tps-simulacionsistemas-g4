@@ -33,8 +33,6 @@ public class AdministrationFile {
                     bw.newLine();
                     bw.write(String.valueOf(Constants.BOX_LENGTH));
                     bw.newLine();
-                    bw.write(String.valueOf(Constants.NEIGHBOUR_RADIUS));
-                    bw.newLine();
                     createRandomParticlesFile(bw, Constants.MAX_PARTICLE_RADIUS, "%.4f");
                     bw.close();
                 }
