@@ -1,33 +1,37 @@
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Population {
     private final Double neighbourRadius;
-    private final long startExecutionTime;
     private final List<Particle> particles;
     private final int boxLength;
 
     public Population(List<Particle> particles, Double neighbourRadius, int boxLength) {
-        this.startExecutionTime = System.currentTimeMillis();
         this.particles = particles;
         this.neighbourRadius = neighbourRadius;
         this.boxLength = boxLength;
     }
 
     public Pair<Map<Integer, Set<Particle>>, Long> getResultsBruteForceMethod(boolean periodicConditions) {
+        Long startTime = System.nanoTime();
         return new Pair<>(
                 getNeighboursBruteForceMethod(periodicConditions),
-                System.currentTimeMillis() - startExecutionTime);
+                System.nanoTime() - startTime);
     }
 
     private Map<Integer, Set<Particle>> getNeighboursBruteForceMethod(boolean periodicConditions) {
         Map<Integer, Set<Particle>> neighbours = new HashMap<>();
 
+
+
         particles.forEach(particle -> {
-            Set<Particle> particleNeighbours = particles.stream()
+            Supplier<TreeSet<Particle>> treeSetSupplier = () -> new TreeSet<Particle>();
+            TreeSet<Particle> particleNeighbours = particles.stream()
                     .filter(NeighbourPredicates.IsANeighbour(particle, neighbourRadius, boxLength, periodicConditions, false))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(treeSetSupplier));
+
             neighbours.put(particle.getId(), particleNeighbours);
         });
 
@@ -35,9 +39,10 @@ public class Population {
     }
 
     public Pair<Map<Integer, Set<Particle>>, Long> getResultsCellIndexMethod(int cellsQuantity, boolean periodicConditions) {
+        Long startTime = System.nanoTime();
         return new Pair<>(
                 getNeighboursCellIndexMethod(cellsQuantity, periodicConditions),
-                System.currentTimeMillis() - startExecutionTime);
+                System.nanoTime() - startTime);
     }
 
     private Map<Integer, Set<Particle>> getNeighboursCellIndexMethod(int cellsQuantity, boolean periodicConditions) {
@@ -51,10 +56,10 @@ public class Population {
                 for (Particle particle : matrix.get(i).get(j)) {
                     newNeighbours = getParticleNeighboursCellIndexMethod(particle, matrix, cellsQuantity, periodicConditions);
                     newNeighbours.forEach(p -> {
-                        neighbours.putIfAbsent(p.getId(), new HashSet<>());
+                        neighbours.putIfAbsent(p.getId(), new TreeSet<>());
                         neighbours.get(p.getId()).add(particle);
                     });
-                    neighbours.putIfAbsent(particle.getId(), new HashSet<>());
+                    neighbours.putIfAbsent(particle.getId(), new TreeSet<>());
                     neighbours.get(particle.getId()).addAll(newNeighbours);
                 }
             }
@@ -64,7 +69,7 @@ public class Population {
     }
 
     private Set<Particle> getParticleNeighboursCellIndexMethod(Particle particle, List<List<List<Particle>>> matrix, int cellsQuantity, boolean periodicConditions) {
-        Set<Particle> neighbours = new HashSet<>();
+        Set<Particle> neighbours = new TreeSet<>();
         List<Pair<Integer, Integer>> neighbourCells = new ArrayList<>();
         Pair<Integer, Integer> position = getParticleCell(particle, cellsQuantity);
 
@@ -139,7 +144,6 @@ public class Population {
     public String toString() {
         return "Population{" +
                 "neighbourRadius=" + neighbourRadius +
-                ", startExecutionTime=" + startExecutionTime +
                 ", particles=" + particles +
                 ", boxLength=" + boxLength +
                 '}';

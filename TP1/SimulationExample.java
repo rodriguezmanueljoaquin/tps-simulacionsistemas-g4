@@ -62,6 +62,47 @@ public class SimulationExample {
 
     }
 
+    private static Integer getOptimusCellsQuantity(Population population, double maxParticleRadius){
+        double cellsQuantityLimit = boxLength/(Constants.NEIGHBOUR_RADIUS+2*maxParticleRadius); //c
+        int currentCellsQuantity = (int) Math.floor(cellsQuantityLimit);
+        Pair<Integer,Long> optimusResult = new Pair<>(currentCellsQuantity,null);
+        Map<Integer,Long> cellsQuantityTimesMap = new HashMap<>();
+        //If c is an int, M = c - 1
+        if(cellsQuantityLimit == Math.floor(cellsQuantityLimit) && !Double.isInfinite(cellsQuantityLimit)){
+            currentCellsQuantity = (int) cellsQuantityLimit - 1;
+        }
+        //We try all M's until M == 0
+        for(int M = currentCellsQuantity;M>0;M--){;
+            Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(M, Constants.PERIODIC_CONDITIONS);
+            //Check if the execution time has improved
+            if(optimusResult.getRight()==null || resultsCellIndexMethod.getRight()<optimusResult.getRight()){
+                optimusResult.setLeft(M);
+                optimusResult.setRight(resultsCellIndexMethod.getRight());
+            }
+            //Add M and his current execution time to the map
+            cellsQuantityTimesMap.put(M, resultsCellIndexMethod.getRight());
+        }
+
+        System.out.println("---All cells quantity times---");
+        System.out.println(cellsQuantityTimesMap);
+
+        System.out.println("---Optimus time---");
+        System.out.println("Optimus time is : "+optimusResult.getRight()+" ns");
+
+        return optimusResult.getLeft();
+    }
+
+    private static int getMaxCellsQuantity(double maxParticleRadius){
+        double cellsQuantityLimit = boxLength/(Constants.NEIGHBOUR_RADIUS+2*maxParticleRadius); //c
+        int currentCellsQuantity = (int) Math.floor(cellsQuantityLimit);
+        //If c is an int, M = c - 1
+        if(cellsQuantityLimit == Math.floor(cellsQuantityLimit) && !Double.isInfinite(cellsQuantityLimit)){
+            currentCellsQuantity = (int) cellsQuantityLimit - 1;
+        }
+        return currentCellsQuantity;
+    }
+
+
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
 
         Pair<String,String> filepaths = getFilepaths(args);
@@ -77,14 +118,24 @@ public class SimulationExample {
 
         double maxParticleRadius = particles.stream().map(Particle::getRadius).max(Comparator.naturalOrder()).get();
 
-        if((double) boxLength/ Constants.CELLS_QUANTITY <= Constants.NEIGHBOUR_RADIUS + 2*maxParticleRadius)
+//        int optimusCellsQuantity = getOptimusCellsQuantity(population,maxParticleRadius);
+//
+//        System.out.println("---Optimus M---");
+//        System.out.println("The optimus M is : "+optimusCellsQuantity);
+//        System.out.println("------------------------");
+
+        int cellsQuantity = getMaxCellsQuantity(maxParticleRadius);
+
+        System.out.println("The current M is : "+cellsQuantity);
+
+        if((double) boxLength/ cellsQuantity <= Constants.NEIGHBOUR_RADIUS + 2*maxParticleRadius)
             System.out.println("WARNING: Condition L/M > RC + 2*maxParticleRadius is not being fullfilled, the CellIndexMethod may not work correctly");
 
         System.out.println("===== CELL INDEX METHOD =====");
-        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(Constants.CELLS_QUANTITY, Constants.PERIODIC_CONDITIONS);
+        Pair<Map<Integer, Set<Particle>>, Long> resultsCellIndexMethod = population.getResultsCellIndexMethod(cellsQuantity, Constants.PERIODIC_CONDITIONS);
 
         //Execution time
-        System.out.println("Exec time : " + resultsCellIndexMethod.getRight());
+        System.out.println("Exec time : " + resultsCellIndexMethod.getRight()+" ns");
         //System.out.println(resultsCellIndexMethod.getLeft());
 
 
@@ -92,7 +143,7 @@ public class SimulationExample {
         Pair<Map<Integer, Set<Particle>>, Long> resultsBruteForceMethod = population.getResultsBruteForceMethod(Constants.PERIODIC_CONDITIONS);
 
         //Execution time
-        System.out.println("Exec time : " + resultsBruteForceMethod.getRight());
+        System.out.println("Exec time : " + resultsBruteForceMethod.getRight()+" ns");
         //System.out.println(resultsBruteForceMethod.getLeft());
 
         System.out.println("\nResults are " +

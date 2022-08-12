@@ -1,6 +1,6 @@
 import java.util.Objects;
 
-public class Particle {
+public class Particle implements Comparable{
     private final Double radius;
     private final Double x;
     private final Double y;
@@ -21,8 +21,8 @@ public class Particle {
     public Double calculateDistancePeriodicTo(Particle other, int boxLength, boolean cellIndexOptimized) {
         double minDistance = 2 * boxLength; // la distancia si o si sera mas chica que este valor inicial
 
-        for (int i = cellIndexOptimized ? 0 : -1; i < 2; i++) {
-            for (int j = cellIndexOptimized ? -i : -1; j < 2; j++) {
+        for (int i =  -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
                 minDistance = Math.min(minDistance, Math.max(0,
                         Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength) - this.radius - other.radius));
             }
@@ -67,5 +67,15 @@ public class Particle {
                 ", y=" + Math.floor(y * 100) / 100 +
                 "), id=" + id +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        if(getClass() != o.getClass()){
+            return -1;
+        }
+        Particle other = (Particle) o;
+        return this.id.compareTo(other.getId());
     }
 }
