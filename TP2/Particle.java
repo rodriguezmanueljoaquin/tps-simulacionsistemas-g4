@@ -19,7 +19,7 @@ public class Particle implements Comparable{
         return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()));
     }
 
-    public Double calculateDistancePeriodicTo(Particle other, int boxLength) {
+    public Double calculateDistancePeriodicTo(Particle other, double boxLength) {
         double minDistance = 2 * boxLength; // la distancia si o si sera mas chica que este valor inicial
 
         for (int i =  -1; i < 2; i++) {

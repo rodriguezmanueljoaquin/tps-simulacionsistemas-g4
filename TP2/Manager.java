@@ -7,7 +7,7 @@ public class Manager {
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new File("results").mkdir();
 
-        Population population = new Population();
+        Population population = new Population(1000, 1., 10.);
 
         population.runSimulation("out1");
     }
