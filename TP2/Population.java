@@ -19,6 +19,14 @@ public class Population {
         }
     }
 
+    private double doublePositiveMod(double d, int mod){
+        if(d > mod)
+            return  (d - mod);
+        else if (d < 0) {
+            return (d + mod);
+        }else return d;
+    }
+
     public void nextIteration() {
         double cosAverage = particles.stream().map(Particle::getAngle).mapToDouble(Math::cos).average().getAsDouble();
         double sinAverage = particles.stream().map(Particle::getAngle).mapToDouble(Math::sin).average().getAsDouble();
@@ -27,8 +35,8 @@ public class Population {
 
         particles.forEach(p -> {
             p.setAngle(angleAverage + (rand.nextDouble() * Constants.NOISE_AMPLITUDE) - Constants.NOISE_AMPLITUDE / 2);
-            p.setX(p.getX() + p.getXVelocity() * Constants.DELTA_T);
-            p.setY(p.getY() + p.getYVelocity() * Constants.DELTA_T);
+            p.setX(doublePositiveMod(p.getX() + p.getXVelocity() * Constants.DELTA_T, Constants.BOX_LENGTH));
+            p.setY(doublePositiveMod(p.getY() + p.getYVelocity() * Constants.DELTA_T, Constants.BOX_LENGTH));
         });
 
         time++;
@@ -41,7 +49,9 @@ public class Population {
             throw new FileNotFoundException(); // TODO: MEJORAR EXCEPCION
 
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format("%.2f\n%d\n%d\n", Constants.NOISE_AMPLITUDE, Constants.PARTICLES_QUANTITY, Constants.BOX_LENGTH));
+        writer.println(String.format("%.2f\n%d\n%.2f\n%d\n",
+                Constants.NOISE_AMPLITUDE, Constants.PARTICLES_QUANTITY, Constants.PARTICLE_VELOCITY, Constants.BOX_LENGTH));
+        writer.close();
 
         writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
         for(int i = 0; i < 100 ;i++){
