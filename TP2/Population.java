@@ -1,8 +1,8 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Population {
     private List<Particle> particles;
@@ -34,11 +34,23 @@ public class Population {
         time++;
     }
 
-    public void createOutputFile(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter(outputName + ".txt", "UTF-8");
-        writer.println(time);
-        for (Particle p : this.particles) {
-            writer.println(String.format("%d;%.2f;%.2f;%.2f;%.2f", p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity()));
+    public void runSimulation(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
+        File file = new File("./results/" + outputName);
+
+        if(!file.mkdir())
+            throw new FileNotFoundException(); // TODO: MEJORAR EXCEPCION
+
+        PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
+        writer.println(String.format("%.2f\n%d\n%d\n", Constants.NOISE_AMPLITUDE, Constants.PARTICLES_QUANTITY, Constants.BOX_LENGTH));
+
+        writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
+        for(int i = 0; i < 100 ;i++){
+            writer.println(time);
+            for (Particle p : this.particles) {
+                writer.println(String.format("%d;%.2f;%.2f;%.2f;%.2f", p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity()));
+            }
+            writer.println();
+            nextIteration();
         }
         writer.close();
     }

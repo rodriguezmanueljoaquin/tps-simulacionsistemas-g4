@@ -1,14 +1,15 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
 public class Manager {
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+        new File("results").mkdir();
+
         Population population = new Population();
 
-        population.createOutputFile("out0");
-
-        population.nextIteration();
-        population.createOutputFile("out1");
+        population.runSimulation("out0");
+        population.runSimulation("out1");
     }
 
 }
