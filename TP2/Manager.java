@@ -9,7 +9,6 @@ public class Manager {
 
         Population population = new Population();
 
-        population.runSimulation("out0");
         population.runSimulation("out1");
     }
 

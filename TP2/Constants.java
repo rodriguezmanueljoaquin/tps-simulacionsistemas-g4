@@ -1,6 +1,5 @@
 public class Constants {
-    public static final double PARTICLE_RADIUS = 0.5;
-    public static final boolean PERIODIC_CONDITIONS = true;
+    public static final double NEIGHBOUR_RADIUS = 0.5;
     public static final int PARTICLES_QUANTITY = 1000;
     public static final int BOX_LENGTH = 10; // L
     public static final double NOISE_AMPLITUDE = 1;

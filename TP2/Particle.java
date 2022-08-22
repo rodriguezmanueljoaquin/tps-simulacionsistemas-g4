@@ -1,7 +1,6 @@
 import java.util.Objects;
 
 public class Particle implements Comparable{
-    private final Double radius = Constants.PARTICLE_RADIUS;
     private Double x;
     private Double y;
     private static Integer count = 1;
@@ -17,16 +16,16 @@ public class Particle implements Comparable{
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - this.radius - other.radius);
+        return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()));
     }
 
-    public Double calculateDistancePeriodicTo(Particle other, int boxLength, boolean cellIndexOptimized) {
+    public Double calculateDistancePeriodicTo(Particle other, int boxLength) {
         double minDistance = 2 * boxLength; // la distancia si o si sera mas chica que este valor inicial
 
         for (int i =  -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
                 minDistance = Math.min(minDistance, Math.max(0,
-                        Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength) - this.radius - other.radius));
+                        Math.hypot(this.getX() - other.getX() + i * boxLength, this.getY() - other.getY() + j * boxLength)));
             }
         }
         return minDistance;
@@ -47,10 +46,6 @@ public class Particle implements Comparable{
 
     public Integer getId() {
         return id;
-    }
-
-    public Double getRadius() {
-        return radius;
     }
 
     public Double getXVelocity() { return velocity * Math.cos(angle);}
@@ -80,7 +75,6 @@ public class Particle implements Comparable{
     @Override
     public String toString() {
         return "Particle{" +
-                "radius=" + radius +
                 ", x=" + x +
                 ", y=" + y +
                 ", id=" + id +

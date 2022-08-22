@@ -5,12 +5,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class Population {
-    private List<Particle> particles;
+    private Set<Particle> particles;
     private Random rand;
     private Integer time;
 
     public Population() {
-        this.particles = new ArrayList<>();
+        this.particles = new HashSet<>();
         this.rand = new Random(Constants.RANDOM_SEED);
         this.time = 0;
 
@@ -28,25 +28,28 @@ public class Population {
     }
 
     public void nextIteration() {
-        double cosAverage = particles.stream().map(Particle::getAngle).mapToDouble(Math::cos).average().getAsDouble();
-        double sinAverage = particles.stream().map(Particle::getAngle).mapToDouble(Math::sin).average().getAsDouble();
+        Map<Particle, Set<Particle>> particleNeighbours = CellIndexMethod.getNeighboursCellIndexMethod(particles);
 
-        double angleAverage = Math.atan2(sinAverage, cosAverage);
+        particleNeighbours.forEach((p, neighbourhood) -> {
+            neighbourhood.add(p); // El promedio debe tener en cuenta a la particula analizada, tambien nos asegura de que el getAsDouble no da error
+            double cosAverage = neighbourhood.stream().map(Particle::getAngle).mapToDouble(Math::cos).average().getAsDouble();
+            double sinAverage = neighbourhood.stream().map(Particle::getAngle).mapToDouble(Math::sin).average().getAsDouble();
 
-        particles.forEach(p -> {
+            double angleAverage = Math.atan2(sinAverage, cosAverage);
             p.setAngle(angleAverage + (rand.nextDouble() * Constants.NOISE_AMPLITUDE) - Constants.NOISE_AMPLITUDE / 2);
             p.setX(doublePositiveMod(p.getX() + p.getXVelocity() * Constants.DELTA_T, Constants.BOX_LENGTH));
             p.setY(doublePositiveMod(p.getY() + p.getYVelocity() * Constants.DELTA_T, Constants.BOX_LENGTH));
         });
 
         time++;
+        this.particles = particleNeighbours.keySet();
     }
 
     public void runSimulation(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
         File file = new File("./results/" + outputName);
 
         if(!file.mkdir())
-            throw new FileNotFoundException(); // TODO: MEJORAR EXCEPCION
+            throw new FileNotFoundException("CARPETA '" + outputName + "' YA EXISTENTE"); // TODO: MEJORAR EXCEPCION
 
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
         writer.println(String.format("%.2f\n%d\n%.2f\n%d\n",
@@ -54,7 +57,7 @@ public class Population {
         writer.close();
 
         writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
-        for(int i = 0; i < 100 ;i++){
+        for(int i = 0; i < 1000 ;i++){
             writer.println(time);
             for (Particle p : this.particles) {
                 writer.println(String.format("%d;%.2f;%.2f;%.2f;%.2f", p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity()));
