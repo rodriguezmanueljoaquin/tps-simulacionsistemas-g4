@@ -75,7 +75,6 @@ def __readStaticInputFile(staticInputFilePath):
         if not line:
             read = False
         else:
-            # print(lineCount)
             if(lineCount==0):
                 eta = float(line.strip())
             elif(lineCount==1):
@@ -83,7 +82,7 @@ def __readStaticInputFile(staticInputFilePath):
             elif(lineCount==2):
                 v = float(line.strip())
             else:
-                L = int(line.strip())
+                L = float(line.strip())
             lineCount+=1
     
     return SimulationResult(eta,N,v,L)

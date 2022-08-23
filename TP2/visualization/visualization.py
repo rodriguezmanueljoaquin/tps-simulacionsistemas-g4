@@ -1,5 +1,6 @@
 import argparse
 from files import readInputFiles
+from graph import plotTemporalObservable
 
 def main():
     simulationResults = list()
@@ -17,9 +18,8 @@ def main():
     ##Leemos los archivos de input
     readInputFiles(inputFilesDirectoryPath,simulationResults)
 
-    ##Imprimimos los resultados
-    for simulationResult in simulationResults:
-        print(simulationResult.vaDict)
+    ##Graficamos el observable temporal
+    plotTemporalObservable(simulationResults)
 
 
 if __name__ == "__main__":

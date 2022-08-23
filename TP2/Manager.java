@@ -7,9 +7,15 @@ public class Manager {
     public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
         new File("results").mkdir();
 
-        Population population = new Population(1000, 1., 10.);
+        Population population;
 
-        population.runSimulation("out1");
+        for(int i=5; i > 0; i--){
+
+            population = new Population(1000, (double) i, 10.);
+            population.runSimulation("out_eta_"+i);
+
+        }
+
     }
 
 }
