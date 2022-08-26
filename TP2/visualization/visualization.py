@@ -6,7 +6,7 @@ import renderOvito
 
 def main():
     simulationResults = list()
-    inputFilesDirectoryPath="./input"
+    inputFilesDirectoryPath="../results"
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('-d','--InputFilesDirectory',dest='inputFilesDirectory')
@@ -21,7 +21,7 @@ def main():
     readInputFiles(inputFilesDirectoryPath,simulationResults)
 
     for result in simulationResults:
-        animate(result, "particles-{}-{}-{}-{}.xyz\n".format(result.eta,result.N,result.v,result.L))
+        animate(result, "obito_input/particles_{}_{}_{}.xyz\n".format(result.N,result.eta,result.L))
 
     ##Graficamos el observable temporal
     plotTemporalObservable(simulationResults)

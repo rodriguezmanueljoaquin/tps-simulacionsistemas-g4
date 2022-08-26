@@ -64,7 +64,7 @@ public class Population {
         writer.close();
 
         writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
-        for(int i = 0; i < 1000 ;i++){
+        for(int i = 0; i < 500; i++){
             writer.println(time);
             for (Particle p : this.particles) {
                 writer.println(String.format("%d;%.2f;%.2f;%.2f;%.2f", p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity()));
