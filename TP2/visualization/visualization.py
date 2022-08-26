@@ -1,6 +1,8 @@
 import argparse
 from files import readInputFiles
 from graph import plotTemporalObservable
+import exportOvito
+import renderOvito
 
 def main():
     simulationResults = list()
@@ -18,8 +20,16 @@ def main():
     ##Leemos los archivos de input
     readInputFiles(inputFilesDirectoryPath,simulationResults)
 
+    #animate(simulationResults[0])
+
+
     ##Graficamos el observable temporal
     plotTemporalObservable(simulationResults)
+
+def animate(result):
+    exportOvito.exportOvito(result)
+    renderOvito.animation()
+    
 
 
 if __name__ == "__main__":
