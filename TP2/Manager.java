@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 
 public class Manager {
@@ -21,7 +22,7 @@ public class Manager {
         simulationParameters.forEach(parameters ->{
             Population population = new Population(parameters.particlesQty, parameters.eta, parameters.boxLength);
             try {
-                population.runSimulation(String.format("out_%d_%.2f_%.2f", parameters.particlesQty, parameters.eta, parameters.boxLength));
+                population.runSimulation(String.format(Locale.ENGLISH,"out_%d_%.2f_%.2f", parameters.particlesQty, parameters.eta, parameters.boxLength));
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

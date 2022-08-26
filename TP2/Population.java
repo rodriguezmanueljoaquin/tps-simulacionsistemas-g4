@@ -59,7 +59,7 @@ public class Population {
             throw new FileNotFoundException("CARPETA '" + outputName + "' YA EXISTENTE"); // TODO: MEJORAR EXCEPCION
 
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format("%.2f\n%d\n%.2f\n%.2f",
+        writer.println(String.format(Locale.ENGLISH,"%.2f\n%d\n%.2f\n%.2f",
                 this.noiseAmplitude, this.particlesQty, Constants.PARTICLE_VELOCITY, this.boxLength));
         writer.close();
 
@@ -67,7 +67,7 @@ public class Population {
         for(int i = 0; i < 500; i++){
             writer.println(time);
             for (Particle p : this.particles) {
-                writer.println(String.format("%d;%.2f;%.2f;%.2f;%.2f", p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity()));
+                writer.println(String.format(Locale.ENGLISH,"%d;%.2f;%.2f;%.2f;%.2f", p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity()));
             }
             nextIteration();
         }
