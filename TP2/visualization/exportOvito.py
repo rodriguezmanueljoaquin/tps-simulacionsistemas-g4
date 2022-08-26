@@ -6,8 +6,8 @@ from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import math
 
-def exportOvito(simulationResults):
-    exportParticles(simulationResults.N,simulationResults.particlesDict,"particles.xyz")
+def exportOvito(simulationResults,name):
+    exportParticles(simulationResults.N,simulationResults.particlesDict,name)
 
 
 def exportParticles(n,particlesDict,name):

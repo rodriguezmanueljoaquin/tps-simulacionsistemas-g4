@@ -20,15 +20,15 @@ def main():
     ##Leemos los archivos de input
     readInputFiles(inputFilesDirectoryPath,simulationResults)
 
-    #animate(simulationResults[0])
-
+    for result in simulationResults:
+        animate(result, "particles-{}-{}-{}-{}.xyz\n".format(result.eta,result.N,result.v,result.L))
 
     ##Graficamos el observable temporal
     plotTemporalObservable(simulationResults)
 
-def animate(result):
-    exportOvito.exportOvito(result)
-    renderOvito.animation()
+def animate(result,name):
+    exportOvito.exportOvito(result,name)
+    #renderOvito.animation()
     
 
 
