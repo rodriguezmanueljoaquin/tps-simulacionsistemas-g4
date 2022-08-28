@@ -21,7 +21,7 @@ def main():
     readInputFiles(inputFilesDirectoryPath,simulationResults)
 
     for result in simulationResults:
-        animate(result, "obito_input/particles_{}_{}_{}.xyz\n".format(result.N,result.eta,result.L))
+        animate(result, "ovito_input/particles_{}_{}_{}.xyz\n".format(result.N,result.eta,result.L))
 
     ##Graficamos el observable temporal
     plotTemporalObservable(simulationResults)
