@@ -1,4 +1,4 @@
-
+import math
 
 class SimulationResult:
 
@@ -15,6 +15,9 @@ class SimulationResult:
 
     def __repr__(self):
         return self.__str__()
+
+    def getDensity(self):
+        return self.N/math.pow(self.L,2)
 
     
     

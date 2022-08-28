@@ -5,18 +5,30 @@ from particle import Particle
 
 def readInputFiles(inputFilesDirectoryPath,simulationResults):
 
+    print('Reading input files. . .')
+
     ##Iteramos en el path de los archivos de input
+    dirCount = 1
     for dir in os.listdir(inputFilesDirectoryPath):
+        print('\tReading directory '+str(dirCount)+'. . .')
         etaDirPath = inputFilesDirectoryPath +"/"+dir
         ##Por cada directorio, leemos los archivos estatico y dinamico correspondientes
         if(os.path.isdir(etaDirPath)):
             simulationResult = None
             for inputFile in sorted(os.listdir(etaDirPath),reverse=True):
                 if(inputFile.lower().startswith('static')):
+                    print('\t\tReading static file. . .')
                     simulationResult = __readStaticInputFile(etaDirPath+"/"+inputFile)
+                    print('\t\tStatic file successfully read')
                 else:
+                    print('\t\tReading dynamic file. . .')
                     __readDynamicInputFile(etaDirPath+"/"+inputFile,simulationResult)
+                    print('\t\tDynamic file successfully read')
             simulationResults.append(simulationResult)
+        print('\tDirectory successfully read. . .')
+        dirCount+=1
+
+    print('Input files successfully read')
 
 
 def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
@@ -62,6 +74,8 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
         Va = np.linalg.norm(velocitySum)/(N*v)
         simulationResult.vaDict[currentTime] = Va
 
+    file.close()
+
 
 def __readStaticInputFile(staticInputFilePath):
     lineCount = 0
@@ -84,6 +98,8 @@ def __readStaticInputFile(staticInputFilePath):
             else:
                 L = float(line.strip())
             lineCount+=1
+
+    file.close()
     
     return SimulationResult(eta,N,v,L)
 

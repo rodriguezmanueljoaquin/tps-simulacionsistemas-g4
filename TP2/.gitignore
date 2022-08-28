@@ -31,6 +31,6 @@ hs_err_pid*
 # output files
 *.txt
 *xyz
-/visualization/obito_input/*
+/visualization/ovito_input/*
 out/*
 *.pyc

@@ -7,7 +7,9 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import math
 
 def exportOvito(simulationResults,name):
+    print('Generating ovito file. . .')
     exportParticles(simulationResults.N,simulationResults.particlesDict,name)
+    print('Ovito file successfully generated')
 
 
 def exportParticles(n,particlesDict,name):

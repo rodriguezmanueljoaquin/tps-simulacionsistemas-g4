@@ -53,15 +53,24 @@ public class Population {
     }
 
     public void runSimulation(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
+
+        System.out.println("Starting simulation. . .");
+
         File file = new File("./results/" + outputName);
 
         if(!file.mkdir())
             throw new FileNotFoundException("CARPETA '" + outputName + "' YA EXISTENTE"); // TODO: MEJORAR EXCEPCION
 
+        System.out.println("\tCreating static file. . .");
+
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
         writer.println(String.format(Locale.ENGLISH,"%.2f\n%d\n%.2f\n%.2f",
                 this.noiseAmplitude, this.particlesQty, Constants.PARTICLE_VELOCITY, this.boxLength));
         writer.close();
+
+        System.out.println("\tStatic file successfully created");
+
+        System.out.println("\tCreating dynamic file. . .");
 
         writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
         for(int i = 0; i < 500; i++){
@@ -72,5 +81,11 @@ public class Population {
             nextIteration();
         }
         writer.close();
+
+        System.out.println("\tDynamic file successfully created");
+
+        System.out.println("Simulation successfully finished");
+
+
     }
 }
