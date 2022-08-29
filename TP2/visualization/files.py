@@ -40,6 +40,11 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
     
     file = open(dynamicInputFilePath , 'r')
 
+    line = file.readline()
+    lineCount += 1
+    currentTime = int(line.strip())
+    velocitySum = np.array([0,0])
+    simulationResult.particlesDict[currentTime] = dict()
     while read:
         line = file.readline()
         
@@ -49,18 +54,14 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
             ##Si es una linea correspondiente a un tiempo, en caso de leer previamente la data de las particulas calculamos el Va en cuestion
             ##Luego, reinciamos el vector de velocidades y seteamos el tiempo correspondiente
             if(lineCount%(N+1)==0):
-                if(readingParticles):
-                    readingParticles = False
-                    Va = np.linalg.norm(velocitySum)/(N*v)
-                    simulationResult.vaDict[currentTime] = Va
+                Va = np.linalg.norm(velocitySum)/(N*v)
+                simulationResult.vaDict[currentTime] = Va
                 currentTime = int(line.strip())
                 velocitySum = np.array([0,0])
                 simulationResult.particlesDict[currentTime] = dict()
 
             else:
                 ##Si no es una linea correspondiente a un tiempo, leemos y almacenamos la data de cada particula
-                if(not readingParticles):
-                    readingParticles = True
                 particleData = line.split(";")
                 particle = Particle(int(particleData[0]),float(particleData[1]),float(particleData[2]),float(particleData[3]),float(particleData[4]))
                 simulationResult.particlesDict[currentTime][particle.id] = particle
@@ -69,10 +70,8 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
             lineCount += 1
 
     ##Calculamos el Va correspondiente a la ultima particula
-    if(readingParticles):
-        readingParticles = False
-        Va = np.linalg.norm(velocitySum)/(N*v)
-        simulationResult.vaDict[currentTime] = Va
+    Va = np.linalg.norm(velocitySum)/(N*v)
+    simulationResult.vaDict[currentTime] = Va
 
     file.close()
 

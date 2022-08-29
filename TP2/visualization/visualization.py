@@ -38,8 +38,8 @@ def main():
         if(not os.path.exists(ovitoFolderName)):
             os.makedirs(ovitoFolderName)
 
-        for result in simulationResults:
-            animate(result, "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,result.N,result.eta,result.L))
+        #for result in simulationResults:
+            #animate(result, "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,result.N,result.eta,result.L))
 
         ##Graficamos los observables
         plotObservables(simulationResults,noiseObservableParameter)
