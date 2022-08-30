@@ -50,31 +50,18 @@ def main():
         else:
             plotScalarObservable(simulationResults,noiseObservableParameter)
 
-        if(observableType == 'temporal'):
-            plotTemporalObservable(simulationResults,noiseObservableParameter)
-            return
-        else:
-            plotScalarObservable(simulationResults,noiseObservableParameter)
-
         ovitoFolderName = "ovito_input"
 
         ##Si no existe la carpeta para almacenar los archivos de ovito, la crea
         if(not os.path.exists(ovitoFolderName)):
             os.makedirs(ovitoFolderName)
-
-<<<<<<< HEAD
         animate(simulationResults[5], "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,simulationResults[5].N,simulationResults[5].eta,simulationResults[5].L))
         animate(simulationResults[1], "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,simulationResults[1].N,simulationResults[1].eta,simulationResults[4].L))
         ##Graficamos los observables
-        plotObservables(simulationResults,noiseObservableParameter)
-=======
+
         #for result in simulationResults:
             #animate(result, "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,result.N,result.eta,result.L))
 
-<<<<<<< HEAD
->>>>>>> ee906afa72a16e10870afbc1a53bcdd6331a6c24
-=======
->>>>>>> ee906afa72a16e10870afbc1a53bcdd6331a6c24
     
     else:
         print("Invalid command line arguments")
