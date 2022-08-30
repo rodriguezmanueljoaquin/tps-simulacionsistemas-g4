@@ -50,6 +50,12 @@ def main():
         else:
             plotScalarObservable(simulationResults,noiseObservableParameter)
 
+        if(observableType == 'temporal'):
+            plotTemporalObservable(simulationResults,noiseObservableParameter)
+            return
+        else:
+            plotScalarObservable(simulationResults,noiseObservableParameter)
+
         ovitoFolderName = "ovito_input"
 
         ##Si no existe la carpeta para almacenar los archivos de ovito, la crea
@@ -65,6 +71,9 @@ def main():
         #for result in simulationResults:
             #animate(result, "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,result.N,result.eta,result.L))
 
+<<<<<<< HEAD
+>>>>>>> ee906afa72a16e10870afbc1a53bcdd6331a6c24
+=======
 >>>>>>> ee906afa72a16e10870afbc1a53bcdd6331a6c24
     
     else:
