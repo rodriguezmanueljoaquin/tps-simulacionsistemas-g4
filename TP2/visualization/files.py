@@ -36,7 +36,6 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
     read = True
     N = simulationResult.N
     v = simulationResult.v
-    readingParticles = False
     
     file = open(dynamicInputFilePath , 'r')
 
@@ -97,13 +96,5 @@ def __readStaticInputFile(staticInputFilePath):
             else:
                 L = float(line.strip())
             lineCount+=1
-
     file.close()
-    
     return SimulationResult(eta,N,v,L)
-
-
-
-
-
-     

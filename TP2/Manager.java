@@ -11,13 +11,20 @@ public class Manager {
         new File("results").mkdir();
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
-        // high density
-        simulationParameters.add(new SimulationParameters(2500, 0.1, 10.));
-        simulationParameters.add(new SimulationParameters(2500, 5., 10.));
+        // variando ruido;
+        for (double i = 0 ; i <= 5 ; i+=1)
+            simulationParameters.add(new SimulationParameters(2500, i, 10.));
+        for (double i = 0 ; i <= 5 ; i+=1)
+            simulationParameters.add(new SimulationParameters(2500, i, 15.));
+        for (double i = 0 ; i <= 5 ; i+=1)
+            simulationParameters.add(new SimulationParameters(2500, i, 20.));
 
-        // low density
-        simulationParameters.add(new SimulationParameters(250, 0.1, 10.));
-        simulationParameters.add(new SimulationParameters(250, 5., 10.));
+
+        // variando densidad
+      /*  for (double i = 10 ; i <= 25 ; i+=5)
+            simulationParameters.add(new SimulationParameters(2500, 1., i));
+
+       */
 
         simulationParameters.forEach(parameters ->{
             Population population = new Population(parameters.particlesQty, parameters.eta, parameters.boxLength);
