@@ -4,17 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from constants import ESTABILIZATION_TIME
 
-observablesPath = "./observables"
-
-def plotObservables(simulationResults,noiseObservableParameter,simulationDensities):
-    plt.rcParams.update({'font.size': 22})
-    ##Armamos el observable temporal
-    # __plotTemporalObservable(simulationResults,noiseObservableParameter)
-    ##Armamos el observable escalar
-    # __plotScalarObservable(simulationResults,noiseObservableParameter,simulationDensities)
-    ##Graficamos ambos observables
-    plt.show()
-
 
 def plotTemporalObservable(simulationResults,noiseObservableParameter):
     plt.rcParams.update({'font.size': 22})
@@ -47,8 +36,9 @@ def plotTemporalObservable(simulationResults,noiseObservableParameter):
 
 
 def plotScalarObservable(simulationResults,noiseObservableParameter):
+    plt.style.use('seaborn-pastel')
     plt.rcParams.update({'font.size': 22})
-    plt.style.use('ggplot')
+
     simulationsByParameter = {}
     for simulationResult in simulationResults:
         dictionaryParameter = simulationResult.getDensity() if noiseObservableParameter else simulationResult.eta
@@ -57,8 +47,7 @@ def plotScalarObservable(simulationResults,noiseObservableParameter):
         else: simulationsByParameter[dictionaryParameter].append(simulationResult)
 
 
-    parameter = 'noises' if noiseObservableParameter else 'densities'
-
+    parameter = 'Noise' if noiseObservableParameter else 'Density'
 
     for dictParam, dictSimulationResults in simulationsByParameter.items():
         polarizationAverage = []
@@ -82,8 +71,10 @@ def plotScalarObservable(simulationResults,noiseObservableParameter):
             plt.ylabel("Polarization")
             plt.xlabel(parameter)
 
-        plt.errorbar(parameterValues,polarizationAverage,yerr=errors)
-        plt.legend(str(dictParam))
+        plt.errorbar(parameterValues,polarizationAverage,yerr=errors,label=str(dictParam))
+
+    legendTitle = 'noises' if not noiseObservableParameter else 'densities'
+    plt.legend(title=legendTitle)
     plt.show()
 
 
