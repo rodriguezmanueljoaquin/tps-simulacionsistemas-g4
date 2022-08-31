@@ -23,7 +23,7 @@ def plotTemporalObservable(simulationResults,noiseObservableParameter):
         for time,Va in simulationResult.vaDict.items():
             data['Time'].append(time)
             data['Polarization'].append(Va)
-            data[parameter].append(paramValue)
+            data[parameter].append(round(paramValue,2))
 
     temporalObservableDataDF = pd.DataFrame(data)
 
@@ -71,7 +71,7 @@ def plotScalarObservable(simulationResults,noiseObservableParameter):
             plt.ylabel("Polarization")
             plt.xlabel(parameter)
 
-        plt.errorbar(parameterValues,polarizationAverage,yerr=errors,label=str(dictParam))
+        plt.errorbar(parameterValues,polarizationAverage,yerr=errors,label=str(round(dictParam,2)))
 
     legendTitle = 'noises' if not noiseObservableParameter else 'densities'
     plt.legend(title=legendTitle)
