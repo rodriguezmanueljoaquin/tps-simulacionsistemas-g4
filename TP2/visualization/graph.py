@@ -31,7 +31,8 @@ def plotTemporalObservable(simulationResults,noiseObservableParameter):
     plt.title(f"Temporal observable: Polarization vs Time")
     plt.ylabel("Polarization")
     plt.xlabel("Time (Steps)")
-    sns.lineplot(data=temporalObservableDataDF, x="Time", y="Polarization",hue=parameter,legend="full",palette="pastel")
+    ax = sns.lineplot(data=temporalObservableDataDF, x="Time", y="Polarization",hue=parameter,legend="full",palette="pastel")
+    sns.move_legend(ax,"lower right")
     plt.show()
 
 
