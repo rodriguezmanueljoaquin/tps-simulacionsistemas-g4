@@ -1,12 +1,13 @@
 import java.util.Objects;
 
-public class Particle implements Comparable{
+public class Particle implements Comparable {
     private Double x;
     private Double y;
     private static Integer count = 1;
     private final Integer id;
     private static final double velocity = Constants.PARTICLE_VELOCITY;
-    private double angle;
+    private double yVelocity;
+    private double xVelocity;
 
     private static final double radius = Constants.PARTICLE_RADIUS;
 
@@ -16,11 +17,12 @@ public class Particle implements Comparable{
         this.x = x;
         this.y = y;
         this.id = count++;
-        this.angle = angle;
+        this.xVelocity = velocity * Math.cos(angle);
+        this.yVelocity = velocity * Math.sin(angle);
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - Particle.getRadius()*2;
+        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - Particle.getRadius() * 2;
     }
 
 
@@ -32,21 +34,23 @@ public class Particle implements Comparable{
         return y;
     }
 
-    public double getAngle() {
-        return angle;
-    }
-
     public Integer getId() {
         return id;
     }
 
-    public Double getXVelocity() { return velocity * Math.cos(angle);}
-
-    public Double getYVelocity() { return velocity * Math.sin(angle);}
-
-    public void setAngle(double angle) {
-        this.angle = angle;
+    public static double getRadius() {
+        return radius;
     }
+
+    public double getyVelocity() {
+        return yVelocity;
+    }
+
+
+    public double getxVelocity() {
+        return xVelocity;
+    }
+
 
     public void setX(Double x) {
         this.x = x;
@@ -56,8 +60,13 @@ public class Particle implements Comparable{
         this.y = y;
     }
 
-    public static double getRadius() {
-        return radius;
+    public void setxVelocity(double xVelocity) {
+        this.xVelocity = xVelocity;
+    }
+
+
+    public void setyVelocity(double yVelocity) {
+        this.yVelocity = yVelocity;
     }
 
     @Override
@@ -71,10 +80,11 @@ public class Particle implements Comparable{
     @Override
     public String toString() {
         return "Particle{" +
-                ", x=" + x +
+                "x=" + x +
                 ", y=" + y +
                 ", id=" + id +
-                ", angle=" + angle +
+                ", yVelocity=" + yVelocity +
+                ", xVelocity=" + xVelocity +
                 '}';
     }
 
@@ -85,7 +95,7 @@ public class Particle implements Comparable{
 
     @Override
     public int compareTo(Object o) {
-        if(getClass() != o.getClass()){
+        if (getClass() != o.getClass()) {
             return -1;
         }
         Particle other = (Particle) o;
