@@ -20,7 +20,7 @@ public class Particle implements Comparable{
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()));
+        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - Particle.getRadius()*2;
     }
 
 
@@ -54,6 +54,10 @@ public class Particle implements Comparable{
 
     public void setY(Double y) {
         this.y = y;
+    }
+
+    public static double getRadius() {
+        return radius;
     }
 
     @Override

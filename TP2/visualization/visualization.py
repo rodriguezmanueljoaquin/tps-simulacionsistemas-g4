@@ -55,8 +55,8 @@ def main():
         ##Si no existe la carpeta para almacenar los archivos de ovito, la crea
         if(not os.path.exists(ovitoFolderName)):
             os.makedirs(ovitoFolderName)
-        animate(simulationResults[5], "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,simulationResults[5].N,simulationResults[5].eta,simulationResults[5].L))
-        animate(simulationResults[1], "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,simulationResults[1].N,simulationResults[1].eta,simulationResults[4].L))
+        #animate(simulationResults[5], "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,simulationResults[5].N,simulationResults[5].eta,simulationResults[5].L))
+        #animate(simulationResults[1], "{}/particles_{}_{}_{}.xyz".format(ovitoFolderName,simulationResults[1].N,simulationResults[1].eta,simulationResults[4].L))
         ##Graficamos los observables
 
         #for result in simulationResults:
