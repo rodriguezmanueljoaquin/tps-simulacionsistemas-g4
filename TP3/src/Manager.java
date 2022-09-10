@@ -7,30 +7,25 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Manager {
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void main(String[] args) {
         new File("results").mkdir();
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
 
         // variando densidad
-      /*  for (double i = 10 ; i <= 25 ; i+=5)
-            simulationParameters.add(new SimulationParameters(2500, 1., i));
-
-       */
+        simulationParameters.add(new SimulationParameters(20, 0.24, 0.09, 0.01));
 
         simulationParameters.forEach(parameters ->{
             Population population = new Population(parameters.particlesQty, parameters.width,parameters.height,parameters.gap);
 
-//            try {
-//                population.runSimulation(String.format(Locale.ENGLISH,"out_%d_%.2f_%.2f", parameters.particlesQty, parameters.eta, parameters.boxLength));
-//            } catch (FileNotFoundException | UnsupportedEncodingException e) {
-//                throw new RuntimeException(e);
-//            }
-//
+            try {
+                for (int i = 1 ; i <= 25 ; i++)
+                    population.runSimulation(String.format(Locale.ENGLISH,"out_%d_%d_%f", i, parameters.particlesQty, parameters.gap));
+            } catch (FileNotFoundException | UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+
         });
-
-
-
     }
 
     private static class SimulationParameters {

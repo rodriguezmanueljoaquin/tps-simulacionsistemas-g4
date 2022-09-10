@@ -98,18 +98,18 @@ public class Population {
                 particle -> particle.setyVelocity(-particle.getyVelocity())
         );
 
-        for(Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)){
+        for (Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)) {
             Particle p1 = pair.getLeft();
             Particle p2 = pair.getRight();
             double deltaVDotDeltaR = (p1.getxVelocity() - p2.getxVelocity()) * (p1.getX() - p2.getX()) + (p1.getyVelocity() - p2.getyVelocity()) * (p1.getY() - p2.getY());
-            double j = (2*2*Constants.PARTICLE_MASS*deltaVDotDeltaR)/(2*Constants.PARTICLE_RADIUS*2*Constants.PARTICLE_MASS);
-            double jx = j*(p1.getX()-p2.getX())/(2*Constants.PARTICLE_RADIUS);
-            double jy = j*(p1.getY()-p2.getY())/(2*Constants.PARTICLE_RADIUS);
+            double j = (2 * 2 * Constants.PARTICLE_MASS * deltaVDotDeltaR) / (2 * Constants.PARTICLE_RADIUS * 2 * Constants.PARTICLE_MASS);
+            double jx = j * (p1.getX() - p2.getX()) / (2 * Constants.PARTICLE_RADIUS);
+            double jy = j * (p1.getY() - p2.getY()) / (2 * Constants.PARTICLE_RADIUS);
 
-            p1.setxVelocity(p1.getxVelocity() + jx/Constants.PARTICLE_MASS);
-            p1.setyVelocity(p1.getyVelocity() + jy/Constants.PARTICLE_MASS);
-            p2.setxVelocity(p1.getxVelocity() - jx/Constants.PARTICLE_MASS);
-            p2.setyVelocity(p1.getxVelocity() - jx/Constants.PARTICLE_MASS);
+            p1.setxVelocity(p1.getxVelocity() + jx / Constants.PARTICLE_MASS);
+            p1.setyVelocity(p1.getyVelocity() + jy / Constants.PARTICLE_MASS);
+            p2.setxVelocity(p1.getxVelocity() - jx / Constants.PARTICLE_MASS);
+            p2.setyVelocity(p1.getyVelocity() - jy / Constants.PARTICLE_MASS);
         }
     }
 
@@ -127,9 +127,9 @@ public class Population {
                         height - Constants.PARTICLE_RADIUS : Constants.PARTICLE_RADIUS)
                         - p1.getY()) / p1.getyVelocity();
 
-        if(timeToVertical < timeToHorizontal)
+        if (timeToVertical < timeToHorizontal)
             return new Pair<>(timeToVertical, WALL_VERTICAL_COLLISION_KEY);
-        else return new Pair<>(timeToHorizontal, WALL_HORIZONTAL_COLLISION_KEY)
+        else return new Pair<>(timeToHorizontal, WALL_HORIZONTAL_COLLISION_KEY);
     }
 
     private double getTimeToParticleCollision(Particle p1, Particle p2) {
@@ -141,6 +141,43 @@ public class Population {
             return Double.MAX_VALUE;
         }
         return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
+
+    }
+
+
+    public void runSimulation(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
+
+        System.out.println("Starting simulation. . .");
+
+        File file = new File("./results/" + outputName);
+
+        if (!file.mkdir())
+            throw new FileNotFoundException("CARPETA '" + outputName + "' YA EXISTENTE"); // TODO: MEJORAR EXCEPCION
+
+        System.out.println("\tCreating static file. . .");
+
+        PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
+        writer.println(String.format(Locale.ENGLISH, "%d\n%f %f\n%f\n%f", this.particlesQty, this.width, this.height, this.gap, Constants.PARTICLE_VELOCITY));
+        writer.close();
+
+        System.out.println("\tStatic file successfully created");
+
+        System.out.println("\tCreating dynamic file. . .");
+
+        writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
+        for (int i = 0; i < 1000; i++) {
+            writer.println(i);
+            for (Particle p : this.particles) {
+                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f", p.getId(), p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity()));
+            }
+            nextCollision();
+        }
+        writer.close();
+
+        System.out.println("\tDynamic file successfully created");
+
+        System.out.println("Simulation successfully finished");
+
 
     }
 }
