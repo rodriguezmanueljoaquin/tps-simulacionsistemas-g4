@@ -15,6 +15,10 @@ public class Population {
 
     private Double gap;
 
+    private static final String WALL_VERTICAL_COLLISION_KEY = "WALL_VERTICAL";
+    private static final String WALL_HORIZONTAL_COLLISION_KEY = "WALL_HORIZONTAL";
+    private static final String PARTICLES_COLLISION_KEY = "PARTICLES";
+
 
     public Population(Integer particlesQty, Double width, Double height, Double gap) {
         this.particlesQty = particlesQty;
@@ -42,36 +46,78 @@ public class Population {
         }
     }
 
-    public void nextCollision() {
-        double minTime = Double.MAX_VALUE;
-        //CALCULAR CHOQUES
+    public Pair<Double, Map<String, List<Pair<Particle, Particle>>>> getCollisionTimeAndParticles() {
+        double timeToNextCollision = Double.MAX_VALUE;
+        Map<String, List<Pair<Particle, Particle>>> collisionedParticles = new HashMap<>();
+        collisionedParticles.put(WALL_VERTICAL_COLLISION_KEY, new ArrayList<>());
+        collisionedParticles.put(WALL_HORIZONTAL_COLLISION_KEY, new ArrayList<>());
+        collisionedParticles.put(PARTICLES_COLLISION_KEY, new ArrayList<>());
+
         for (int i = 0; i < particles.size(); i++) {
             for (int j = i + 1; j < particles.size(); j++) {
-                double time = getTimeToCollision(particles.get(i), particles.get(j));
-                if (time < minTime) minTime = time;
+                double timeToParticleCollision = getTimeToParticleCollision(particles.get(i), particles.get(j));
+                if (timeToParticleCollision <= timeToNextCollision) {
+                    if (timeToParticleCollision != timeToNextCollision) {
+                        timeToNextCollision = timeToParticleCollision;
+                        collisionedParticles.replaceAll((key, pairs) -> new ArrayList<>());
+                    }
+                    collisionedParticles.get(PARTICLES_COLLISION_KEY).add(new Pair<>(particles.get(i), particles.get(j)));
+                }
             }
-            double wallTime = getTimeToWall(particles.get(i));
-            if (wallTime < minTime) minTime = wallTime;
+
+            Pair<Double, String> wallTimeAndType = timeToWallCollisionAndType(particles.get(i));
+            if (wallTimeAndType.getLeft() <= timeToNextCollision) {
+                if (wallTimeAndType.getLeft() != timeToNextCollision) {
+                    timeToNextCollision = wallTimeAndType.getLeft();
+                    collisionedParticles.replaceAll((key, pairs) -> new ArrayList<>());
+                }
+                // colisionaron en el mismo tiempo
+                collisionedParticles.get(wallTimeAndType.getRight()).add(new Pair<>(particles.get(i), null));
+            }
         }
-        //AGARRAR EL 1° Y ACTUALIZAR VELOCIDADES DE LAS PARTICULAS
 
-        for (Particle p : particles) {
-            p.setX(p.getX() + p.getxVelocity() * minTime);
-            p.setY(p.getY() + p.getyVelocity() * minTime);
-        }
-
-        //actualizar las velocidades de las que chocaron
-
-
-        //VOLVER AL PUNTO 1
-
+        return new Pair<>(timeToNextCollision, collisionedParticles);
     }
 
-    private double getTimeToWall(Particle p1) {
+    public void nextCollision() {
+        Pair<Double, Map<String, List<Pair<Particle, Particle>>>> answer = getCollisionTimeAndParticles();
+        double timeToNextCollision = answer.getLeft();
+        Map<String, List<Pair<Particle, Particle>>> collisionedParticles = answer.getRight();
+
+        // Actualización de posiciones
+        for (Particle p : particles) {
+            p.setX(p.getX() + p.getxVelocity() * timeToNextCollision);
+            p.setY(p.getY() + p.getyVelocity() * timeToNextCollision);
+        }
+
+        // Actualización de velocidades
+        collisionedParticles.get(WALL_VERTICAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+                particle -> particle.setxVelocity(-particle.getxVelocity())
+        );
+        collisionedParticles.get(WALL_HORIZONTAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+                particle -> particle.setyVelocity(-particle.getyVelocity())
+        );
+
+        for(Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)){
+            Particle p1 = pair.getLeft();
+            Particle p2 = pair.getRight();
+            double deltaVDotDeltaR = (p1.getxVelocity() - p2.getxVelocity()) * (p1.getX() - p2.getX()) + (p1.getyVelocity() - p2.getyVelocity()) * (p1.getY() - p2.getY());
+            double j = (2*2*Constants.PARTICLE_MASS*deltaVDotDeltaR)/(2*Constants.PARTICLE_RADIUS*2*Constants.PARTICLE_MASS);
+            double jx = j*(p1.getX()-p2.getX())/(2*Constants.PARTICLE_RADIUS);
+            double jy = j*(p1.getY()-p2.getY())/(2*Constants.PARTICLE_RADIUS);
+
+            p1.setxVelocity(p1.getxVelocity() + jx/Constants.PARTICLE_MASS);
+            p1.setyVelocity(p1.getyVelocity() + jy/Constants.PARTICLE_MASS);
+            p2.setxVelocity(p1.getxVelocity() - jx/Constants.PARTICLE_MASS);
+            p2.setyVelocity(p1.getxVelocity() - jx/Constants.PARTICLE_MASS);
+        }
+    }
+
+    private Pair<Double, String> timeToWallCollisionAndType(Particle p1) {
         double timeToVertical;
         double timeToHorizontal;
         if (p1.getxVelocity() > 0) {
-            timeToVertical = ((p1.getX() < width / 2  ? width / 2 : width) - p1.getX() - Constants.PARTICLE_RADIUS) / p1.getxVelocity();
+            timeToVertical = ((p1.getX() < width / 2 ? width / 2 : width) - p1.getX() - Constants.PARTICLE_RADIUS) / p1.getxVelocity();
         } else {
             timeToVertical = ((p1.getX() < width / 2 ? 0 : width / 2) - p1.getX() + Constants.PARTICLE_RADIUS) / p1.getxVelocity();
         }
@@ -80,10 +126,13 @@ public class Population {
                 (p1.getyVelocity() > 0 ?
                         height - Constants.PARTICLE_RADIUS : Constants.PARTICLE_RADIUS)
                         - p1.getY()) / p1.getyVelocity();
-        return Math.min(timeToVertical, timeToHorizontal);
+
+        if(timeToVertical < timeToHorizontal)
+            return new Pair<>(timeToVertical, WALL_VERTICAL_COLLISION_KEY);
+        else return new Pair<>(timeToHorizontal, WALL_HORIZONTAL_COLLISION_KEY)
     }
 
-    private double getTimeToCollision(Particle p1, Particle p2) {
+    private double getTimeToParticleCollision(Particle p1, Particle p2) {
         double deltaRSquared = Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2);
         double deltaVSquared = Math.pow(p1.getxVelocity() - p2.getxVelocity(), 2) + Math.pow(p1.getyVelocity() - p2.getyVelocity(), 2);
         double deltaVDotDeltaR = (p1.getxVelocity() - p2.getxVelocity()) * (p1.getX() - p2.getX()) + (p1.getyVelocity() - p2.getyVelocity()) * (p1.getY() - p2.getY());
