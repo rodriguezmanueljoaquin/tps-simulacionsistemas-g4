@@ -20,10 +20,10 @@ public class Population {
     private static final String PARTICLES_COLLISION_KEY = "PARTICLES";
 
 
-    public Population(Integer particlesQty, Double width, Double height, Double gap) {
+    public Population(Integer particlesQty, Double width, Double height, Double gap, long seed) {
         this.particlesQty = particlesQty;
         this.particles = new ArrayList<>();
-        this.rand = new Random(Constants.RANDOM_SEED);
+        this.rand = new Random(seed);
         this.width = width;
         this.height = height;
         this.gap = gap;
@@ -101,31 +101,31 @@ public class Population {
         for (Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)) {
             Particle p1 = pair.getLeft();
             Particle p2 = pair.getRight();
-            double deltaVDotDeltaR = (p1.getxVelocity() - p2.getxVelocity()) * (p1.getX() - p2.getX()) + (p1.getyVelocity() - p2.getyVelocity()) * (p1.getY() - p2.getY());
+            double deltaVDotDeltaR = (p2.getxVelocity() - p1.getxVelocity()) * (p2.getX() - p1.getX()) + (p2.getyVelocity() - p1.getyVelocity()) * (p2.getY() - p1.getY());
             double j = (2 * 2 * Constants.PARTICLE_MASS * deltaVDotDeltaR) / (2 * Constants.PARTICLE_RADIUS * 2 * Constants.PARTICLE_MASS);
-            double jx = j * (p1.getX() - p2.getX()) / (2 * Constants.PARTICLE_RADIUS);
-            double jy = j * (p1.getY() - p2.getY()) / (2 * Constants.PARTICLE_RADIUS);
+            double jx = (j * (p2.getX() - p1.getX())) / (2 * Constants.PARTICLE_RADIUS);
+            double jy = (j * (p2.getY() - p1.getY())) / (2 * Constants.PARTICLE_RADIUS);
 
-            p1.setxVelocity(p1.getxVelocity() + jx / Constants.PARTICLE_MASS);
-            p1.setyVelocity(p1.getyVelocity() + jy / Constants.PARTICLE_MASS);
-            p2.setxVelocity(p1.getxVelocity() - jx / Constants.PARTICLE_MASS);
-            p2.setyVelocity(p1.getyVelocity() - jy / Constants.PARTICLE_MASS);
+            p2.setxVelocity(p2.getxVelocity() + (jx / Constants.PARTICLE_MASS));
+            p2.setyVelocity(p2.getyVelocity() + (jy / Constants.PARTICLE_MASS));
+            p1.setxVelocity(p1.getxVelocity() - (jx / Constants.PARTICLE_MASS));
+            p1.setyVelocity(p1.getyVelocity() - (jy / Constants.PARTICLE_MASS));
         }
     }
 
-    private Pair<Double, String> timeToWallCollisionAndType(Particle p1) {
+    private Pair<Double, String> timeToWallCollisionAndType(Particle p) {
         double timeToVertical;
         double timeToHorizontal;
-        if (p1.getxVelocity() > 0) {
-            timeToVertical = ((p1.getX() < width / 2 ? width / 2 : width) - p1.getX() - Constants.PARTICLE_RADIUS) / p1.getxVelocity();
+        if (p.getxVelocity() > 0) {
+            timeToVertical = ((p.getX() < width / 2 ? width / 2 : width) - p.getX() - Constants.PARTICLE_RADIUS) / p.getxVelocity();
         } else {
-            timeToVertical = ((p1.getX() < width / 2 ? 0 : width / 2) - p1.getX() + Constants.PARTICLE_RADIUS) / p1.getxVelocity();
+            timeToVertical = ((p.getX() < width / 2 ? 0 : width / 2) - p.getX() + Constants.PARTICLE_RADIUS) / p.getxVelocity();
         }
 
         timeToHorizontal = (
-                (p1.getyVelocity() > 0 ?
+                (p.getyVelocity() > 0 ?
                         height - Constants.PARTICLE_RADIUS : Constants.PARTICLE_RADIUS)
-                        - p1.getY()) / p1.getyVelocity();
+                        - p.getY()) / p.getyVelocity();
 
         if (timeToVertical < timeToHorizontal)
             return new Pair<>(timeToVertical, WALL_VERTICAL_COLLISION_KEY);
@@ -133,51 +133,42 @@ public class Population {
     }
 
     private double getTimeToParticleCollision(Particle p1, Particle p2) {
-        double deltaRSquared = Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2);
-        double deltaVSquared = Math.pow(p1.getxVelocity() - p2.getxVelocity(), 2) + Math.pow(p1.getyVelocity() - p2.getyVelocity(), 2);
-        double deltaVDotDeltaR = (p1.getxVelocity() - p2.getxVelocity()) * (p1.getX() - p2.getX()) + (p1.getyVelocity() - p2.getyVelocity()) * (p1.getY() - p2.getY());
+        double deltaRSquared = Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2);
+        double deltaVSquared = Math.pow(p2.getxVelocity() - p1.getxVelocity(), 2) + Math.pow(p2.getyVelocity() - p1.getyVelocity(), 2);
+        double deltaVDotDeltaR = (p2.getxVelocity() - p1.getxVelocity()) * (p2.getX() - p1.getX()) + (p2.getyVelocity() - p1.getyVelocity()) * (p2.getY() - p1.getY());
         double d = Math.pow(deltaVDotDeltaR, 2) - deltaVSquared * (deltaRSquared - Math.pow(2 * Constants.PARTICLE_RADIUS, 2));
-        if (deltaVDotDeltaR >= 0 || d < 0) {
+        if (deltaVDotDeltaR >= 0 || d < 0)
             return Double.MAX_VALUE;
-        }
-        return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
-
+        else return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
     }
 
-
-    public void runSimulation(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
-
-        System.out.println("Starting simulation. . .");
-
-        File file = new File("./results/" + outputName);
-
-        if (!file.mkdir())
-            throw new FileNotFoundException("CARPETA '" + outputName + "' YA EXISTENTE"); // TODO: MEJORAR EXCEPCION
-
+    public static void createStaticFile(String outputName, Integer particlesQty, Double width, Double height, Double gap)throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%d\n%f %f\n%f\n%f", this.particlesQty, this.width, this.height, this.gap, Constants.PARTICLE_VELOCITY));
+        writer.println(String.format(Locale.ENGLISH, "%d\n%f %f\n%f\n%f", particlesQty, width, height, gap, Constants.PARTICLE_VELOCITY));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
+    }
 
+
+    public void createDynamicFile(String outputName, String iterName) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating dynamic file. . .");
 
-        writer = new PrintWriter("./results/" + outputName + "/dynamic.txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("./results/" + outputName + "/dynamic"+iterName+".txt", "UTF-8");
+
         for (int i = 0; i < 1000; i++) {
             writer.println(i);
             for (Particle p : this.particles) {
-                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f", p.getId(), p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity()));
+                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f",
+                        p.getId(), p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity()));
             }
             nextCollision();
         }
         writer.close();
 
         System.out.println("\tDynamic file successfully created");
-
-        System.out.println("Simulation successfully finished");
-
 
     }
 }

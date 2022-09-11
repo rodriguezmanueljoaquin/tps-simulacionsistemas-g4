@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 public class Manager {
     public static void main(String[] args) {
@@ -14,13 +15,18 @@ public class Manager {
 
         // variando densidad
         simulationParameters.add(new SimulationParameters(20, 0.24, 0.09, 0.01));
-
-        simulationParameters.forEach(parameters ->{
-            Population population = new Population(parameters.particlesQty, parameters.width,parameters.height,parameters.gap);
-
+        simulationParameters.forEach(parameters -> {
+            Population population = null;
             try {
-                for (int i = 1 ; i <= 25 ; i++)
-                    population.runSimulation(String.format(Locale.ENGLISH,"out_%d_%d_%f", i, parameters.particlesQty, parameters.gap));
+                String path = String.format(Locale.ENGLISH, "out_%d_0-0%.0f", parameters.particlesQty, parameters.gap*100);
+                new File("results/" + path).mkdir();
+                Population.createStaticFile(path, parameters.particlesQty, parameters.width, parameters.height, parameters.gap);
+
+                Random random = new Random(Constants.RANDOM_SEED);
+                for (int i = 0 ; i < Constants.SIMULATION_REPETITION_TIMES ; i++){
+                    population = new Population(parameters.particlesQty, parameters.width, parameters.height, parameters.gap, random.nextLong());
+                    population.createDynamicFile(path, String.valueOf(i+1));
+                }
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
