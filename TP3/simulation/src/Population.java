@@ -108,10 +108,10 @@ public class Population {
             double jx = (j * deltaX) / (sigma);
             double jy = (j * deltaY) / (sigma);
 
-            p2.setxVelocity(p2.getxVelocity() + (jx / p2.getMass()));
-            p2.setyVelocity(p2.getyVelocity() + (jy / p2.getMass()));
-            p1.setxVelocity(p1.getxVelocity() - (jx / p1.getMass()));
-            p1.setyVelocity(p1.getyVelocity() - (jy / p1.getMass()));
+            p1.setxVelocity(p1.getxVelocity() + (jx / p1.getMass()));
+            p1.setyVelocity(p1.getyVelocity() + (jy / p1.getMass()));
+            p2.setxVelocity(p2.getxVelocity() - (jx / p2.getMass()));
+            p2.setyVelocity(p2.getyVelocity() - (jy / p2.getMass()));
         }
     }
 
