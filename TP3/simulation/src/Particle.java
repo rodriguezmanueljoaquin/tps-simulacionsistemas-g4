@@ -5,10 +5,10 @@ public class Particle implements Comparable {
     private Double y;
     private static Integer count = 1;
     private final Integer id;
-    private static final double velocity = Constants.PARTICLE_VELOCITY;
     private double yVelocity;
     private double xVelocity;
 
+    private static final double velocity = Constants.PARTICLE_VELOCITY;
     private static final double radius = Constants.PARTICLE_RADIUS;
 
     private static final double mass = Constants.PARTICLE_MASS;
@@ -22,9 +22,8 @@ public class Particle implements Comparable {
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - Particle.getRadius() * 2;
+        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - other.getRadius() - radius;
     }
-
 
     public Double getX() {
         return x;
@@ -38,8 +37,12 @@ public class Particle implements Comparable {
         return id;
     }
 
-    public static double getRadius() {
+    public double getRadius() {
         return radius;
+    }
+
+    public double getMass() {
+        return mass;
     }
 
     public double getyVelocity() {
@@ -63,7 +66,6 @@ public class Particle implements Comparable {
     public void setxVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
     }
-
 
     public void setyVelocity(double yVelocity) {
         this.yVelocity = yVelocity;

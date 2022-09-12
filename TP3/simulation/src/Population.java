@@ -101,16 +101,21 @@ public class Population {
         for (Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)) {
             Particle p1 = pair.getLeft();
             Particle p2 = pair.getRight();
-            double deltaVDotDeltaR = (p2.getxVelocity() - p1.getxVelocity()) * (p2.getX() - p1.getX()) +
-                    (p2.getyVelocity() - p1.getyVelocity()) * (p2.getY() - p1.getY());
-            double j = (2 * 2 * Constants.PARTICLE_MASS * deltaVDotDeltaR) / (2 * Constants.PARTICLE_RADIUS * 2 * Constants.PARTICLE_MASS);
-            double jx = (j * (p2.getX() - p1.getX())) / (2 * Constants.PARTICLE_RADIUS);
-            double jy = (j * (p2.getY() - p1.getY())) / (2 * Constants.PARTICLE_RADIUS);
+            double sigma = p1.getRadius() + p2.getRadius();
+            double deltaX = p2.getX() - p1.getX();
+            double deltaY = p2.getY() - p1.getY();
+            double deltaVDotDeltaR =
+                    (p2.getxVelocity() - p1.getxVelocity()) * deltaX +
+                    (p2.getyVelocity() - p1.getyVelocity()) * deltaY;
 
-            p2.setxVelocity(p2.getxVelocity() + (jx / Constants.PARTICLE_MASS));
-            p2.setyVelocity(p2.getyVelocity() + (jy / Constants.PARTICLE_MASS));
-            p1.setxVelocity(p1.getxVelocity() - (jx / Constants.PARTICLE_MASS));
-            p1.setyVelocity(p1.getyVelocity() - (jy / Constants.PARTICLE_MASS));
+            double j = (2 * (p2.getMass()*p1.getMass()) * deltaVDotDeltaR) / (sigma * (p1.getMass() + p2.getMass()));
+            double jx = (j * deltaX) / (sigma);
+            double jy = (j * deltaY) / (sigma);
+
+            p2.setxVelocity(p2.getxVelocity() + (jx / p2.getMass()));
+            p2.setyVelocity(p2.getyVelocity() + (jy / p2.getMass()));
+            p1.setxVelocity(p1.getxVelocity() - (jx / p1.getMass()));
+            p1.setyVelocity(p1.getyVelocity() - (jy / p1.getMass()));
         }
     }
 
@@ -118,14 +123,14 @@ public class Population {
         double timeToVertical;
         double timeToHorizontal;
         if (p.getxVelocity() > 0) {
-            timeToVertical = ((p.getX() < width / 2 ? width / 2 : width) - p.getX() - Constants.PARTICLE_RADIUS) / p.getxVelocity();
+            timeToVertical = ((p.getX() < width / 2 ? width / 2 : width) - p.getX() - p.getRadius()) / p.getxVelocity();
         } else {
-            timeToVertical = ((p.getX() < width / 2 ? 0 : width / 2) - p.getX() + Constants.PARTICLE_RADIUS) / p.getxVelocity();
+            timeToVertical = ((p.getX() < width / 2 ? 0 : width / 2) - p.getX() + p.getRadius()) / p.getxVelocity();
         }
 
         timeToHorizontal = (
                 (p.getyVelocity() > 0 ?
-                        height - Constants.PARTICLE_RADIUS : Constants.PARTICLE_RADIUS)
+                        height - p.getRadius() : p.getRadius())
                         - p.getY()) / p.getyVelocity();
 
         if (timeToVertical < timeToHorizontal)
@@ -134,10 +139,16 @@ public class Population {
     }
 
     private double getTimeToParticleCollision(Particle p1, Particle p2) {
-        double deltaRSquared = Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2);
-        double deltaVSquared = Math.pow(p2.getxVelocity() - p1.getxVelocity(), 2) + Math.pow(p2.getyVelocity() - p1.getyVelocity(), 2);
-        double deltaVDotDeltaR = (p2.getxVelocity() - p1.getxVelocity()) * (p2.getX() - p1.getX()) + (p2.getyVelocity() - p1.getyVelocity()) * (p2.getY() - p1.getY());
-        double d = Math.pow(deltaVDotDeltaR, 2) - deltaVSquared * (deltaRSquared - Math.pow(2 * Constants.PARTICLE_RADIUS, 2));
+        double deltaX = p2.getX() - p1.getX();
+        double deltaY = p2.getY() - p1.getY();
+        double deltaxV = p2.getxVelocity() - p1.getxVelocity();
+        double deltayV = p2.getyVelocity() - p1.getyVelocity();
+
+        double deltaRSquared = Math.pow(deltaX, 2) + Math.pow(deltaY, 2);
+        double deltaVSquared = Math.pow(deltaxV, 2) + Math.pow(deltayV, 2);
+        double deltaVDotDeltaR = (deltaxV) * (deltaX) + (deltayV) * (deltaY);
+        double d = Math.pow(deltaVDotDeltaR, 2) - deltaVSquared * (deltaRSquared - Math.pow(p1.getRadius() + p2.getRadius(), 2));
+
         if (deltaVDotDeltaR >= 0 || d < 0)
             return Double.MAX_VALUE;
         else return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
