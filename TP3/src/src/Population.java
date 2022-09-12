@@ -101,7 +101,8 @@ public class Population {
         for (Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)) {
             Particle p1 = pair.getLeft();
             Particle p2 = pair.getRight();
-            double deltaVDotDeltaR = (p2.getxVelocity() - p1.getxVelocity()) * (p2.getX() - p1.getX()) + (p2.getyVelocity() - p1.getyVelocity()) * (p2.getY() - p1.getY());
+            double deltaVDotDeltaR = (p2.getxVelocity() - p1.getxVelocity()) * (p2.getX() - p1.getX()) +
+                    (p2.getyVelocity() - p1.getyVelocity()) * (p2.getY() - p1.getY());
             double j = (2 * 2 * Constants.PARTICLE_MASS * deltaVDotDeltaR) / (2 * Constants.PARTICLE_RADIUS * 2 * Constants.PARTICLE_MASS);
             double jx = (j * (p2.getX() - p1.getX())) / (2 * Constants.PARTICLE_RADIUS);
             double jy = (j * (p2.getY() - p1.getY())) / (2 * Constants.PARTICLE_RADIUS);
