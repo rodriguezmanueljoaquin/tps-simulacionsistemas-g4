@@ -102,9 +102,9 @@ public class Population {
             double deltaY = p2.getY() - p1.getY();
             double deltaVDotDeltaR =
                     (p2.getxVelocity() - p1.getxVelocity()) * deltaX +
-                    (p2.getyVelocity() - p1.getyVelocity()) * deltaY;
+                            (p2.getyVelocity() - p1.getyVelocity()) * deltaY;
 
-            double j = (2 * (p2.getMass()*p1.getMass()) * deltaVDotDeltaR) / (sigma * (p1.getMass() + p2.getMass()));
+            double j = (2 * (p2.getMass() * p1.getMass()) * deltaVDotDeltaR) / (sigma * (p1.getMass() + p2.getMass()));
             double jx = (j * deltaX) / (sigma);
             double jy = (j * deltaY) / (sigma);
 
@@ -118,10 +118,22 @@ public class Population {
     private Pair<Double, String> timeToWallCollisionAndType(Particle p) {
         double timeToVertical;
         double timeToHorizontal;
+
         if (p.getxVelocity() > 0) {
-            timeToVertical = ((p.getX() < width / 2 ? width / 2 : width) - p.getX() - p.getRadius()) / p.getxVelocity();
+            if (p.getX() > width / 2 ||
+                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - width / 2) < gap / 2)
+                // que este en la caja derecha o pase por el gap hacia esa caja
+                timeToVertical = (width - p.getX() - p.getRadius()) / p.getxVelocity();
+            else {
+                timeToVertical = (width / 2 - p.getX() - p.getRadius()) / p.getxVelocity();
+            }
         } else {
-            timeToVertical = ((p.getX() < width / 2 ? 0 : width / 2) - p.getX() + p.getRadius()) / p.getxVelocity();
+            if (p.getX() < width / 2 ||
+                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - width / 2) < gap / 2)
+                timeToVertical = (-p.getX() + p.getRadius()) / p.getxVelocity();
+            else {
+                timeToVertical = (width / 2 - p.getX() + p.getRadius()) / p.getxVelocity();
+            }
         }
 
         timeToHorizontal = (
@@ -150,7 +162,7 @@ public class Population {
         else return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
     }
 
-    public static void createStaticFile(String outputName, Integer particlesQty, Double width, Double height, Double gap)throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputName, Integer particlesQty, Double width, Double height, Double gap) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
@@ -164,9 +176,9 @@ public class Population {
     public void createDynamicFile(String outputName, String iterName) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating dynamic file. . .");
 
-        PrintWriter writer = new PrintWriter("./results/" + outputName + "/dynamic"+iterName+".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("./results/" + outputName + "/dynamic" + iterName + ".txt", "UTF-8");
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < Constants.SIMULATION_STEPS; i++) {
             writer.println(i);
             for (Particle p : this.particles) {
                 writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f",
