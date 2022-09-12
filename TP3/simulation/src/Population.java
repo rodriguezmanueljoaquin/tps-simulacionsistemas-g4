@@ -8,17 +8,13 @@ public class Population {
     private List<Particle> particles;
     private Random rand;
     private Integer particlesQty;
-
     private Double height;
-
     private Double width;
-
     private Double gap;
 
     private static final String WALL_VERTICAL_COLLISION_KEY = "WALL_VERTICAL";
     private static final String WALL_HORIZONTAL_COLLISION_KEY = "WALL_HORIZONTAL";
     private static final String PARTICLES_COLLISION_KEY = "PARTICLES";
-
 
     public Population(Integer particlesQty, Double width, Double height, Double gap, long seed) {
         this.particlesQty = particlesQty;

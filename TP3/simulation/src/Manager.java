@@ -23,9 +23,12 @@ public class Manager {
                 Population.createStaticFile(path, parameters.particlesQty, parameters.width, parameters.height, parameters.gap);
 
                 Random random = new Random(Constants.RANDOM_SEED);
+                String dynamicsPath = path + "/dynamics";
+                new File("results/" + dynamicsPath).mkdir();
+
                 for (int i = 0 ; i < Constants.SIMULATION_REPETITION_TIMES ; i++){
                     population = new Population(parameters.particlesQty, parameters.width, parameters.height, parameters.gap, random.nextLong());
-                    population.createDynamicFile(path, String.valueOf(i+1));
+                    population.createDynamicFile(dynamicsPath, String.valueOf(i+1));
                 }
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
