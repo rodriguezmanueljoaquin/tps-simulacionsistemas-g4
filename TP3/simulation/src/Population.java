@@ -121,7 +121,7 @@ public class Population {
 
         if (p.getxVelocity() > 0) {
             if (p.getX() > width / 2 ||
-                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - width / 2) < gap / 2)
+                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - height / 2) < gap / 2)
                 // que este en la caja derecha o pase por el gap hacia esa caja
                 timeToVertical = (width - p.getX() - p.getRadius()) / p.getxVelocity();
             else {
@@ -129,7 +129,7 @@ public class Population {
             }
         } else {
             if (p.getX() < width / 2 ||
-                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - width / 2) < gap / 2)
+                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - height / 2) < gap / 2)
                 timeToVertical = (-p.getX() + p.getRadius()) / p.getxVelocity();
             else {
                 timeToVertical = (width / 2 - p.getX() + p.getRadius()) / p.getxVelocity();

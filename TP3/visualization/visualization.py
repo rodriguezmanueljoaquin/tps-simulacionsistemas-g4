@@ -1,5 +1,4 @@
 import argparse
-import os
 from files import readInputFiles
 # from graph import plotTemporalObservable, plotScalarObservable
 import exportOvito
@@ -57,14 +56,10 @@ def main():
         # else:
         #     plotScalarObservable(simulationResults,noiseObservableParameter)
 
-        ovitoFolderName = "ovito_input"
 
         simulationResults = simulationResultsDict[(20,0.01)]
 
-        # ##Si no existe la carpeta para almacenar los archivos de ovito, la crea
-        if(not os.path.exists(ovitoFolderName)):
-            os.makedirs(ovitoFolderName)
-        animate(simulationResults[5], "{}/particles_{}_{}.xyz".format(ovitoFolderName,simulationResults[5].N,simulationResults[5].gap))
+        exportOvito.exportOvito(simulationResults[5])
 
     
     else:
@@ -73,7 +68,7 @@ def main():
 
 
 def animate(result,name):
-    exportOvito.exportOvito(result,name)
+    exportOvito.exportOvito(result)
     # renderOvito.animation()
     
 

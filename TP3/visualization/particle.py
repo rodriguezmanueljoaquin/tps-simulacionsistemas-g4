@@ -1,4 +1,5 @@
-
+from cmath import pi
+import random
 
 class Particle:    
     
@@ -8,6 +9,8 @@ class Particle:
         self.y = y
         self.velx = velx
         self.vely = vely
+        random.seed(self.id)
+        self.color_id = (random.random()*2*pi) - pi
 
     def __eq__(self, other):
         return self.id == other.id
