@@ -1,2 +1,2 @@
-
+STEP = 1
 UMBRAL = 0.05

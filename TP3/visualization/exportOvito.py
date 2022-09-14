@@ -44,7 +44,6 @@ def exportWalls(width, height, gap):
 
 def exportParticles(N,gap,particlesDict):
     file = open("{}/particles_{}_{}.xyz".format(ovitoFolderName, N, gap), "w")
-    norm = cm.colors.Normalize(vmin=0, vmax=N)
     for time in particlesDict:
         file.write("{}\ncomment\n".format(N))
         for idP in particlesDict[time]:

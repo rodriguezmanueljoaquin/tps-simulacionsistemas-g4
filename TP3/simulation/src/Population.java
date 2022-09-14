@@ -11,6 +11,7 @@ public class Population {
     private Double height;
     private Double width;
     private Double gap;
+    private Double currentIterationTime;
 
     private static final String WALL_VERTICAL_COLLISION_KEY = "WALL_VERTICAL";
     private static final String WALL_HORIZONTAL_COLLISION_KEY = "WALL_HORIZONTAL";
@@ -23,6 +24,7 @@ public class Population {
         this.width = width;
         this.height = height;
         this.gap = gap;
+        this.currentIterationTime = 0.;
 
 
         for (int i = 0; i < this.particlesQty; i++) {
@@ -78,6 +80,7 @@ public class Population {
     public void nextCollision() {
         Pair<Double, Map<String, List<Pair<Particle, Particle>>>> answer = getCollisionTimeAndParticles();
         double timeToNextCollision = answer.getLeft();
+        this.currentIterationTime += timeToNextCollision;
         Map<String, List<Pair<Particle, Particle>>> collisionedParticles = answer.getRight();
 
         // Actualización de posiciones
@@ -179,7 +182,7 @@ public class Population {
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/dynamic" + iterName + ".txt", "UTF-8");
 
         for (int i = 0; i < Constants.SIMULATION_STEPS; i++) {
-            writer.println(i);
+            writer.println(this.currentIterationTime);
             for (Particle p : this.particles) {
                 writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f",
                         p.getId(), p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity()));

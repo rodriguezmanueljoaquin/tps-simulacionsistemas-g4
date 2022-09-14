@@ -1,6 +1,6 @@
 import argparse
 from files import readInputFiles
-# from graph import plotTemporalObservable, plotScalarObservable
+from graph import plotTemporalObservable, plotScalarObservable
 import exportOvito
 import renderOvito
 from simulationResult import SimulationResult
@@ -51,10 +51,11 @@ def main():
         # simulationResults.sort(key=etaFunc)
 
         # if(observableType == 'temporal'):
-        #     plotTemporalObservable(simulationResults,noiseObservableParameter)
-        #     return
-        # else:
-        #     plotScalarObservable(simulationResults,noiseObservableParameter)
+        if(True):
+            plotTemporalObservable(simulationResultsDict, gapObservableParameter)
+            return
+        else:
+            plotScalarObservable(simulationResults,noiseObservableParameter)
 
 
         simulationResults = simulationResultsDict[(20,0.01)]
@@ -65,14 +66,9 @@ def main():
     else:
         print("Invalid command line arguments")
 
-
-
 def animate(result,name):
     exportOvito.exportOvito(result)
     # renderOvito.animation()
-    
-
 
 if __name__ == "__main__":
     main()
-

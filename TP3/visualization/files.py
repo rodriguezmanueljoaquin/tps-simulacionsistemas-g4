@@ -1,7 +1,7 @@
 import os
 import copy
 import numpy as np
-from constants import UMBRAL
+from constants import STEP, UMBRAL
 from simulationResult import SimulationResult
 from particle import Particle
 
@@ -55,7 +55,7 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
 
     line = file.readline()
     lineCount += 1
-    currentTime = int(line.strip())
+    currentTime = float(line.strip())
     sectionSum = 0
     simulationResult.particlesDict[currentTime] = dict()
     while read:
@@ -73,7 +73,7 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
                 if(simulationResult.balanceTime is None):
                     if(Fp-0.5<UMBRAL):
                         simulationResult.setBalanceTime(currentTime)
-                currentTime = int(line.strip())
+                currentTime = float(line.strip())
                 sectionSum = 0
                 simulationResult.particlesDict[currentTime] = dict()
 
@@ -86,12 +86,24 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
 
             lineCount += 1
 
-    ##Calculamos el Fp correspondiente a la ultima particula
+    ##Calculamos el Fp correspondiente al tiempo actual
     Fp = sectionSum/N
     simulationResult.fpDict[currentTime] = Fp
 
-    file.close()
+    ## Saco los tiempos que no me interesan que son aquellos anteriores al ultimo cerca del STEP
+    currentIterTime = 0
+    removeKeys = list()
+    for key in sorted(simulationResult.fpDict.keys()):
+        if currentIterTime + STEP < key:
+            for removeKey in removeKeys: 
+                simulationResult.fpDict.pop(removeKey)
 
+            currentIterTime += STEP
+            removeKeys.clear()
+        else:
+            removeKeys.append(key)
+
+    file.close()
 
 def __readStaticInputFile(staticInputFilePath):
     lineCount = 0

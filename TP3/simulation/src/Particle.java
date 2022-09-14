@@ -7,10 +7,8 @@ public class Particle implements Comparable {
     private final Integer id;
     private double yVelocity;
     private double xVelocity;
-
     private static final double velocity = Constants.PARTICLE_VELOCITY;
     private static final double radius = Constants.PARTICLE_RADIUS;
-
     private static final double mass = Constants.PARTICLE_MASS;
 
     public Particle(Double x, Double y, double angle) {
