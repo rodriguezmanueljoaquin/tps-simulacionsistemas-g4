@@ -1,8 +1,9 @@
+from math import ceil, floor
 import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import STEP, PARAM_GAP_SIZE, PARAM_PARTICLES_QTY
+from constants import MAX_STEP, STEP, PARAM_GAP_SIZE, PARAM_PARTICLES_QTY
 from files import removeItemsOutOfStepAndMaxStep
 
 
@@ -26,11 +27,9 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
     for simParams, simulationsResults in simulationResultsDict.items():
         # simParams es de la forma (N, abertura)
         simulationResult = simulationsResults[0] # solo nos interesa el primero, se podria tomar el promedio de todas las ejecuciones pero es innecesario y posiblemente no se visualize bien
-        step = 0
         removeItemsOutOfStepAndMaxStep(simulationResult)
         for time, Fp in simulationResult.fpDict.items():
-            step += STEP
-            data['Time'].append(step)
+            data['Time'].append(ceil(time/STEP)*STEP)
             data['Fraction'].append(Fp)
             data[parameter + (" m" if observableParameter == PARAM_GAP_SIZE else "")].append(simParams[param_key])
 
@@ -42,7 +41,7 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
     plt.xlabel("Tiempo (Pasos)")
     ax = sns.lineplot(data=temporalObservableDataDF, x="Time", y="Fraction",
                 hue=parameter, legend="full",palette="pastel")
-    sns.move_legend(ax,"lower right")
+    sns.move_legend(ax,"upper right")
     plt.show()
 
 

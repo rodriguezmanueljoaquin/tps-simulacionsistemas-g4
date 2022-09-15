@@ -54,8 +54,9 @@ def main():
         else:
             plotScalarObservable(simulationResults,noiseObservableParameter)
 
-        simulationResults = simulationResultsDict[(20,0.01)]
-        exportOvito.exportOvito(simulationResults[5])
+
+        # ANIMACION:
+        # exportOvito.exportOvito(simulationResultsDict[(20,0.01)][0])
     
     else:
         print("Invalid command line arguments")

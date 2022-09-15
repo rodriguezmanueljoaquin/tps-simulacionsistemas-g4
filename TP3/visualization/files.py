@@ -44,54 +44,47 @@ def readInputFiles(inputFilesDirectoryPath,simulationResultsDict):
 
 
 def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
-    lineCount = 0
     read = True
     N = simulationResult.N
     v = simulationResult.v
     width = simulationResult.width
-    height = simulationResult.height
     
     file = open(dynamicInputFilePath , 'r')
 
-    line = file.readline()
-    lineCount += 1
-    currentTime = float(line.strip())
-    sectionSum = 0
-    simulationResult.particlesDict[currentTime] = dict()
+    # line = file.readline()
+    # currentTime = float(line.strip())
+    # sectionSum = 0
+    # simulationResult.particlesDict[currentTime] = dict()
     while read:
         line = file.readline()
         
         if not line:
             read = False
         else:
+            ##Si aun no llego al equilibrio, chequeamos que haya llegado a dicha condicion
+            currentTime = float(line.strip())
+            if currentTime > MAX_STEP * STEP:
+                read = False
+            else:
+                sectionSum = 0
+                simulationResult.particlesDict[currentTime] = dict()
+                for i in range(N):
+                    line = file.readline()
+                    particleData = line.split(";")
+                    id = float(particleData[0])
+                    x = float(particleData[1])
+                    y = float(particleData[2])
+                    vx = float(particleData[3])
+                    vy = float(particleData[4])
+                    simulationResult.particlesDict[currentTime][id] = Particle(id,x,y,vx,vy)
+                    sectionSum += (x<=width/2)
 
-            ##Si es una linea correspondiente a un tiempo, en caso de leer previamente la data de las particulas calculamos el Va en cuestion
-            ##Luego, reinciamos el vector de velocidades y seteamos el tiempo correspondiente
-            if(lineCount%(N+1)==0):
                 Fp = sectionSum/N
                 simulationResult.fpDict[currentTime] = Fp
-                ##Si aun no llego al equilibrio, chequeamos que haya llegado a dicha condicion
                 if(simulationResult.balanceTime is None):
                     if(Fp-0.5<UMBRAL):
                         simulationResult.setBalanceTime(currentTime)
-                currentTime = float(line.strip())
-                if currentTime > MAX_STEP:
-                    read = False
-                sectionSum = 0
-                simulationResult.particlesDict[currentTime] = dict()
-
-            else:
-                ##Si no es una linea correspondiente a un tiempo, leemos y almacenamos la data de cada particula
-                particleData = line.split(";")
-                particle = Particle(int(particleData[0]),float(particleData[1]),float(particleData[2]),float(particleData[3]),float(particleData[4]))
-                simulationResult.particlesDict[currentTime][particle.id] = particle
-                sectionSum+=(particle.x<=width/2)
-
-            lineCount += 1
-
-    ##Calculamos el Fp correspondiente al tiempo actual
-    Fp = sectionSum/N
-    simulationResult.fpDict[currentTime] = Fp
+                        
 
     file.close()
 
@@ -105,7 +98,7 @@ def removeItemsOutOfStepAndMaxStep(simulationResult):
             keysToRemove.append(stepTime)
         else:
             if currentIterTime > stepTime:
-                keysToRemove.append(stepKeys[:-1]) # el ultimo es el mas cercano al cambio del step asi que no lo borro
+                keysToRemove += stepKeys[:-1] # el ultimo es el mas cercano al cambio del step asi que no lo borro
                 stepKeys.clear()
                 currentIterTime += STEP
 
