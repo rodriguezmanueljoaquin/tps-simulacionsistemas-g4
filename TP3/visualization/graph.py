@@ -2,38 +2,46 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import STEP
+from constants import STEP, PARAM_GAP_SIZE, PARAM_PARTICLES_QTY
+from files import removeItemsOutOfStepAndMaxStep
 
 
-def plotTemporalObservable(simulationResultsDict, noiseObservableParameter):
+def plotTemporalObservable(simulationResultsDict, observableParameter):
+    # Las key del diccionario son de la forma (N, gap)
+    if observableParameter == PARAM_PARTICLES_QTY:
+        param_key =0
+    elif observableParameter == PARAM_GAP_SIZE:
+        param_key =1
+    else: raise Exception("Invalid observable parameter")
+
     plt.rcParams.update({'font.size': 22})
-    parameter = 'run'
+    parameter = "Cantidad de partículas" if observableParameter == 'particles_number' else "Tamaño de abertura"
 
     data = {
         parameter:[],
         'Time':[],
-        'Fp':[]
+        'Fraction':[]
     }
 
-    step = STEP
-
-
-    # for simulationResult in simulationResultsDict:
-    step = 0
-    print(simulationResultsDict.keys())
-    for time, Fp in simulationResultsDict[(20,0.01)][0].fpDict.items():
-        step += STEP
-        data['Time'].append(step)
-        data['Fp'].append(Fp)
-        data[parameter].append(1)
+    for simParams, simulationsResults in simulationResultsDict.items():
+        # simParams es de la forma (N, abertura)
+        simulationResult = simulationsResults[0] # solo nos interesa el primero, se podria tomar el promedio de todas las ejecuciones pero es innecesario y posiblemente no se visualize bien
+        step = 0
+        removeItemsOutOfStepAndMaxStep(simulationResult)
+        for time, Fp in simulationResult.fpDict.items():
+            step += STEP
+            data['Time'].append(step)
+            data['Fraction'].append(Fp)
+            data[parameter + (" m" if observableParameter == PARAM_GAP_SIZE else "")].append(simParams[param_key])
 
     temporalObservableDataDF = pd.DataFrame(data)
 
     plt.figure(num="Temporal observable",figsize = (15,9))
-    plt.title(f"Temporal observable: Polarization vs Time")
-    plt.ylabel("Fp")
-    plt.xlabel("Time (Steps)")
-    ax = sns.lineplot(data=temporalObservableDataDF, x="Time", y="Fp",hue=parameter,legend="full",palette="pastel")
+    plt.title(f"Temporal observable: Fracción de partículas vs {parameter}")
+    plt.ylabel("Fracción de partículas")
+    plt.xlabel("Tiempo (Pasos)")
+    ax = sns.lineplot(data=temporalObservableDataDF, x="Time", y="Fraction",
+                hue=parameter, legend="full",palette="pastel")
     sns.move_legend(ax,"lower right")
     plt.show()
 

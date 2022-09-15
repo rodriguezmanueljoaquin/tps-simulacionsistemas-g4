@@ -1,7 +1,7 @@
 import os
 import copy
 import numpy as np
-from constants import STEP, UMBRAL
+from constants import MAX_STEP, STEP, UMBRAL
 from simulationResult import SimulationResult
 from particle import Particle
 
@@ -64,6 +64,7 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
         if not line:
             read = False
         else:
+
             ##Si es una linea correspondiente a un tiempo, en caso de leer previamente la data de las particulas calculamos el Va en cuestion
             ##Luego, reinciamos el vector de velocidades y seteamos el tiempo correspondiente
             if(lineCount%(N+1)==0):
@@ -74,6 +75,8 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
                     if(Fp-0.5<UMBRAL):
                         simulationResult.setBalanceTime(currentTime)
                 currentTime = float(line.strip())
+                if currentTime > MAX_STEP:
+                    read = False
                 sectionSum = 0
                 simulationResult.particlesDict[currentTime] = dict()
 
@@ -90,20 +93,26 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
     Fp = sectionSum/N
     simulationResult.fpDict[currentTime] = Fp
 
+    file.close()
+
+def removeItemsOutOfStepAndMaxStep(simulationResult):
     ## Saco los tiempos que no me interesan que son aquellos anteriores al ultimo cerca del STEP
     currentIterTime = 0
-    removeKeys = list()
-    for key in sorted(simulationResult.fpDict.keys()):
-        if currentIterTime + STEP < key:
-            for removeKey in removeKeys: 
-                simulationResult.fpDict.pop(removeKey)
-
-            currentIterTime += STEP
-            removeKeys.clear()
+    keysToRemove = list()
+    stepKeys = list()
+    for stepTime in sorted(simulationResult.fpDict.keys()):
+        if stepTime > MAX_STEP:
+            keysToRemove.append(stepTime)
         else:
-            removeKeys.append(key)
+            if currentIterTime > stepTime:
+                keysToRemove.append(stepKeys[:-1]) # el ultimo es el mas cercano al cambio del step asi que no lo borro
+                stepKeys.clear()
+                currentIterTime += STEP
 
-    file.close()
+            stepKeys.append(stepTime)
+
+    for removeKey in keysToRemove:
+        simulationResult.fpDict.pop(removeKey)
 
 def __readStaticInputFile(staticInputFilePath):
     lineCount = 0

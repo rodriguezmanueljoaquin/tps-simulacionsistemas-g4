@@ -8,8 +8,6 @@ public class Population {
     private List<Particle> particles;
     private Random rand;
     private Integer particlesQty;
-    private Double height;
-    private Double width;
     private Double gap;
     private Double currentIterationTime;
 
@@ -17,12 +15,10 @@ public class Population {
     private static final String WALL_HORIZONTAL_COLLISION_KEY = "WALL_HORIZONTAL";
     private static final String PARTICLES_COLLISION_KEY = "PARTICLES";
 
-    public Population(Integer particlesQty, Double width, Double height, Double gap, long seed) {
+    public Population(Integer particlesQty,  Double gap, long seed) {
         this.particlesQty = particlesQty;
         this.particles = new ArrayList<>();
         this.rand = new Random(seed);
-        this.width = width;
-        this.height = height;
         this.gap = gap;
         this.currentIterationTime = 0.;
 
@@ -32,7 +28,7 @@ public class Population {
             Particle particle = null;
             while (!validPos) {
                 validPos = true;
-                particle = new Particle((rand.nextDouble() * (this.width / 2 - Constants.PARTICLE_RADIUS * 2)) + Constants.PARTICLE_RADIUS, (rand.nextDouble() * (this.height - Constants.PARTICLE_RADIUS * 2)) + Constants.PARTICLE_RADIUS, rand.nextDouble() * 2 * Math.PI);
+                particle = new Particle((rand.nextDouble() * (Constants.SIMULATION_WIDTH / 2 - Constants.PARTICLE_RADIUS * 2)) + Constants.PARTICLE_RADIUS, (rand.nextDouble() * (Constants.SIMULATION_HEIGHT - Constants.PARTICLE_RADIUS * 2)) + Constants.PARTICLE_RADIUS, rand.nextDouble() * 2 * Math.PI);
                 for (Particle other : particles) {
                     Double d = particle.calculateDistanceTo(other);
                     if (d <= 0) { //TODO VER SI EN 0 PUEDE ARRANCAR
@@ -123,25 +119,25 @@ public class Population {
         double timeToHorizontal;
 
         if (p.getxVelocity() > 0) {
-            if (p.getX() > width / 2 ||
-                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - height / 2) < gap / 2)
+            if (p.getX() > Constants.SIMULATION_WIDTH / 2 ||
+                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (Constants.SIMULATION_WIDTH / 2 - p.getX()) - Constants.SIMULATION_HEIGHT / 2) < gap / 2)
                 // que este en la caja derecha o pase por el gap hacia esa caja
-                timeToVertical = (width - p.getX() - p.getRadius()) / p.getxVelocity();
+                timeToVertical = (Constants.SIMULATION_WIDTH - p.getX() - p.getRadius()) / p.getxVelocity();
             else {
-                timeToVertical = (width / 2 - p.getX() - p.getRadius()) / p.getxVelocity();
+                timeToVertical = (Constants.SIMULATION_WIDTH / 2 - p.getX() - p.getRadius()) / p.getxVelocity();
             }
         } else {
-            if (p.getX() < width / 2 ||
-                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (width / 2 - p.getX()) - height / 2) < gap / 2)
+            if (p.getX() < Constants.SIMULATION_WIDTH / 2 ||
+                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (Constants.SIMULATION_WIDTH / 2 - p.getX()) - Constants.SIMULATION_HEIGHT / 2) < gap / 2)
                 timeToVertical = (-p.getX() + p.getRadius()) / p.getxVelocity();
             else {
-                timeToVertical = (width / 2 - p.getX() + p.getRadius()) / p.getxVelocity();
+                timeToVertical = (Constants.SIMULATION_WIDTH / 2 - p.getX() + p.getRadius()) / p.getxVelocity();
             }
         }
 
         timeToHorizontal = (
                 (p.getyVelocity() > 0 ?
-                        height - p.getRadius() : p.getRadius())
+                        Constants.SIMULATION_HEIGHT - p.getRadius() : p.getRadius())
                         - p.getY()) / p.getyVelocity();
 
         if (timeToVertical < timeToHorizontal)
@@ -165,11 +161,11 @@ public class Population {
         else return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
     }
 
-    public static void createStaticFile(String outputName, Integer particlesQty, Double width, Double height, Double gap) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputName, Integer particlesQty, Double gap) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%d\n%f %f\n%f\n%f", particlesQty, width, height, gap, Constants.PARTICLE_VELOCITY));
+        writer.println(String.format(Locale.ENGLISH, "%d\n%f %f\n%f\n%f", particlesQty, Constants.SIMULATION_WIDTH, Constants.SIMULATION_HEIGHT, gap, Constants.PARTICLE_VELOCITY));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
