@@ -11,9 +11,6 @@ public class Population {
     private Double gap;
     private Double currentIterationTime;
 
-    private static final String WALL_VERTICAL_COLLISION_KEY = "WALL_VERTICAL";
-    private static final String WALL_HORIZONTAL_COLLISION_KEY = "WALL_HORIZONTAL";
-    private static final String PARTICLES_COLLISION_KEY = "PARTICLES";
 
     public Population(Integer particlesQty,  Double gap, long seed) {
         this.particlesQty = particlesQty;
@@ -40,41 +37,8 @@ public class Population {
         }
     }
 
-    public Pair<Double, Map<String, List<Pair<Particle, Particle>>>> getCollisionTimeAndParticles() {
-        double timeToNextCollision = Double.MAX_VALUE;
-        Map<String, List<Pair<Particle, Particle>>> collisionedParticles = new HashMap<>();
-        collisionedParticles.put(WALL_VERTICAL_COLLISION_KEY, new ArrayList<>());
-        collisionedParticles.put(WALL_HORIZONTAL_COLLISION_KEY, new ArrayList<>());
-        collisionedParticles.put(PARTICLES_COLLISION_KEY, new ArrayList<>());
-
-        for (int i = 0; i < particles.size(); i++) {
-            for (int j = i + 1; j < particles.size(); j++) {
-                double timeToParticleCollision = getTimeToParticleCollision(particles.get(i), particles.get(j));
-                if (timeToParticleCollision <= timeToNextCollision) {
-                    if (timeToParticleCollision != timeToNextCollision) {
-                        timeToNextCollision = timeToParticleCollision;
-                        collisionedParticles.replaceAll((key, pairs) -> new ArrayList<>());
-                    }
-                    collisionedParticles.get(PARTICLES_COLLISION_KEY).add(new Pair<>(particles.get(i), particles.get(j)));
-                }
-            }
-
-            Pair<Double, String> wallTimeAndType = timeToWallCollisionAndType(particles.get(i));
-            if (wallTimeAndType.getLeft() <= timeToNextCollision) {
-                if (wallTimeAndType.getLeft() != timeToNextCollision) {
-                    timeToNextCollision = wallTimeAndType.getLeft();
-                    collisionedParticles.replaceAll((key, pairs) -> new ArrayList<>());
-                }
-                // colisionaron en el mismo tiempo
-                collisionedParticles.get(wallTimeAndType.getRight()).add(new Pair<>(particles.get(i), null));
-            }
-        }
-
-        return new Pair<>(timeToNextCollision, collisionedParticles);
-    }
-
     public void nextCollision() {
-        Pair<Double, Map<String, List<Pair<Particle, Particle>>>> answer = getCollisionTimeAndParticles();
+        Pair<Double, Map<String, List<Pair<Particle, Particle>>>> answer = CollisionHelper.getCollisionTimeAndParticles(particles, gap);
         double timeToNextCollision = answer.getLeft();
         this.currentIterationTime += timeToNextCollision;
         Map<String, List<Pair<Particle, Particle>>> collisionedParticles = answer.getRight();
@@ -86,14 +50,14 @@ public class Population {
         }
 
         // Actualización de velocidades
-        collisionedParticles.get(WALL_VERTICAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+        collisionedParticles.get(Constants.WALL_VERTICAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
                 particle -> particle.setxVelocity(-particle.getxVelocity())
         );
-        collisionedParticles.get(WALL_HORIZONTAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+        collisionedParticles.get(Constants.WALL_HORIZONTAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
                 particle -> particle.setyVelocity(-particle.getyVelocity())
         );
 
-        for (Pair<Particle, Particle> pair : collisionedParticles.get(PARTICLES_COLLISION_KEY)) {
+        for (Pair<Particle, Particle> pair : collisionedParticles.get(Constants.PARTICLES_COLLISION_KEY)) {
             Particle p1 = pair.getLeft();
             Particle p2 = pair.getRight();
             double sigma = p1.getRadius() + p2.getRadius();
@@ -112,53 +76,6 @@ public class Population {
             p2.setxVelocity(p2.getxVelocity() - (jx / p2.getMass()));
             p2.setyVelocity(p2.getyVelocity() - (jy / p2.getMass()));
         }
-    }
-
-    private Pair<Double, String> timeToWallCollisionAndType(Particle p) {
-        double timeToVertical;
-        double timeToHorizontal;
-
-        if (p.getxVelocity() > 0) {
-            if (p.getX() > Constants.SIMULATION_WIDTH / 2 ||
-                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (Constants.SIMULATION_WIDTH / 2 - p.getX()) - Constants.SIMULATION_HEIGHT / 2) < gap / 2)
-                // que este en la caja derecha o pase por el gap hacia esa caja
-                timeToVertical = (Constants.SIMULATION_WIDTH - p.getX() - p.getRadius()) / p.getxVelocity();
-            else {
-                timeToVertical = (Constants.SIMULATION_WIDTH / 2 - p.getX() - p.getRadius()) / p.getxVelocity();
-            }
-        } else {
-            if (p.getX() < Constants.SIMULATION_WIDTH / 2 ||
-                    Math.abs(p.getY() + p.getyVelocity() * p.getxVelocity() / (Constants.SIMULATION_WIDTH / 2 - p.getX()) - Constants.SIMULATION_HEIGHT / 2) < gap / 2)
-                timeToVertical = (-p.getX() + p.getRadius()) / p.getxVelocity();
-            else {
-                timeToVertical = (Constants.SIMULATION_WIDTH / 2 - p.getX() + p.getRadius()) / p.getxVelocity();
-            }
-        }
-
-        timeToHorizontal = (
-                (p.getyVelocity() > 0 ?
-                        Constants.SIMULATION_HEIGHT - p.getRadius() : p.getRadius())
-                        - p.getY()) / p.getyVelocity();
-
-        if (timeToVertical < timeToHorizontal)
-            return new Pair<>(timeToVertical, WALL_VERTICAL_COLLISION_KEY);
-        else return new Pair<>(timeToHorizontal, WALL_HORIZONTAL_COLLISION_KEY);
-    }
-
-    private double getTimeToParticleCollision(Particle p1, Particle p2) {
-        double deltaX = p2.getX() - p1.getX();
-        double deltaY = p2.getY() - p1.getY();
-        double deltaxV = p2.getxVelocity() - p1.getxVelocity();
-        double deltayV = p2.getyVelocity() - p1.getyVelocity();
-
-        double deltaRSquared = Math.pow(deltaX, 2) + Math.pow(deltaY, 2);
-        double deltaVSquared = Math.pow(deltaxV, 2) + Math.pow(deltayV, 2);
-        double deltaVDotDeltaR = (deltaxV) * (deltaX) + (deltayV) * (deltaY);
-        double d = Math.pow(deltaVDotDeltaR, 2) - deltaVSquared * (deltaRSquared - Math.pow(p1.getRadius() + p2.getRadius(), 2));
-
-        if (deltaVDotDeltaR >= 0 || d < 0)
-            return Double.MAX_VALUE;
-        else return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
     }
 
     public static void createStaticFile(String outputName, Integer particlesQty, Double gap) throws FileNotFoundException, UnsupportedEncodingException {
