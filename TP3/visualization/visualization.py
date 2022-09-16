@@ -1,5 +1,5 @@
 import argparse
-from files import readInputFiles
+from files import readInputFiles, removeItemsOutOfStepAndMaxStep
 from graph import plotTemporalObservable, plotScalarObservable
 import exportOvito
 import renderOvito
@@ -48,7 +48,7 @@ def main():
 
         # simulationResults.sort(key=etaFunc)
 
-        if(False): #TODO: Deberia ser una variable indicando si se quiere animar o graficar
+        if(True): #TODO: Deberia ser una variable indicando si se quiere animar o graficar
             if(observableType == 'temporal'):
                 plotTemporalObservable(simulationResultsDict, observableParam)
                 return
@@ -57,7 +57,9 @@ def main():
 
         else:
         # ANIMACION:
-            exportOvito.exportOvito(simulationResultsDict[(150,0.01)][0])
+            simulationResult = simulationResultsDict[(150, 0.01)][0]
+            removeItemsOutOfStepAndMaxStep(simulationResult)
+            exportOvito.exportOvito(simulationResult)
     
     else:
         print("Invalid command line arguments")

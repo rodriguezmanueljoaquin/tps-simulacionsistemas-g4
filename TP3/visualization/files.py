@@ -92,20 +92,24 @@ def removeItemsOutOfStepAndMaxStep(simulationResult):
     ## Saco los tiempos que no me interesan que son aquellos anteriores al ultimo cerca del STEP
     currentIterTime = 0
     keysToRemove = list()
-    stepKeys = list()
+    stepKeysToRemove = list()
     for stepTime in sorted(simulationResult.fpDict.keys()):
         if stepTime > MAX_STEP:
             keysToRemove.append(stepTime)
         else:
-            if currentIterTime > stepTime:
-                keysToRemove += stepKeys[:-1] # el ultimo es el mas cercano al cambio del step asi que no lo borro
-                stepKeys.clear()
+            if currentIterTime < stepTime:
+                keysToRemove += stepKeysToRemove[:-1] # el ultimo es el mas cercano al cambio del step asi que no lo borro
+                stepKeysToRemove.clear()
                 currentIterTime += STEP
 
-            stepKeys.append(stepTime)
+            stepKeysToRemove.append(stepTime)
 
+    keysToRemove += stepKeysToRemove[:-1]
     for removeKey in keysToRemove:
         simulationResult.fpDict.pop(removeKey)
+        simulationResult.particlesDict.pop(removeKey)
+
+    print("Unnecesary steps removed")
 
 def __readStaticInputFile(staticInputFilePath):
     lineCount = 0
