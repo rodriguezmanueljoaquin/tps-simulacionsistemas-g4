@@ -14,8 +14,9 @@ public class Manager {
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
 
         // variando cantidad de particulas
-        for (int i = 25; i <= 200 ; i+=25)
-            simulationParameters.add(new SimulationParameters(i, 0.01));
+        //for (int i = 25; i <= 200 ; i+=25)
+          //  simulationParameters.add(new SimulationParameters(i, 0.01));
+        simulationParameters.add(new SimulationParameters(150, 0.01));
 
         simulationParameters.forEach(parameters -> {
             Population population = null;

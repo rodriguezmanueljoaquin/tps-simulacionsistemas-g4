@@ -1,15 +1,27 @@
 import java.util.Objects;
 
-public class Particle implements Comparable {
+public class Particle {
     private Double x;
     private Double y;
     private static Integer count = 1;
     private final Integer id;
     private double yVelocity;
     private double xVelocity;
-    private static final double velocity = Constants.PARTICLE_VELOCITY;
-    private static final double radius = Constants.PARTICLE_RADIUS;
-    private static final double mass = Constants.PARTICLE_MASS;
+    private double velocity;
+    private double radius;
+    private double mass;
+
+    public Particle(Double x, Double y, double angle, double velocity, double radius, double mass) {
+        this.x = x;
+        this.y = y;
+        this.xVelocity = velocity * Math.cos(angle);
+        this.yVelocity = velocity * Math.sin(angle);
+        this.velocity = velocity;
+        this.radius = radius;
+        this.mass = mass;
+
+        this.id = count++;
+    }
 
     public Particle(Double x, Double y, double angle) {
         this.x = x;
@@ -70,14 +82,6 @@ public class Particle implements Comparable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Particle particle = (Particle) o;
-        return Objects.equals(id, particle.id);
-    }
-
-    @Override
     public String toString() {
         return "Particle{" +
                 "x=" + x +
@@ -86,19 +90,5 @@ public class Particle implements Comparable {
                 ", yVelocity=" + yVelocity +
                 ", xVelocity=" + xVelocity +
                 '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (getClass() != o.getClass()) {
-            return -1;
-        }
-        Particle other = (Particle) o;
-        return this.id.compareTo(other.getId());
     }
 }

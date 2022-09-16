@@ -48,15 +48,16 @@ def main():
 
         # simulationResults.sort(key=etaFunc)
 
-        if(observableType == 'temporal'):
-            plotTemporalObservable(simulationResultsDict, observableParam)
-            return
+        if(False): #TODO: Deberia ser una variable indicando si se quiere animar o graficar
+            if(observableType == 'temporal'):
+                plotTemporalObservable(simulationResultsDict, observableParam)
+                return
+            else:
+                plotScalarObservable(simulationResults,noiseObservableParameter)
+
         else:
-            plotScalarObservable(simulationResults,noiseObservableParameter)
-
-
         # ANIMACION:
-        # exportOvito.exportOvito(simulationResultsDict[(20,0.01)][0])
+            exportOvito.exportOvito(simulationResultsDict[(150,0.01)][0])
     
     else:
         print("Invalid command line arguments")
