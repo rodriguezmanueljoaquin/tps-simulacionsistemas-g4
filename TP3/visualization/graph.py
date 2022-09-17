@@ -46,7 +46,7 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
                 hue=parameter, legend="full",palette="pastel")
     ax.axhline(y=0.5+UMBRAL, color='r', linestyle='--', label="Umbral ("+str(UMBRAL)+")")
     ax.axhline(y=0.5-UMBRAL, color='r', linestyle='--')
-    ax.legend()
+    ax.legend(title=parameter)
     sns.move_legend(ax,"upper right")
     plt.show()
 
