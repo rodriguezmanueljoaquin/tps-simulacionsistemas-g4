@@ -1,6 +1,6 @@
 import argparse
 from files import readInputFiles, removeItemsOutOfStepAndMaxStep
-from graph import plotTemporalObservable, plotScalarObservable
+from graph import plotTemporalObservable, plotScalarObservable, plotPressureGraphs
 import exportOvito
 import renderOvito
 from simulationResult import SimulationResult
@@ -28,12 +28,12 @@ def main():
                 argsValid = False
         if(args.observable is not None):
             observableType = args.observable.lower().strip()
-            if((observableType != 'scalar' and observableType != 'temporal') or visualizationAction=='animate'):
+            if((observableType != 'scalar' and observableType != 'temporal' and observableType != 'pressure') or visualizationAction=='animate'):
                 argsValid = False
 
         if(args.variable is not None):
             observableParam = args.variable.lower().strip()
-            if((observableParam!=PARAM_GAP_SIZE and observableParam!=PARAM_PARTICLES_QTY) or visualizationAction=='animate'):
+            if((observableParam!=PARAM_GAP_SIZE and observableParam!=PARAM_PARTICLES_QTY) or observableType=='pressure' or visualizationAction=='animate'):
                 argsValid=False
     except Exception as e:
         print("Error in command line arguments")
@@ -48,8 +48,11 @@ def main():
             if(observableType == 'temporal'):
                 plotTemporalObservable(simulationResultsDict, observableParam)
                 return
-            else:
+            elif(observableType == 'scalar'):
                 plotScalarObservable(simulationResultsDict, observableParam)
+                return
+            else:
+                plotPressureGraphs(simulationResultsDict)
 
         else:
         # ANIMACION:

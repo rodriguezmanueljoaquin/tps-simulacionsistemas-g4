@@ -36,7 +36,7 @@ def readInputFiles(inputFilesDirectoryPath,simulationResultsDict):
                             print('\t\t\tDynamic file successfully read')
                             simulationResultsList.append(simulationResultToAdd)
                     print('\t\tDynamic files directory successfully read. . .')
-                    simulationResultsDict[(simulationResultBase.N,simulationResultBase.gap)] = simulationResultsList
+                    simulationResultsDict[(simulationResultBase.N,simulationResultBase.gap,simulationResultBase.v)] = simulationResultsList
         print('\tDirectory successfully read. . .')
         dirCount+=1
 
@@ -48,6 +48,7 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
     N = simulationResult.N
     v = simulationResult.v
     width = simulationResult.width
+    impulseSum = 0
     
     file = open(dynamicInputFilePath , 'r')
 
@@ -60,31 +61,41 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
         
         if not line:
             read = False
+            #Registramos el ultimo tiempo de la simulacion
+            finalTime = currentTime
         else:
             ##Si aun no llego al equilibrio, chequeamos que haya llegado a dicha condicion
             currentTime = float(line.strip())
-            if currentTime > MAX_STEP * STEP:
-                read = False
-            else:
-                sectionSum = 0
-                simulationResult.particlesDict[currentTime] = dict()
-                for i in range(N):
-                    line = file.readline()
-                    particleData = line.split(";")
-                    id = float(particleData[0])
-                    x = float(particleData[1])
-                    y = float(particleData[2])
-                    vx = float(particleData[3])
-                    vy = float(particleData[4])
-                    simulationResult.particlesDict[currentTime][id] = Particle(id,x,y,vx,vy)
-                    sectionSum += (x<=width/2)
+            # if currentTime > MAX_STEP * STEP:
+            #     read = False
+            # else:
+            sectionSum = 0
+            simulationResult.particlesDict[currentTime] = dict()
+            for i in range(N):
+                line = file.readline()
+                particleData = line.split(";")
+                id = float(particleData[0])
+                x = float(particleData[1])
+                y = float(particleData[2])
+                vx = float(particleData[3])
+                vy = float(particleData[4])
+                lastCollisionType = particleData[5]
+                particle = Particle(id,x,y,vx,vy,lastCollisionType)
+                simulationResult.particlesDict[currentTime][id] = particle
+                sectionSum += (x<=width/2)
+                #Si se llego al equilibrio, realizamos los calculos correspondientes a la presion
+                if(simulationResult.balanceTime is not None):
+                    impulseSum += particle.getImpulse(simulationResult.mass)
 
-                Fp = sectionSum/N
-                simulationResult.fpDict[currentTime] = Fp
-                if(simulationResult.balanceTime is None):
-                    if(Fp-0.5<UMBRAL):
-                        simulationResult.setBalanceTime(currentTime)
-                        
+            Fp = sectionSum/N
+            simulationResult.fpDict[currentTime] = Fp
+            if(simulationResult.balanceTime is None):
+                if(Fp-0.5<UMBRAL):
+                    simulationResult.setBalanceTime(currentTime)
+
+    #Finalmente, calculamos la presion a partir de la suma de impulsos y el tiempo final de simulacion
+
+    simulationResult.setPressure(impulseSum,finalTime)
 
     file.close()
 
@@ -131,8 +142,13 @@ def __readStaticInputFile(staticInputFilePath):
                 height = float(widthAndHeight[1].strip())
             elif(lineCount==2):
                 gap = float(line.strip())
-            else:
+            elif(lineCount==3):
                 v = float(line.strip())
+            else:
+                mass = float(line.strip())
+            # else:
+            #     v = float(line.strip())
             lineCount+=1
     file.close()
-    return SimulationResult(N,width,height,gap,v)
+    # return SimulationResult(N,width,height,gap,v,mass)
+    return SimulationResult(N,width,height,gap,v,mass)

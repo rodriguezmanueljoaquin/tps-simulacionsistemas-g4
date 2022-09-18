@@ -9,7 +9,7 @@ from scalarObservableObject import ScalarObservableObject
 
 
 def plotTemporalObservable(simulationResultsDict, observableParameter):
-    # Las key del diccionario son de la forma (N, gap)
+    # Las key del diccionario son de la forma (N, gap, v)
     if observableParameter == PARAM_PARTICLES_QTY:
         param_key =0
     elif observableParameter == PARAM_GAP_SIZE:
@@ -28,7 +28,7 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
     simulationsResultsList = list(simulationResultsDict.items())
     simulationsResultsList.sort(key=lambda x: x[0][param_key])
     for simParams, simulationsResults in simulationsResultsList:
-        # simParams es de la forma (N, abertura)
+        # simParams es de la forma (N, gap, v)
         simulationResult = simulationsResults[0] 
         # solo nos interesa el primero, se podria tomar el promedio de todas las ejecuciones pero es innecesario y posiblemente no se visualize bien
         removeItemsOutOfStepAndMaxStep(simulationResult)
@@ -53,7 +53,7 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
 
 
 def plotScalarObservable(simulationResultsDict, observableParameter):
-    # Las key del diccionario son de la forma (N, gap)
+    # Las key del diccionario son de la forma (N, gap, v)
     if observableParameter == PARAM_PARTICLES_QTY:
         param_key =0
     elif observableParameter == PARAM_GAP_SIZE:
@@ -73,7 +73,7 @@ def plotScalarObservable(simulationResultsDict, observableParameter):
     parameter = "Cantidad de partículas" if observableParameter == PARAM_PARTICLES_QTY else "Tamaño de abertura"
 
     plt.figure(num="Scalar observable",figsize = (15,9))
-    plt.ylabel("Tiempo de equilibrio")
+    plt.ylabel("Tiempo de equilibrio (Pasos)")
     plt.xlabel(parameter)
 
     for dictParam, scalarObservableObjectList in simulationsByParameter.items():
@@ -93,6 +93,35 @@ def plotScalarObservable(simulationResultsDict, observableParameter):
 
     legendTitle = "Cantidad de partículas" if observableParameter == PARAM_GAP_SIZE else "Tamaño de abertura"
     plt.legend(title=legendTitle)
+    plt.show()
+
+
+def plotPressureGraphs(simulationResultsDict):
+    plt.rcParams.update({'font.size': 22})
+
+    data = {
+        'pressure_average':[],
+        'temperature':[]
+    }
+
+    simulationsResultsList = list(simulationResultsDict.items())
+    simulationsResultsList.sort(key=lambda x: x[0][2])
+    for simParams, simulationsResults in simulationsResultsList:
+        # simParams es de la forma (N, gap, v)
+        pressureList = [simulationResult.pressure for simulationResult in simulationsResults]
+        pressureAverage = np.mean(pressureList)
+        data['pressure_average'].append(pressureAverage)
+        data['temperature'].append(simulationsResults[0].getTemperature())
+        plt.text(simParams[2], pressureAverage , '(v = {})'.format(simParams[2]))
+
+    pressureGraphDataDF = pd.DataFrame(data)
+
+    plt.figure(num="Pressure vs Temperatur graph",figsize = (15,9))
+    plt.ylabel("Presion (N/m)")
+    plt.xlabel("Temperatura (J)")
+    ax = sns.lineplot(data=pressureGraphDataDF, x="temperature", y="pressure_average",
+                legend="full",palette="pastel")
+
     plt.show()
 
 

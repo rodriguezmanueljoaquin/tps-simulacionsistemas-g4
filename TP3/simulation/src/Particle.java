@@ -10,6 +10,7 @@ public class Particle {
     private double velocity;
     private double radius;
     private double mass;
+    private String lastCollisionType = Constants.NO_COLLISION_KEY;
 
     public Particle(Double x, Double y, double angle, double velocity, double radius, double mass) {
         this.x = x;
@@ -79,6 +80,14 @@ public class Particle {
 
     public void setyVelocity(double yVelocity) {
         this.yVelocity = yVelocity;
+    }
+
+    public String getLastCollisionType() {
+        return lastCollisionType;
+    }
+
+    public void setLastCollisionType(String lastCollisionType) {
+        this.lastCollisionType = lastCollisionType;
     }
 
     @Override
