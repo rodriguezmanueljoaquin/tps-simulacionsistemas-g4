@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from constants import MAX_STEP, STEP, PARAM_GAP_SIZE, PARAM_PARTICLES_QTY, UMBRAL
 from files import removeItemsOutOfStepAndMaxStep
+from scalarObservableObject import ScalarObservableObject
 
 
 def plotTemporalObservable(simulationResultsDict, observableParameter):
@@ -51,47 +52,49 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
     plt.show()
 
 
-def plotScalarObservable(simulationResults,noiseObservableParameter):
+def plotScalarObservable(simulationResultsDict, observableParameter):
+    # Las key del diccionario son de la forma (N, gap)
+    if observableParameter == PARAM_PARTICLES_QTY:
+        param_key =0
+    elif observableParameter == PARAM_GAP_SIZE:
+        param_key =1
+    else: raise Exception("Invalid observable parameter")
+
     plt.style.use('seaborn-pastel')
     plt.rcParams.update({'font.size': 22})
 
     simulationsByParameter = {}
-    for simulationResult in simulationResults:
-        dictionaryParameter = simulationResult.getDensity() if noiseObservableParameter else simulationResult.eta
+    for simParams, simulationsResults in simulationResultsDict.items():
+        dictionaryParameter = simParams[1-param_key]
         if dictionaryParameter not in simulationsByParameter:
-            simulationsByParameter[dictionaryParameter] = [simulationResult]
-        else: simulationsByParameter[dictionaryParameter].append(simulationResult)
+            simulationsByParameter[dictionaryParameter] = [ScalarObservableObject(simParams[param_key],simulationsResults)]
+        else: simulationsByParameter[dictionaryParameter].append(ScalarObservableObject(simParams[param_key],simulationsResults))
 
+    parameter = "Cantidad de partículas" if observableParameter == PARAM_PARTICLES_QTY else "Tamaño de abertura"
 
-    parameter = 'Noise' if noiseObservableParameter else 'Density'
+    plt.figure(num="Scalar observable",figsize = (15,9))
+    plt.ylabel("Tiempo de equilibrio")
+    plt.xlabel(parameter)
 
-    for dictParam, dictSimulationResults in simulationsByParameter.items():
-        polarizationAverage = []
+    for dictParam, scalarObservableObjectList in simulationsByParameter.items():
+        balanceTimeAverage = []
         parameterValues = []
         errors = []
-        dictSimulationResults.sort(key=lambda x: x.eta if noiseObservableParameter else x.getDensity())
+        scalarObservableObjectList .sort(key=lambda x: x.param)
         
 
-        for simulationResult in dictSimulationResults:
-            ##Filtrar los Va desde el tiempo de estabilizacion
-            estabilizedVaDict = dict(filter(lambda elem: elem[0] >= ESTABILIZATION_TIME ,simulationResult.vaDict.items()))
+        for scalarObservableObject in scalarObservableObjectList:
+            parameterValues.append(scalarObservableObject.param)
+            balanceTimeList = [simulationResult.balanceTime for simulationResult in scalarObservableObject.simulationResults]
+            balanceTimeAverage.append(np.mean(balanceTimeList))
+            errors.append(np.std(balanceTimeList))
 
-            parameterValue = simulationResult.eta if noiseObservableParameter else simulationResult.getDensity()
-            parameterValues.append(parameterValue)
-            polarizationValues = list(estabilizedVaDict.values())
-            polarizationAverage.append(np.mean(polarizationValues))
-            errors.append(np.std(polarizationValues))
+        plt.errorbar(parameterValues,balanceTimeAverage,yerr=errors,label=str(round(dictParam,2))+(" m" if observableParameter == PARAM_GAP_SIZE else ""))
 
-            plt.figure(num="Scalar observable",figsize = (15,9))
-            plt.title(f"Scalar observable: Polarization vs {parameter}")
-            plt.ylabel("Polarization")
-            plt.xlabel(parameter)
-
-        plt.errorbar(parameterValues,polarizationAverage,yerr=errors,label=str(round(dictParam,2)))
-
-    legendTitle = 'noises' if not noiseObservableParameter else 'densities'
+    legendTitle = "Cantidad de partículas" if observableParameter == PARAM_GAP_SIZE else "Tamaño de abertura"
     plt.legend(title=legendTitle)
     plt.show()
+
 
 
 
