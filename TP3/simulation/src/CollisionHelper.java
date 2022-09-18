@@ -114,4 +114,38 @@ public class CollisionHelper {
         }
         return new Pair<>(timeToCollision, gapCollision);
     }
+
+    public static void collideParticleToGapEnd(Particle p1, Particle gapEndParticle){
+        double sigma = p1.getRadius() + gapEndParticle.getRadius();
+        double deltaX = gapEndParticle.getX() - p1.getX();
+        double deltaY = gapEndParticle.getY() - p1.getY();
+        double deltaVDotDeltaR =
+                (0 - p1.getxVelocity()) * deltaX +
+                        (0 - p1.getyVelocity()) * deltaY;
+
+        double j = (2 * p1.getMass() * deltaVDotDeltaR) / sigma;
+        double jx = (j * deltaX) / (sigma);
+        double jy = (j * deltaY) / (sigma);
+
+        p1.setxVelocity(p1.getxVelocity() + (jx / p1.getMass()));
+        p1.setyVelocity(p1.getyVelocity() + (jy / p1.getMass()));
+    }
+
+    public static void collideParticles(Particle p1, Particle p2) {
+        double sigma = p1.getRadius() + p2.getRadius();
+        double deltaX = p2.getX() - p1.getX();
+        double deltaY = p2.getY() - p1.getY();
+        double deltaVDotDeltaR =
+                (p2.getxVelocity() - p1.getxVelocity()) * deltaX +
+                        (p2.getyVelocity() - p1.getyVelocity()) * deltaY;
+
+        double j = (2 * (p2.getMass() * p1.getMass()) * deltaVDotDeltaR) / (sigma * (p1.getMass() + p2.getMass()));
+        double jx = (j * deltaX) / (sigma);
+        double jy = (j * deltaY) / (sigma);
+
+        p1.setxVelocity(p1.getxVelocity() + (jx / p1.getMass()));
+        p1.setyVelocity(p1.getyVelocity() + (jy / p1.getMass()));
+        p2.setxVelocity(p2.getxVelocity() - (jx / p2.getMass()));
+        p2.setyVelocity(p2.getyVelocity() - (jy / p2.getMass()));
+    }
 }

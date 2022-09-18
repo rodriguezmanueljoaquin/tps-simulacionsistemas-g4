@@ -4,7 +4,7 @@ public class Constants {
     public static final double PARTICLE_MASS = 1;
     public static final double SIMULATION_WIDTH = 0.24;
     public static final double SIMULATION_HEIGHT = 0.09;
-    public static final int SIMULATION_REPETITION_TIMES = 5;
+    public static final int SIMULATION_REPETITION_TIMES = 2;
     public static final long SIMULATION_STEPS = 50000;
     public static final String NO_COLLISION_KEY = "NO_COLLISION";
     public static final String WALL_VERTICAL_COLLISION_KEY = "WALL_VERTICAL";

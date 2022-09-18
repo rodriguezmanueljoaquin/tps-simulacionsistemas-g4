@@ -15,24 +15,24 @@ public class Manager {
 //            simulationParameters.add(new SimulationParameters(i, 0.01, Constants.PARTICLE_VELOCITY));
 
         // variando gap
-//        Integer [] particlesQtyArray = new Integer[]{100,150,200};
-//        for (Integer particlesQty : particlesQtyArray) {
-//            for (double i = 0.01; i <= 0.1; i += 0.02)
-//                simulationParameters.add(new SimulationParameters(particlesQty, i, Constants.PARTICLE_VELOCITY));
-//        }
+        Integer [] particlesQtyArray = new Integer[]{100,150,200};
+        for (Integer particlesQty : particlesQtyArray) {
+            for (double i = 0.01; i <= 0.1; i += 0.02)
+                simulationParameters.add(new SimulationParameters(particlesQty, i, Constants.PARTICLE_VELOCITY));
+        }
 
         // variando velocidad
-        Double [] velocities = new Double[]{0.01,0.02,0.04};
-        for (Double velocity : velocities){
-            simulationParameters.add(new SimulationParameters(100,0.01,velocity));
-        }
+//        Double [] velocities = new Double[]{0.01,0.02,0.04};
+//        for (Double velocity : velocities){
+//            simulationParameters.add(new SimulationParameters(100,0.01,velocity));
+//        }
 
         simulationParameters.forEach(parameters -> {
             Population population = null;
             try {
                 String path = String.format(Locale.ENGLISH, "out_%d_0-0%.0f_0-0%.0f", parameters.particlesQty, parameters.gap*100,parameters.velocity*100);
                 new File("results/" + path).mkdir();
-                Population.createStaticFile(path, parameters.particlesQty, parameters.gap);
+                Population.createStaticFile(path, parameters.particlesQty, parameters.gap, parameters.velocity);
 
                 Random random = new Random(Constants.RANDOM_SEED);
                 String dynamicsPath = path + "/dynamics";
