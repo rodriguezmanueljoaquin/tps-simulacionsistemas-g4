@@ -47,11 +47,11 @@ public class Population {
     }
 
     public void nextCollision() {
-        Pair<Double, Map<String, List<Pair<Particle, Particle>>>> answer =
+        Pair<Double, Map<CollisionType, List<Pair<Particle, Particle>>>> answer =
                 CollisionHelper.getCollisionTimeAndParticles(particles, gap, topGapParticle, bottomGapParticle);
         double timeToNextCollision = answer.getLeft();
         this.currentIterationTime += timeToNextCollision;
-        Map<String, List<Pair<Particle, Particle>>> collisionedParticles = answer.getRight();
+        Map<CollisionType, List<Pair<Particle, Particle>>> collisionedParticles = answer.getRight();
 
         // Actualización de posiciones
         for (Particle p : particles) {
@@ -60,34 +60,34 @@ public class Population {
         }
 
         // Actualización de velocidades
-        collisionedParticles.get(Constants.WALL_VERTICAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+        collisionedParticles.get(CollisionType.WALL_VERTICAL).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     particle.setxVelocity(-particle.getxVelocity());
                     particle.setLastCollisionType(CollisionType.WALL_VERTICAL);
                 }
         );
-        collisionedParticles.get(Constants.WALL_HORIZONTAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+        collisionedParticles.get(CollisionType.WALL_HORIZONTAL).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     particle.setyVelocity(-particle.getyVelocity());
                     particle.setLastCollisionType(CollisionType.WALL_HORIZONTAL);
                 }
         );
 
-        collisionedParticles.get(Constants.TOP_GAP_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+        collisionedParticles.get(CollisionType.TOP_GAP).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     CollisionHelper.collideParticleToGapEnd(particle, topGapParticle);
                     particle.setLastCollisionType(CollisionType.TOP_GAP);
                 }
         );
 
-        collisionedParticles.get(Constants.BOTTOM_GAP_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
+        collisionedParticles.get(CollisionType.BOTTOM_GAP).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     CollisionHelper.collideParticleToGapEnd(particle, bottomGapParticle);
                     particle.setLastCollisionType(CollisionType.BOTTOM_GAP);
                 }
         );
 
-        for (Pair<Particle, Particle> pair : collisionedParticles.get(Constants.PARTICLES_COLLISION_KEY)){
+        for (Pair<Particle, Particle> pair : collisionedParticles.get(CollisionType.PARTICLES)){
             CollisionHelper.collideParticles(pair.getLeft(), pair.getRight());
             pair.getLeft().setLastCollisionType(CollisionType.PARTICLES);
             pair.getRight().setLastCollisionType(CollisionType.PARTICLES);

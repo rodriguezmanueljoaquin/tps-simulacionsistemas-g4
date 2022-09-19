@@ -66,27 +66,27 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
         else:
             ##Si aun no llego al equilibrio, chequeamos que haya llegado a dicha condicion
             currentTime = float(line.strip())
-            if currentTime > MAX_STEP * STEP:
+            if currentTime >= MAX_STEP * STEP:
                 finalTime = currentTime
                 read = False
-            else:
-                sectionSum = 0
-                simulationResult.particlesDict[currentTime] = dict()
-                for i in range(N):
-                    line = file.readline()
-                    particleData = line.split(";")
-                    id = float(particleData[0])
-                    x = float(particleData[1])
-                    y = float(particleData[2])
-                    vx = float(particleData[3])
-                    vy = float(particleData[4])
-                    lastCollisionType = int(particleData[5])
-                    particle = Particle(id,x,y,vx,vy,lastCollisionType)
-                    simulationResult.particlesDict[currentTime][id] = particle
-                    sectionSum += (x<=width/2)
-                    #Si se llego al equilibrio, realizamos los calculos correspondientes a la presion
-                    if(simulationResult.balanceTime is not None):
-                        impulseSum += particle.getImpulse(simulationResult.mass)
+                
+            sectionSum = 0
+            simulationResult.particlesDict[currentTime] = dict()
+            for i in range(N):
+                line = file.readline()
+                particleData = line.split(";")
+                id = float(particleData[0])
+                x = float(particleData[1])
+                y = float(particleData[2])
+                vx = float(particleData[3])
+                vy = float(particleData[4])
+                lastCollisionType = int(particleData[5])
+                particle = Particle(id,x,y,vx,vy,lastCollisionType)
+                simulationResult.particlesDict[currentTime][id] = particle
+                sectionSum += (x<=width/2)
+                #Si se llego al equilibrio, realizamos los calculos correspondientes a la presion
+                if(simulationResult.balanceTime is not None):
+                    impulseSum += particle.getImpulse(simulationResult.mass)
 
             Fp = sectionSum/N
             simulationResult.fpDict[currentTime] = Fp

@@ -2,14 +2,14 @@ import java.util.*;
 
 public class CollisionHelper {
 
-    public static Pair<Double, Map<String, List<Pair<Particle, Particle>>>> getCollisionTimeAndParticles(List<Particle> particles, double gap, Particle topGapParticle, Particle bottomGapParticle) {
+    public static Pair<Double, Map<CollisionType, List<Pair<Particle, Particle>>>> getCollisionTimeAndParticles(List<Particle> particles, double gap, Particle topGapParticle, Particle bottomGapParticle) {
         double timeToNextCollision = Double.MAX_VALUE;
-        Map<String, List<Pair<Particle, Particle>>> collisionedParticles = new HashMap<>();
-        collisionedParticles.put(Constants.WALL_VERTICAL_COLLISION_KEY, new ArrayList<>());
-        collisionedParticles.put(Constants.WALL_HORIZONTAL_COLLISION_KEY, new ArrayList<>());
-        collisionedParticles.put(Constants.PARTICLES_COLLISION_KEY, new ArrayList<>());
-        collisionedParticles.put(Constants.TOP_GAP_COLLISION_KEY, new ArrayList<>());
-        collisionedParticles.put(Constants.BOTTOM_GAP_COLLISION_KEY, new ArrayList<>());
+        Map<CollisionType, List<Pair<Particle, Particle>>> collisionedParticles = new HashMap<>();
+        collisionedParticles.put(CollisionType.WALL_VERTICAL, new ArrayList<>());
+        collisionedParticles.put(CollisionType.WALL_HORIZONTAL, new ArrayList<>());
+        collisionedParticles.put(CollisionType.PARTICLES, new ArrayList<>());
+        collisionedParticles.put(CollisionType.TOP_GAP, new ArrayList<>());
+        collisionedParticles.put(CollisionType.BOTTOM_GAP, new ArrayList<>());
 
         for (int i = 0; i < particles.size(); i++) {
             for (int j = i + 1; j < particles.size(); j++) {
@@ -20,11 +20,11 @@ public class CollisionHelper {
                         timeToNextCollision = timeToParticleCollision;
                         collisionedParticles.replaceAll((key, pairs) -> new ArrayList<>());
                     }
-                    collisionedParticles.get(Constants.PARTICLES_COLLISION_KEY).add(new Pair<>(particles.get(i), particles.get(j)));
+                    collisionedParticles.get(CollisionType.PARTICLES).add(new Pair<>(particles.get(i), particles.get(j)));
                 }
             }
 
-            Pair<Double, String> wallTimeAndType = timeToWallCollisionAndType(particles.get(i), gap, topGapParticle, bottomGapParticle);
+            Pair<Double, CollisionType> wallTimeAndType = timeToWallCollisionAndType(particles.get(i), gap, topGapParticle, bottomGapParticle);
             if (wallTimeAndType.getLeft() <= timeToNextCollision) {
                 if (wallTimeAndType.getLeft() != timeToNextCollision) {
                     // reset
@@ -39,10 +39,10 @@ public class CollisionHelper {
         return new Pair<>(timeToNextCollision, collisionedParticles);
     }
 
-    private static Pair<Double, String> timeToWallCollisionAndType(Particle p, double gap, Particle topGapParticle, Particle bottomGapParticle) {
+    private static Pair<Double, CollisionType> timeToWallCollisionAndType(Particle p, double gap, Particle topGapParticle, Particle bottomGapParticle) {
         double timeToVertical;
         double timeToHorizontal;
-        List<Pair<Double, String>> timesAndTypesToCollision = new ArrayList<>();
+        List<Pair<Double, CollisionType>> timesAndTypesToCollision = new ArrayList<>();
 
         if (p.getxVelocity() > 0) {
             double maxX = p.getX() + p.getRadius();
@@ -82,8 +82,8 @@ public class CollisionHelper {
 
         timesAndTypesToCollision.add(getTimeAndTypeToGapCollision(p,
                 topGapParticle, bottomGapParticle));
-        timesAndTypesToCollision.add(new Pair<>(timeToVertical, Constants.WALL_VERTICAL_COLLISION_KEY));
-        timesAndTypesToCollision.add(new Pair<>(timeToHorizontal, Constants.WALL_HORIZONTAL_COLLISION_KEY));
+        timesAndTypesToCollision.add(new Pair<>(timeToVertical,CollisionType.WALL_VERTICAL));
+        timesAndTypesToCollision.add(new Pair<>(timeToHorizontal, CollisionType.WALL_HORIZONTAL));
 
         return timesAndTypesToCollision.stream().min(Comparator.comparing(Pair::getLeft)).get();
     }
@@ -104,13 +104,13 @@ public class CollisionHelper {
         else return (-1) * (deltaVDotDeltaR + Math.sqrt(d)) / (deltaVSquared);
     }
 
-    private static Pair<Double, String> getTimeAndTypeToGapCollision(Particle p, Particle topGapParticle, Particle bottomGapParticle) {
+    private static Pair<Double, CollisionType> getTimeAndTypeToGapCollision(Particle p, Particle topGapParticle, Particle bottomGapParticle) {
         double timeToCollision = getTimeToParticleCollision(p, topGapParticle);
-        String gapCollision = Constants.TOP_GAP_COLLISION_KEY;
+        CollisionType gapCollision = CollisionType.TOP_GAP;
         double newTimeToCollision = getTimeToParticleCollision(p, bottomGapParticle);
         if (newTimeToCollision > 0 && newTimeToCollision < timeToCollision) {
             timeToCollision = newTimeToCollision;
-            gapCollision = Constants.BOTTOM_GAP_COLLISION_KEY;
+            gapCollision = CollisionType.BOTTOM_GAP;
         }
         return new Pair<>(timeToCollision, gapCollision);
     }

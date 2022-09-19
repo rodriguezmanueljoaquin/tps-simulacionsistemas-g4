@@ -1,5 +1,5 @@
 STEP = 1 #int
-MAX_STEP = 1000
+MAX_STEP = 400
 UMBRAL = 0.10
 PARAM_PARTICLES_QTY = "particles_number"
 PARAM_GAP_SIZE = "gap_size"

@@ -11,14 +11,20 @@ public class Manager {
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
 
         // variando cantidad de particulas
-//        for (int i = 25; i <= 200 ; i+=25)
-//            simulationParameters.add(new SimulationParameters(i, 0.01, Constants.PARTICLE_VELOCITY));
+        for (int i = 20; i <= 220 ; i+=40)
+            simulationParameters.add(new SimulationParameters(i, 0.03, Constants.PARTICLE_VELOCITY));
 
-//        // variando gap
+        // variando gap
 //        Integer [] particlesQtyArray = new Integer[]{100,150,200};
 //        for (Integer particlesQty : particlesQtyArray) {
-//            for (double i = 0.01; i <= 0.1; i += 0.02)
+//            for (double i = 0.01; i <= 0.1; i += 0.04)
 //                simulationParameters.add(new SimulationParameters(particlesQty, i, Constants.PARTICLE_VELOCITY));
+//        }
+
+        // variando velocidad
+//        Double [] velocities = new Double[]{0.01,0.02,0.04};
+//        for (Double velocity : velocities){
+//            simulationParameters.add(new SimulationParameters(100,0.01,velocity));
 //        }
 
         //variando velocidad
