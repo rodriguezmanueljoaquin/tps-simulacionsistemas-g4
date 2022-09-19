@@ -89,7 +89,7 @@ def plotScalarObservable(simulationResultsDict, observableParameter):
             balanceTimeAverage.append(np.mean(balanceTimeList))
             errors.append(np.std(balanceTimeList))
 
-        plt.errorbar(parameterValues,balanceTimeAverage,yerr=errors,label=str(round(dictParam,2))+(" m" if observableParameter == PARAM_GAP_SIZE else ""))
+        plt.errorbar(parameterValues,balanceTimeAverage,yerr=errors,label=str(round(dictParam,2))+(" m" if observableParameter == PARAM_PARTICLES_QTY else ""))
 
     legendTitle = "Cantidad de partículas" if observableParameter == PARAM_GAP_SIZE else "Tamaño de abertura"
     plt.legend(title=legendTitle)

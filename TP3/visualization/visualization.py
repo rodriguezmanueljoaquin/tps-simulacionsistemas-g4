@@ -61,7 +61,16 @@ def main():
 
         else:
         # ANIMACION:
-            simulationResult = simulationResultsDict[(150, 0.01)][0]
+            simulationResult = simulationResultsDict[(100, 0.01, 0.01)][0]
+            removeItemsOutOfStepAndMaxStep(simulationResult)
+            exportOvito.exportOvito(simulationResult)
+            simulationResult = simulationResultsDict[(180, 0.03, 0.01)][0]
+            removeItemsOutOfStepAndMaxStep(simulationResult)
+            exportOvito.exportOvito(simulationResult)
+            simulationResult = simulationResultsDict[(20, 0.03, 0.01)][0]
+            removeItemsOutOfStepAndMaxStep(simulationResult)
+            exportOvito.exportOvito(simulationResult)
+            simulationResult = simulationResultsDict[(100, 0.07, 0.01)][0]
             removeItemsOutOfStepAndMaxStep(simulationResult)
             exportOvito.exportOvito(simulationResult)
     
