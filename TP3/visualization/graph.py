@@ -42,7 +42,7 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
     plt.figure(num="Temporal observable",figsize = (15,9))
     #plt.title(f"Temporal observable: Fracción de partículas vs {parameter}")
     plt.ylabel("Fracción de partículas")
-    plt.xlabel("Tiempo (Pasos)")
+    plt.xlabel("Tiempo (s)")
     ax = sns.lineplot(data=temporalObservableDataDF, x="Time", y="Fraction",
                 hue=parameter, legend="full",palette="pastel", ci=None)
     ax.axhline(y=0.5+UMBRAL, color='r', linestyle='--', label="Umbral ("+str(UMBRAL)+")")
@@ -73,7 +73,7 @@ def plotScalarObservable(simulationResultsDict, observableParameter):
     parameter = "Cantidad de partículas" if observableParameter == PARAM_PARTICLES_QTY else "Tamaño de abertura"
 
     plt.figure(num="Scalar observable",figsize = (15,9))
-    plt.ylabel("Tiempo de equilibrio (Pasos)")
+    plt.ylabel("Tiempo de equilibrio (s)")
     plt.xlabel(parameter)
 
     for dictParam, scalarObservableObjectList in simulationsByParameter.items():
@@ -123,7 +123,7 @@ def plotPressureVsTemperatureGraph(simulationResultsDict):
     plt.ylabel("Presion (N/m)")
     plt.xlabel("Temperatura (J)")
     ax = sns.lineplot(data=pressureGraphDataDF, x="temperature", y="pressure_average",
-                legend="full",palette="pastel")
+                legend="full",palette="pastel", marker='o')
 
     plt.show()
 
@@ -141,12 +141,11 @@ def plotCuadraticErrorvsSlopeGraph(simulationResultsDict):
     # print(simulationsResultsList)
     simulationsResultsList.sort(key=lambda x: x[0][2])
 
-    print(simulationResultsDict)
     firstPressurePoint = __getPressureLinealAjustmentPoint(simulationsResultsList[0])
     secondPressurePoint = __getPressureLinealAjustmentPoint(simulationsResultsList[1])
     thirdPressurePoint = __getPressureLinealAjustmentPoint(simulationsResultsList[2])
 
-    originalSlope = (secondPressurePoint[1]-firstPressurePoint[1])/(secondPressurePoint[0]-firstPressurePoint[0])
+    originalSlope = int((secondPressurePoint[1]-firstPressurePoint[1])/(secondPressurePoint[0]-firstPressurePoint[0]))
 
     minErrorPoint = (0,0)
     for currentSlope in range(originalSlope-SLOPE_LIMIT,originalSlope+SLOPE_LIMIT,SLOPE_STEP):
@@ -162,7 +161,7 @@ def plotCuadraticErrorvsSlopeGraph(simulationResultsDict):
     plt.figure(num="Cuadratic error vs slope graph",figsize = (15,9))
     plt.ylabel("Error cuadratico")
     plt.xlabel("Pendiente")
-    plt.text(minErrorPoint[0], minErrorPoint[1] , '({},{})'.format(minErrorPoint[0], minErrorPoint[1]))
+    print(minErrorPoint, "ERROR")
     ax = sns.lineplot(data=cuadraticErrorVsSlopeGraphDataDF, x="slope", y="error",
                 legend="full",palette="pastel")
 
