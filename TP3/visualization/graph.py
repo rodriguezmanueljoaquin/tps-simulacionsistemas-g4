@@ -42,7 +42,7 @@ def plotTemporalObservable(simulationResultsDict, observableParameter):
     plt.figure(num="Temporal observable",figsize = (15,9))
     #plt.title(f"Temporal observable: Fracción de partículas vs {parameter}")
     plt.ylabel("Fracción de partículas")
-    plt.xlabel("Tiempo (Pasos)")
+    plt.xlabel("Tiempo (s)")
     ax = sns.lineplot(data=temporalObservableDataDF, x="Time", y="Fraction",
                 hue=parameter, legend="full",palette="pastel", ci=None)
     ax.axhline(y=0.5+UMBRAL, color='r', linestyle='--', label="Umbral ("+str(UMBRAL)+")")
