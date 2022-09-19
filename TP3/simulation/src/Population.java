@@ -55,6 +55,7 @@ public class Population {
 
         // Actualización de posiciones
         for (Particle p : particles) {
+            p.setLastCollisionType(CollisionType.NO_COLLISION);
             p.setX(p.getX() + p.getxVelocity() * timeToNextCollision);
             p.setY(p.getY() + p.getyVelocity() * timeToNextCollision);
         }
