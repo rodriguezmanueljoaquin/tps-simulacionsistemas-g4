@@ -14,18 +14,18 @@ public class Manager {
 //        for (int i = 25; i <= 200 ; i+=25)
 //            simulationParameters.add(new SimulationParameters(i, 0.01, Constants.PARTICLE_VELOCITY));
 
-        // variando gap
-        Integer [] particlesQtyArray = new Integer[]{100,150,200};
-        for (Integer particlesQty : particlesQtyArray) {
-            for (double i = 0.01; i <= 0.1; i += 0.02)
-                simulationParameters.add(new SimulationParameters(particlesQty, i, Constants.PARTICLE_VELOCITY));
-        }
-
-        // variando velocidad
-//        Double [] velocities = new Double[]{0.01,0.02,0.04};
-//        for (Double velocity : velocities){
-//            simulationParameters.add(new SimulationParameters(100,0.01,velocity));
+//        // variando gap
+//        Integer [] particlesQtyArray = new Integer[]{100,150,200};
+//        for (Integer particlesQty : particlesQtyArray) {
+//            for (double i = 0.01; i <= 0.1; i += 0.02)
+//                simulationParameters.add(new SimulationParameters(particlesQty, i, Constants.PARTICLE_VELOCITY));
 //        }
+
+        //variando velocidad
+        Double [] velocities = new Double[]{0.01,0.02,0.04};
+        for (Double velocity : velocities){
+            simulationParameters.add(new SimulationParameters(100,0.01,velocity));
+        }
 
         simulationParameters.forEach(parameters -> {
             Population population = null;

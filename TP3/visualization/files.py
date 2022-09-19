@@ -67,6 +67,7 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
             ##Si aun no llego al equilibrio, chequeamos que haya llegado a dicha condicion
             currentTime = float(line.strip())
             if currentTime > MAX_STEP * STEP:
+                finalTime = currentTime
                 read = False
             else:
                 sectionSum = 0
@@ -79,7 +80,7 @@ def __readDynamicInputFile(dynamicInputFilePath,simulationResult):
                     y = float(particleData[2])
                     vx = float(particleData[3])
                     vy = float(particleData[4])
-                    lastCollisionType = particleData[5]
+                    lastCollisionType = int(particleData[5])
                     particle = Particle(id,x,y,vx,vy,lastCollisionType)
                     simulationResult.particlesDict[currentTime][id] = particle
                     sectionSum += (x<=width/2)
@@ -146,8 +147,6 @@ def __readStaticInputFile(staticInputFilePath):
                 v = float(line.strip())
             else:
                 mass = float(line.strip())
-            # else:
-            #     v = float(line.strip())
             lineCount+=1
     file.close()
     # return SimulationResult(N,width,height,gap,v,mass)

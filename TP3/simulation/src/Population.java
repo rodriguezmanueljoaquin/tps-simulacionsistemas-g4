@@ -63,34 +63,34 @@ public class Population {
         collisionedParticles.get(Constants.WALL_VERTICAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     particle.setxVelocity(-particle.getxVelocity());
-                    particle.setLastCollisionType(Constants.WALL_VERTICAL_COLLISION_KEY);
+                    particle.setLastCollisionType(CollisionType.WALL_VERTICAL);
                 }
         );
         collisionedParticles.get(Constants.WALL_HORIZONTAL_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     particle.setyVelocity(-particle.getyVelocity());
-                    particle.setLastCollisionType(Constants.WALL_HORIZONTAL_COLLISION_KEY);
+                    particle.setLastCollisionType(CollisionType.WALL_HORIZONTAL);
                 }
         );
 
         collisionedParticles.get(Constants.TOP_GAP_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     CollisionHelper.collideParticleToGapEnd(particle, topGapParticle);
-                    particle.setLastCollisionType(Constants.TOP_GAP_COLLISION_KEY);
+                    particle.setLastCollisionType(CollisionType.TOP_GAP);
                 }
         );
 
         collisionedParticles.get(Constants.BOTTOM_GAP_COLLISION_KEY).stream().map(Pair::getLeft).forEach(
                 particle -> {
                     CollisionHelper.collideParticleToGapEnd(particle, bottomGapParticle);
-                    particle.setLastCollisionType(Constants.BOTTOM_GAP_COLLISION_KEY);
+                    particle.setLastCollisionType(CollisionType.BOTTOM_GAP);
                 }
         );
 
         for (Pair<Particle, Particle> pair : collisionedParticles.get(Constants.PARTICLES_COLLISION_KEY)){
             CollisionHelper.collideParticles(pair.getLeft(), pair.getRight());
-            pair.getLeft().setLastCollisionType(Constants.PARTICLES_COLLISION_KEY);
-            pair.getRight().setLastCollisionType(Constants.PARTICLES_COLLISION_KEY);
+            pair.getLeft().setLastCollisionType(CollisionType.PARTICLES);
+            pair.getRight().setLastCollisionType(CollisionType.PARTICLES);
         }
     }
 
@@ -113,8 +113,8 @@ public class Population {
         for (int i = 0; i < Constants.SIMULATION_STEPS; i++) {
             writer.println(this.currentIterationTime);
             for (Particle p : this.particles) {
-                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%s",
-                        p.getId(), p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity(),p.getLastCollisionType()));
+                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%d",
+                        p.getId(), p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity(),p.getLastCollisionType().ordinal()));
             }
             nextCollision();
         }

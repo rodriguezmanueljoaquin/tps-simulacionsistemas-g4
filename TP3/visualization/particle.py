@@ -1,6 +1,8 @@
 from cmath import pi
 import random
 
+from constants import WALL_VERTICAL, BOTTOM_GAP, TOP_GAP, WALL_HORIZONTAL
+
 
 class Particle:    
     
@@ -33,11 +35,12 @@ class Particle:
         return (self.velx,self.vely)
 
     def getImpulse(self,mass):
+        # print(f"Particle last collision type : {self.lastCollisionType}")
         #Si el choque no fue contra alguna de las paredes o los tabiques de la abertura, el impulso es 0
-        if(self.lastCollisionType!='WALL_VERTICAL' and self.lastCollisionType!='WALL_HORIZONTAL' and self.lastCollisionType!='TOP_GAP' and self.lastCollisionType!='BOTTOM_GAP'):
+        if(self.lastCollisionType == 0 or self.lastCollisionType == 5):
             return 0
         #Sino, retornamos el impulso correspondiente
-        if(self.lastCollisionType=='WALL_HORIZONTAL'):
+        if(self.lastCollisionType==2):
             impulseVelocity = self.vely
         else:
             impulseVelocity = self.velx

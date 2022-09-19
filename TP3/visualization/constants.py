@@ -1,5 +1,16 @@
 STEP = 1 #int
-MAX_STEP = 500
+MAX_STEP = 1000
 UMBRAL = 0.10
 PARAM_PARTICLES_QTY = "particles_number"
 PARAM_GAP_SIZE = "gap_size"
+PARAM_PRESSURE = "pressure"
+SLOPE_LIMIT = 0.2
+SLOPE_STEP = 0.01
+
+#CollisionType ordinal values
+NO_COLLISION = 0
+WALL_VERTICAL = 1
+WALL_HORIZONTAL = 2
+TOP_GAP = 3
+BOTTOM_GAP = 4
+PARTICLES = 5

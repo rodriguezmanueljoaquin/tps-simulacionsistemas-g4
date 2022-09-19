@@ -24,6 +24,9 @@ class SimulationResult:
         self.balanceTime = time
 
     def setPressure(self,totalImpulse,finalTime):
+        # print(f"total impulse : {totalImpulse}")
+        # print(f"finalTime : {finalTime}")
+        # print(f"balanceTime : {self.balanceTime}")
         self.pressure = totalImpulse/((finalTime-self.balanceTime)*self.getPerimeter())
 
     def getTemperature(self):

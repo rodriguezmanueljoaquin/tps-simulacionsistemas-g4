@@ -3,7 +3,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import MAX_STEP, STEP, PARAM_GAP_SIZE, PARAM_PARTICLES_QTY, UMBRAL
+from constants import MAX_STEP, STEP, PARAM_GAP_SIZE, PARAM_PARTICLES_QTY, UMBRAL, SLOPE_LIMIT, SLOPE_STEP
 from files import removeItemsOutOfStepAndMaxStep
 from scalarObservableObject import ScalarObservableObject
 
@@ -96,13 +96,15 @@ def plotScalarObservable(simulationResultsDict, observableParameter):
     plt.show()
 
 
-def plotPressureGraphs(simulationResultsDict):
+def plotPressureVsTemperatureGraph(simulationResultsDict):
     plt.rcParams.update({'font.size': 22})
-
+    
     data = {
         'pressure_average':[],
         'temperature':[]
     }
+
+    plt.figure(num="Pressure vs Temperatur graph",figsize = (15,9))
 
     simulationsResultsList = list(simulationResultsDict.items())
     simulationsResultsList.sort(key=lambda x: x[0][2])
@@ -116,13 +118,70 @@ def plotPressureGraphs(simulationResultsDict):
 
     pressureGraphDataDF = pd.DataFrame(data)
 
-    plt.figure(num="Pressure vs Temperatur graph",figsize = (15,9))
+    print(pressureGraphDataDF.head())
+
     plt.ylabel("Presion (N/m)")
     plt.xlabel("Temperatura (J)")
     ax = sns.lineplot(data=pressureGraphDataDF, x="temperature", y="pressure_average",
                 legend="full",palette="pastel")
 
     plt.show()
+
+
+def plotCuadraticErrorvsSlopeGraph(simulationResultsDict):
+    
+    plt.rcParams.update({'font.size': 22})
+    
+    data = {
+        'error':[],
+        'slope':[]
+    }
+
+    simulationsResultsList = list(simulationResultsDict.items())
+    # print(simulationsResultsList)
+    simulationsResultsList.sort(key=lambda x: x[0][2])
+
+    print(simulationResultsDict)
+    firstPressurePoint = __getPressureLinealAjustmentPoint(simulationsResultsList[0])
+    secondPressurePoint = __getPressureLinealAjustmentPoint(simulationsResultsList[1])
+    thirdPressurePoint = __getPressureLinealAjustmentPoint(simulationsResultsList[2])
+
+    originalSlope = (secondPressurePoint[1]-firstPressurePoint[1])/(secondPressurePoint[0]-firstPressurePoint[0])
+
+    minErrorPoint = (0,0)
+    for currentSlope in range(originalSlope-SLOPE_LIMIT,originalSlope+SLOPE_LIMIT,SLOPE_STEP):
+        linealPressure = currentSlope * thirdPressurePoint[0]
+        error = ((linealPressure-thirdPressurePoint[1])**2)
+        data['error'].append(error)
+        data['slope'].append(currentSlope)
+        if(len(data['error'])==1 or error<minErrorPoint[1]):
+            minErrorPoint = (currentSlope,error)
+
+    cuadraticErrorVsSlopeGraphDataDF = pd.DataFrame(data)
+    
+    plt.figure(num="Cuadratic error vs slope graph",figsize = (15,9))
+    plt.ylabel("Error cuadratico")
+    plt.xlabel("Pendiente")
+    plt.text(minErrorPoint[0], minErrorPoint[1] , '({},{})'.format(minErrorPoint[0], minErrorPoint[1]))
+    ax = sns.lineplot(data=cuadraticErrorVsSlopeGraphDataDF, x="slope", y="error",
+                legend="full",palette="pastel")
+
+    plt.show()
+    
+
+
+def __getPressureLinealAjustmentPoint(simulationResultListObject):
+    # print(simulationResultListObject[1])
+    temperature = simulationResultListObject[1][0].getTemperature()
+    pressureList = [simulationResult.pressure for simulationResult in simulationResultListObject[1]]
+    pressureAverage = np.mean(pressureList)
+    return (temperature,pressureAverage)
+
+
+
+    
+
+
 
 
 
