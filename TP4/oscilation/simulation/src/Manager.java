@@ -7,24 +7,30 @@ import java.util.Random;
 
 public class Manager {
     public static void main(String[] args) {
+        // FIXME
+
         new File("results").mkdir();
 
         ArrayList<OscillationParameters> simulationParameters = new ArrayList<>();
-        for (double i = 0.25; i <= 1; i += 0.25)
-            simulationParameters.add(new OscillationParameters(i*Constants.DELTA_T_OUTPUT_FILE, new VerletAlgorithm()));
+        double initialSimDeltaT = 0.1;
+        for (double simDeltaT = initialSimDeltaT; simDeltaT > Math.pow(10,-6) ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, initialSimDeltaT,
+                    IntegrationAlgorithm.Type.BEEMAN));
 
         simulationParameters.forEach(parameters -> {
             Simulation simulation = null;
             try {
-                String path = String.format(Locale.ENGLISH, "out_%s_%.2f", parameters.algorithm.getName(), parameters.simulationDeltaT);
+                String path = String.format(Locale.ENGLISH, "out_%s_%.6f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
                 new File("results/" + path).mkdir();
-                Simulation.createStaticFile(path, parameters.algorithm.getName());
+                Simulation.createStaticFile(path, parameters.algorithmType.toString());
 
                 Random random = new Random(Constants.RANDOM_SEED);
                 String dynamicsPath = path + "/dynamics";
                 new File("results/" + dynamicsPath).mkdir();
 
-                simulation = new Simulation(parameters.algorithm, parameters.simulationDeltaT);
+//                FIXME
+                simulation = new BeemanSimulation(parameters.simulationDeltaT, parameters.outputDeltaT);
+                System.out.println(parameters.outputDeltaT);
                 simulation.createDynamicFile(dynamicsPath);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
@@ -36,12 +42,14 @@ public class Manager {
 
 
     private static class OscillationParameters {
-        public Double simulationDeltaT;
-        public IntegrationAlgorithm algorithm;
+        public double simulationDeltaT;
+        public double outputDeltaT;
+        public IntegrationAlgorithm.Type algorithmType;
 
-        public OscillationParameters(Double simulationDeltaT, IntegrationAlgorithm algorithm) {
+        public OscillationParameters(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type algorithmType) {
             this.simulationDeltaT = simulationDeltaT;
-            this.algorithm = algorithm;
+            this.outputDeltaT = outputDeltaT;
+            this.algorithmType = algorithmType;
         }
     }
 }

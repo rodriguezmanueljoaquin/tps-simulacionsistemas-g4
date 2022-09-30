@@ -1,6 +1,6 @@
 public class Particle {
-    private Double x;
-    private Double y;
+    private double x;
+    private double y;
     private static Integer count = 1;
     private final Integer id;
     private double yVelocity;
@@ -9,7 +9,7 @@ public class Particle {
     private double radius;
     private double mass;
 
-    public Particle(Double x, Double y, double angle, double velocity, double radius, double mass) {
+    public Particle(double x, double y, double angle, double velocity, double radius, double mass) {
         this.x = x;
         this.y = y;
         this.xVelocity = velocity * Math.cos(angle);
@@ -21,7 +21,7 @@ public class Particle {
         this.id = count++;
     }
 
-    public Particle(Double x, Double y, double angle) {
+    public Particle(double x, double y, double angle) {
         this.x = x;
         this.y = y;
         this.id = count++;
@@ -29,15 +29,15 @@ public class Particle {
         this.yVelocity = velocity * Math.sin(angle);
     }
 
-    public Double calculateDistanceTo(Particle other) {
+    public double calculateDistanceTo(Particle other) {
         return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - other.getRadius() - radius;
     }
 
-    public Double getX() {
+    public double getX() {
         return x;
     }
 
-    public Double getY() {
+    public double getY() {
         return y;
     }
 
@@ -63,11 +63,11 @@ public class Particle {
     }
 
 
-    public void setX(Double x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public void setY(Double y) {
+    public void setY(double y) {
         this.y = y;
     }
 

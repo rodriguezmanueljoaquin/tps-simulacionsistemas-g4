@@ -2,41 +2,47 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
-import java.util.Random;
 
-public class Simulation {
-    private Particle p;
-    private Double simulationDeltaT;
-    private IntegrationAlgorithm algorithm;
-    private Double currentSimulationTime;
-    private Double prevPos;
+public abstract class Simulation {
+    protected Particle p;
+    protected double simulationDeltaT;
+    private double outputDeltaT;
+    protected double currentSimulationTime;
 
-    public Simulation(IntegrationAlgorithm algorithm, Double simulationDeltaT) {
+    public Simulation(Double simulationDeltaT, Double outputDeltaT) {
         this.p = new Particle(
                         Constants.INITIAL_X,
                         0.,
                         0.,
-                        1, // TODO: SE DEBERIA CALCULAR SEGUN FUNCION DE PPT
+                        -Constants.A * Constants.GAMMA/(2*Constants.PARTICLE_MASS), // TODO: SE DEBERIA CALCULAR SEGUN FUNCION DE PPT
                         0,
                         Constants.PARTICLE_MASS);
-        this.algorithm = algorithm;
         this.simulationDeltaT = simulationDeltaT;
+        this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;
-        this.prevPos = 0.; // TODO: SE DEBERIA CALCULAR CON EULER SOBRE -DeltaT ?
+    }
+
+    protected abstract double getNewPosition();
+
+    protected abstract double getNewVelocity();
+
+    protected double getForce(double position, double velocity){
+        return (-Constants.K * position - Constants.GAMMA * velocity);
     }
 
     public void nextIteration(){
-        Pair<Double, Double> newPositions;
-        Pair<Double, Double> newVelocities;
-        for(Double iterationTime = this.currentSimulationTime;
-            iterationTime <= this.currentSimulationTime + Constants.DELTA_T_OUTPUT_FILE;
+        double newPosition, newVelocity;
+
+        for(double iterationTime = this.currentSimulationTime;
+            iterationTime <= this.currentSimulationTime + this.outputDeltaT && iterationTime <= Constants.FINAL_TIME;
             iterationTime += this.simulationDeltaT){
-            newPositions = algorithm.getPosition(iterationTime, this.simulationDeltaT, p.getX(), this.prevPos);
-            newVelocities = algorithm.getVelocity(iterationTime, this.simulationDeltaT);
-            this.prevPos = p.getX();
-            this.p.setX(newPositions.getLeft());
-            this.p.setxVelocity(newVelocities.getLeft());
+            newPosition = getNewPosition();
+            newVelocity = getNewVelocity();
+            this.p.setX(newPosition);
+            this.p.setxVelocity(newVelocity);
         }
+
+        currentSimulationTime += this.outputDeltaT;
     }
 
     public static void createStaticFile(String outputName, String algorithmName) throws FileNotFoundException, UnsupportedEncodingException {
@@ -51,13 +57,12 @@ public class Simulation {
 
     public void createDynamicFile(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating dynamic file. . .");
-
         PrintWriter writer = new PrintWriter("./results/" + outputName + "/dynamic" + ".txt", "UTF-8");
 
-        for (int i = 0; i <= Constants.FINAL_TIME; i+=Constants.DELTA_T_OUTPUT_FILE) {
+        for (double i = 0; i <= Constants.FINAL_TIME; i += this.outputDeltaT) {
             writer.println(this.currentSimulationTime);
-            writer.println(String.format(Locale.ENGLISH, "%f;%f;%f;%f",
-                    p.getX(), p.getY(), p.getxVelocity(), p.getyVelocity()));
+            writer.println(String.format(Locale.ENGLISH, "%f;%f",
+                    p.getX(), p.getxVelocity()));
             nextIteration();
         }
         writer.close();

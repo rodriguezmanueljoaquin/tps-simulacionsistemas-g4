@@ -5,8 +5,9 @@ public class Constants {
 
     public static final double GAMMA = 100; // constante de amortiguamiento
     public static final double PARTICLE_MASS = 70; //kg
-    public static final double DELTA_T_OUTPUT_FILE = 0.25;
     public static final double INITIAL_X = 1;
     public static final double FINAL_TIME = 5;
     public static final long RANDOM_SEED = 123456789;
+    public static final int POS_DERIVATIVE_EVALUATIONS_QTY = 5;
+    public static final int A = 1;
 }
