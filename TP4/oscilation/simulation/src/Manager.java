@@ -22,7 +22,7 @@ public class Manager {
             try {
                 String path = String.format(Locale.ENGLISH, "out_%s_%f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
                 new File(RESULTS_PATH + path).mkdir();
-                Simulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH);
+                Simulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH, parameters.simulationDeltaT);
 
                 Random random = new Random(Constants.RANDOM_SEED);
                 String dynamicsPath = path + "/dynamics";
