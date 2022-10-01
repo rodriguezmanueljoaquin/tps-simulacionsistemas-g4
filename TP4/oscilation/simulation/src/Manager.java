@@ -13,9 +13,9 @@ public class Manager {
 
         ArrayList<OscillationParameters> simulationParameters = new ArrayList<>();
         double initialSimDeltaT = 0.1;
-        for (double simDeltaT = initialSimDeltaT; simDeltaT > Math.pow(10,-6) ; simDeltaT /= 10)
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-6))>Constants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new OscillationParameters(simDeltaT, initialSimDeltaT,
-                    IntegrationAlgorithm.Type.BEEMAN));
+                    IntegrationAlgorithm.Type.GEAR));
 
         simulationParameters.forEach(parameters -> {
             Simulation simulation = null;
@@ -28,8 +28,7 @@ public class Manager {
                 String dynamicsPath = path + "/dynamics";
                 new File(RESULTS_PATH + dynamicsPath).mkdir();
 
-                simulation = new BeemanSimulation(parameters.simulationDeltaT, parameters.outputDeltaT);
-                System.out.println(parameters.outputDeltaT);
+                simulation = getSimulationFromIntegrationAlgorithmType(parameters.algorithmType,parameters.simulationDeltaT,parameters.outputDeltaT);
                 simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
@@ -39,6 +38,16 @@ public class Manager {
 
     }
 
+    private static Simulation getSimulationFromIntegrationAlgorithmType(IntegrationAlgorithm.Type type, double simulationDeltaT, double outputDeltaT){
+        switch (type){
+            case BEEMAN:
+                return new BeemanSimulation(simulationDeltaT, outputDeltaT);
+
+            default:
+                return new GearSimulation(simulationDeltaT,outputDeltaT);
+
+        }
+    }
 
     private static class OscillationParameters {
         public double simulationDeltaT;

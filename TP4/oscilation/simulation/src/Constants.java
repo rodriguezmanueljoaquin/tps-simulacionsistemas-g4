@@ -10,4 +10,5 @@ public class Constants {
     public static final long RANDOM_SEED = 123456789;
     public static final int POS_DERIVATIVE_EVALUATIONS_QTY = 5;
     public static final int A = 1;
+    public static final double EPSILON = 0.00000001;
 }

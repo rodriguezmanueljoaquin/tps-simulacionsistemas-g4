@@ -57,7 +57,7 @@ public abstract class IntegrationAlgorithm {
         for(int i = 0; i <= Constants.POS_DERIVATIVE_EVALUATIONS_QTY; i++){
             double newPrediction = 0.;
 
-            for(int j = i; j < 5; j++){
+            for(int j = i; j <= Constants.POS_DERIVATIVE_EVALUATIONS_QTY; j++){
                 newPrediction += Math.pow(deltaT, j-i) * posDerivativeEvaluations.get(j)/getFactorialOf(j-i);
             }
 
@@ -67,7 +67,7 @@ public abstract class IntegrationAlgorithm {
         return posPredictionDerivatives;
     }
 
-    public static List<Double> gearGetCorrectedDerivatives(Double time, Double deltaT, Double currentPos, Double prevPos,
+    public static List<Double> gearGetCorrectedDerivatives(Double deltaT,
                                          List<Double> posPredictionsDerivative, Double nextAcceleration) {
         double deltaR2 = (nextAcceleration - posPredictionsDerivative.get(2)) * Math.pow(deltaT, 2) / getFactorialOf(2);
 
@@ -83,6 +83,9 @@ public abstract class IntegrationAlgorithm {
 
     // UTILS
     private static long getFactorialOf(int n) {
+        if(n == 0){
+            return 1;
+        }
         if (n <= 2) {
             return n;
         }
