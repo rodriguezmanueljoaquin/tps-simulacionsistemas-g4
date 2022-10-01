@@ -7,9 +7,9 @@ import java.util.Random;
 
 public class Manager {
     public static void main(String[] args) {
-        // FIXME
+        String RESULTS_PATH = "oscilation/results/";
 
-        new File("results").mkdir();
+        new File(RESULTS_PATH).mkdir();
 
         ArrayList<OscillationParameters> simulationParameters = new ArrayList<>();
         double initialSimDeltaT = 0.1;
@@ -20,18 +20,17 @@ public class Manager {
         simulationParameters.forEach(parameters -> {
             Simulation simulation = null;
             try {
-                String path = String.format(Locale.ENGLISH, "out_%s_%.6f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
-                new File("results/" + path).mkdir();
-                Simulation.createStaticFile(path, parameters.algorithmType.toString());
+                String path = String.format(Locale.ENGLISH, "out_%s_%f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
+                new File(RESULTS_PATH + path).mkdir();
+                Simulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH);
 
                 Random random = new Random(Constants.RANDOM_SEED);
                 String dynamicsPath = path + "/dynamics";
-                new File("results/" + dynamicsPath).mkdir();
+                new File(RESULTS_PATH + dynamicsPath).mkdir();
 
-//                FIXME
                 simulation = new BeemanSimulation(parameters.simulationDeltaT, parameters.outputDeltaT);
                 System.out.println(parameters.outputDeltaT);
-                simulation.createDynamicFile(dynamicsPath);
+                simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }

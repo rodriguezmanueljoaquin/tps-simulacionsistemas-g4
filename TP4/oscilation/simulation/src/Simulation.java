@@ -45,19 +45,19 @@ public abstract class Simulation {
         currentSimulationTime += this.outputDeltaT;
     }
 
-    public static void createStaticFile(String outputName, String algorithmName) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputName, String algorithmName, String outputPath) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
-        PrintWriter writer = new PrintWriter("./results/" + outputName + "/static.txt", "UTF-8");
+        PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
         writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n", algorithmName, Constants.PARTICLE_MASS,Constants.K, Constants.GAMMA));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
     }
 
-    public void createDynamicFile(String outputName) throws FileNotFoundException, UnsupportedEncodingException {
+    public void createDynamicFile(String outputName, String outputPath) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating dynamic file. . .");
-        PrintWriter writer = new PrintWriter("./results/" + outputName + "/dynamic" + ".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
         for (double i = 0; i <= Constants.FINAL_TIME; i += this.outputDeltaT) {
             writer.println(this.currentSimulationTime);
