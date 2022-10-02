@@ -30,7 +30,7 @@ public abstract class IntegrationAlgorithm {
 
     public static double beemanGetPredictedVelocity(double currentVelocity, double currentAcceleration,
                                                      double prevAcceleration, double deltaT) {
-        return currentVelocity + (3./2) * currentAcceleration * deltaT - 0.5 * prevAcceleration;
+        return currentVelocity + (3./2) * currentAcceleration * deltaT - 0.5 * prevAcceleration * deltaT;
     }
 
     public static double beemanGetCorrectedVelocity(double currentVelocity, double nextAcceleration, double currentAcceleration,

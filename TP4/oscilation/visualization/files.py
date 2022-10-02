@@ -4,12 +4,13 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, mass, K, gamma, simulation_deltaT):
+    def __init__(self, method_name, mass, K, gamma, A, simulation_deltaT):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.mass = mass
         self.K = K
         self.gamma = gamma
+        self.A = A
         self.simulation_deltaT = simulation_deltaT
         self.N = 1
 
@@ -79,13 +80,15 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     gamma = float(line.strip())
     line = file.readline()
+    A = int(line.strip())
+    line = file.readline()
     simulation_deltaT = float(line.strip())
     line = file.readline()
 
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, mass, K, gamma, simulation_deltaT)
+    return SimulationResult(method_name, mass, K, gamma, A, simulation_deltaT)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True

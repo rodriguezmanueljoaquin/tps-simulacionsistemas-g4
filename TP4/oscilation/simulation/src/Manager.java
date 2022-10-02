@@ -12,10 +12,10 @@ public class Manager {
         new File(RESULTS_PATH).mkdir();
 
         ArrayList<OscillationParameters> simulationParameters = new ArrayList<>();
-        double initialSimDeltaT = 0.1;
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-6))>Constants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, initialSimDeltaT,
-                    IntegrationAlgorithm.Type.GEAR));
+        double initialSimDeltaT = 0.01;
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))>Constants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, Constants.OUTPUT_DELTA_T,
+                    IntegrationAlgorithm.Type.BEEMAN));
 
         simulationParameters.forEach(parameters -> {
             Simulation simulation = null;

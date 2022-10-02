@@ -49,7 +49,7 @@ public abstract class Simulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%f", algorithmName, Constants.PARTICLE_MASS,Constants.K, Constants.GAMMA, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, Constants.PARTICLE_MASS,Constants.K, Constants.GAMMA, Constants.A, simulationDeltaT));
         writer.close();
 
         System.out.println("\tStatic file successfully created");

@@ -1,7 +1,7 @@
 public class Constants {
     public static final double PARTICLE_VELOCITY = 0.01;
     public static final double PARTICLE_RADIUS = 0.0015;
-    public static final double K = 10^4; // constante elastica
+    public static final double K = Math.pow(10,4); // constante elastica
 
     public static final double GAMMA = 100; // constante de amortiguamiento
     public static final double PARTICLE_MASS = 70; //kg
@@ -11,4 +11,5 @@ public class Constants {
     public static final int POS_DERIVATIVE_EVALUATIONS_QTY = 5;
     public static final int A = 1;
     public static final double EPSILON = 0.00000001;
+    public static final double OUTPUT_DELTA_T = 0.001;
 }
