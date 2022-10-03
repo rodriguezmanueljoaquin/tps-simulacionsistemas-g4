@@ -60,9 +60,10 @@ public abstract class Simulation {
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
         for (double i = 0; i <= Constants.FINAL_TIME; i += this.outputDeltaT) {
-            writer.println(this.currentSimulationTime);
-            writer.println(String.format(Locale.ENGLISH, "%f;%f",
-                    p.getX(), p.getxVelocity()));
+            //writer.println(this.currentSimulationTime);
+            writer.write(this.currentSimulationTime +"\n"+ p.getX() + ";" + p.getxVelocity() + "\n");
+           /* writer.println(String.format(Locale.ENGLISH, "%f;%f",
+                    p.getX(), p.getxVelocity()));*/
             nextIteration();
         }
         writer.close();

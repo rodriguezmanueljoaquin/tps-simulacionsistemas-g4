@@ -18,6 +18,7 @@ def plot_curves_with_legend(inputs,curves, legends, X_label = "X", Y_label = "Y"
     plt.ylabel(Y_label)
     if(log_scale):
         plt.yscale("log")
+        plt.xscale("log")
     plt.show()
 
 def plot_particle_evolution_by_simulation(simulation_results_dict):
@@ -109,7 +110,7 @@ def plot_error_graph(simulation_results_dict):
     # print(inputs)
     # print(curves)
     # print(legends)
-    plot_curves_with_legend(inputs,curves, legends, "deltaT", "Cuadratic error")
+    plot_curves_with_legend(inputs,curves, legends, "deltaT", "Cuadratic error",log_scale=True)
 
         
 

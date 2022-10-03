@@ -10,12 +10,12 @@ def get_cuadratic_error(simulation_result):
     gamma = simulation_result.gamma
     mass = simulation_result.mass
     frames_count = len(simulation_result.particles_by_frame)
-    # print(f"frames count : {frames_count}")
     error_sum = 0
     for particle_frame in simulation_result.particles_by_frame:
         time = particle_frame.time
-        # print(f"Particles count : {len(particle_frame.particles)}")
         for particle in particle_frame.particles:
             error_sum += pow(particle.getPosition()[0]-get_analytic(time,A,K,gamma,mass),2)
+        
     
-    return error_sum/(N*frames_count)
+    
+    return error_sum/(N*2)
