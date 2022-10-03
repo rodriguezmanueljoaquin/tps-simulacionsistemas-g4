@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class GearSimulation extends Simulation{
+public class GearAlgorithm extends IntegrationAlgorithmImp{
 
     private double currentAcceleration;
     private List<Double> posCorrectedDerivatives;
 
-    public GearSimulation(Double simulationDeltaT, Double outputDeltaT) {
-        super(simulationDeltaT, outputDeltaT);
+    public GearAlgorithm(Double simulationDeltaT, Double outputDeltaT, Particle p) {
+        super(simulationDeltaT,outputDeltaT,p);
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
         posCorrectedDerivatives = new ArrayList<>();
     }
@@ -54,14 +54,14 @@ public class GearSimulation extends Simulation{
         //Luego, obtenemos las derivadas predichas a partir del algoritmo
         List<Double> predictedDerivatives = IntegrationAlgorithm.gearGetPredictedDerivatives(simulationDeltaT,posDerivativeEvaluations);
         //Luego, calculamos la aceleracion en el proximo paso, a partir de la posicion y la velocidad predichas
-        double nextAcceleration = getForce(predictedDerivatives.get(0),predictedDerivatives.get(1))/Constants.PARTICLE_MASS;
+        double nextAcceleration = getForce(predictedDerivatives.get(0),predictedDerivatives.get(1))/p.getMass();
         //Luego, a partir de la misma, calculamos las derivadas corregidas
         posCorrectedDerivatives = IntegrationAlgorithm.gearGetCorrectedDerivatives(simulationDeltaT,predictedDerivatives,nextAcceleration);
         return;
     }
 
     private double getDerivative(double previousPreviousDerivative, double previousDerivative){
-        return (-Constants.K*previousPreviousDerivative-Constants.GAMMA*previousDerivative)/Constants.PARTICLE_MASS;
+        return (-Constants.K*previousPreviousDerivative-Constants.GAMMA*previousDerivative)/p.getMass();
     }
 
 

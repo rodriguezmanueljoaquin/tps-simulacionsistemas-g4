@@ -1,9 +1,11 @@
-public class VerletSimulation extends Simulation{
+public class VerletAlgorithm extends IntegrationAlgorithmImp{
 
     private double currentAcceleration;
     private double prevPos;
-    public VerletSimulation(Double simulationDeltaT, Double outputDeltaT) {
-        super(simulationDeltaT, outputDeltaT);
+
+
+    public VerletAlgorithm(double simulationDeltaT, double outputDeltaT, Particle p) {
+        super(simulationDeltaT,outputDeltaT,p);
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
         prevPos = p.getX() - p.getxVelocity() *simulationDeltaT;
     }

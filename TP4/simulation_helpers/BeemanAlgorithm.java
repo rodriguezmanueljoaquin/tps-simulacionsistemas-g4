@@ -1,7 +1,7 @@
-public class BeemanSimulation extends Simulation {
+public class BeemanAlgorithm extends IntegrationAlgorithmImp {
     private double currentAcceleration, previousAcceleration;
-    public BeemanSimulation(Double simulationDeltaT, Double outputDeltaT) {
-        super(simulationDeltaT, outputDeltaT);
+    public BeemanAlgorithm(Double simulationDeltaT, Double outputDeltaT , Particle p) {
+        super(simulationDeltaT, outputDeltaT,p);
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
         previousAcceleration = 0; //TODO: ???
     }

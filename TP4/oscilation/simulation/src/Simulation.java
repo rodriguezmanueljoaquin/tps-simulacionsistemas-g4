@@ -3,41 +3,50 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-public abstract class Simulation {
-    protected Particle p;
-    protected double simulationDeltaT;
+public class Simulation {
+    private Particle p;
+    private double simulationDeltaT;
     private double outputDeltaT;
-    protected double currentSimulationTime;
+    private double currentSimulationTime;
 
-    public Simulation(Double simulationDeltaT, Double outputDeltaT) {
+    private IntegrationAlgorithmImp integrationAlgorithmImp;
+
+    public Simulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type type) {
+        this.integrationAlgorithmImp = integrationAlgorithmImp;
         this.p = new Particle(
-                        Constants.INITIAL_X,
+                        ConstantsOsc.INITIAL_X,
                         0.,
                         0.,
-                        -Constants.A * Constants.GAMMA/(2*Constants.PARTICLE_MASS), // TODO: SE DEBERIA CALCULAR SEGUN FUNCION DE PPT
+                        -ConstantsOsc.A * Constants.GAMMA/(2* ConstantsOsc.PARTICLE_MASS), // TODO: SE DEBERIA CALCULAR SEGUN FUNCION DE PPT
                         0,
-                        Constants.PARTICLE_MASS);
+                        ConstantsOsc.PARTICLE_MASS);
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;
+
+        switch (type){
+            case BEEMAN:
+                integrationAlgorithmImp = new BeemanAlgorithm(simulationDeltaT, outputDeltaT, p);
+                break;
+            case VERLET:
+                integrationAlgorithmImp =  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
+                break;
+            default:
+                integrationAlgorithmImp =  new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
+
+        }
     }
 
-    protected abstract double getNewPosition();
 
-    protected abstract double getNewVelocity();
-
-    protected double getForce(double position, double velocity){
-        return (-Constants.K * position - Constants.GAMMA * velocity);
-    }
 
     public void nextIteration() {
         double newPosition, newVelocity;
         double iterationTime = this.currentSimulationTime;
         for (;
-             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= Constants.FINAL_TIME;
+             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= ConstantsOsc.FINAL_TIME;
              iterationTime += this.simulationDeltaT) {
-            newPosition = getNewPosition();
-            newVelocity = getNewVelocity();
+            newPosition = integrationAlgorithmImp.getNewPosition();
+            newVelocity = integrationAlgorithmImp.getNewVelocity();
             this.p.setX(newPosition);
             this.p.setxVelocity(newVelocity);
         }
@@ -49,7 +58,7 @@ public abstract class Simulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, Constants.PARTICLE_MASS,Constants.K, Constants.GAMMA, Constants.A, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, ConstantsOsc.PARTICLE_MASS, Constants.K, Constants.GAMMA, ConstantsOsc.A, simulationDeltaT));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
@@ -59,7 +68,7 @@ public abstract class Simulation {
         System.out.println("\tCreating dynamic file. . .");
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
-        for (double i = 0; i <= Constants.FINAL_TIME; i += this.outputDeltaT) {
+        for (double i = 0; i <= ConstantsOsc.FINAL_TIME; i += this.outputDeltaT) {
             //writer.println(this.currentSimulationTime);
             writer.write(this.currentSimulationTime +"\n"+ p.getX() + ";" + p.getxVelocity() + "\n");
            /* writer.println(String.format(Locale.ENGLISH, "%f;%f",

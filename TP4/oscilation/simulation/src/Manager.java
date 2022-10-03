@@ -13,14 +13,14 @@ public class Manager {
 
         ArrayList<OscillationParameters> simulationParameters = new ArrayList<>();
         double initialSimDeltaT = 0.01;
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))>Constants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, Constants.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> ConstantsOsc.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, ConstantsOsc.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.BEEMAN));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))>Constants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, Constants.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> ConstantsOsc.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, ConstantsOsc.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.VERLET));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))>Constants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, Constants.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> ConstantsOsc.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, ConstantsOsc.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.GEAR));
 
         simulationParameters.forEach(parameters -> {
@@ -30,11 +30,12 @@ public class Manager {
                 new File(RESULTS_PATH + path).mkdir();
                 Simulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH, parameters.simulationDeltaT);
 
-                Random random = new Random(Constants.RANDOM_SEED);
+                Random random = new Random(ConstantsOsc.RANDOM_SEED);
                 String dynamicsPath = path + "/dynamics";
                 new File(RESULTS_PATH + dynamicsPath).mkdir();
 
-                simulation = getSimulationFromIntegrationAlgorithmType(parameters.algorithmType,parameters.simulationDeltaT,parameters.outputDeltaT);
+                simulation =new Simulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
+
                 simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
@@ -44,17 +45,6 @@ public class Manager {
 
     }
 
-    private static Simulation getSimulationFromIntegrationAlgorithmType(IntegrationAlgorithm.Type type, double simulationDeltaT, double outputDeltaT){
-        switch (type){
-            case BEEMAN:
-                return new BeemanSimulation(simulationDeltaT, outputDeltaT);
-            case VERLET:
-                return new VerletSimulation(simulationDeltaT,outputDeltaT);
-            default:
-                return new GearSimulation(simulationDeltaT,outputDeltaT);
-
-        }
-    }
 
     private static class OscillationParameters {
         public double simulationDeltaT;
