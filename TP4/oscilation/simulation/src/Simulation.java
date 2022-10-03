@@ -30,19 +30,19 @@ public abstract class Simulation {
         return (-Constants.K * position - Constants.GAMMA * velocity);
     }
 
-    public void nextIteration(){
+    public void nextIteration() {
         double newPosition, newVelocity;
-
-        for(double iterationTime = this.currentSimulationTime;
-            iterationTime <= this.currentSimulationTime + this.outputDeltaT && iterationTime <= Constants.FINAL_TIME;
-            iterationTime += this.simulationDeltaT){
+        double iterationTime = this.currentSimulationTime;
+        for (;
+             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= Constants.FINAL_TIME;
+             iterationTime += this.simulationDeltaT) {
             newPosition = getNewPosition();
             newVelocity = getNewVelocity();
             this.p.setX(newPosition);
             this.p.setxVelocity(newVelocity);
         }
 
-        currentSimulationTime += this.outputDeltaT;
+        currentSimulationTime = iterationTime;
     }
 
     public static void createStaticFile(String outputName, String algorithmName, String outputPath, double simulationDeltaT) throws FileNotFoundException, UnsupportedEncodingException {

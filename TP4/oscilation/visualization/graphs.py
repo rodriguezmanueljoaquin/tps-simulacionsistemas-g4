@@ -56,31 +56,7 @@ def plot_particle_evolution_by_simulation(simulation_results_dict):
     # print(curves[-1])
     legends.append("Analytic")
 
-    plot_curves_with_legend(inputs,curves, legends, "Time", "Position")
-
-# def plot_particle_evolution_by_simulation(simulation_results):
-#     inputs = []
-#     curves = []
-#     legends = []
-#     for simulation_executions in simulation_results:
-#         # cada simulacion tiene multiples ejecuciones
-#         simulation_result = simulation_executions[0]
-#         position_evolution = []
-#         time_evolution = []
-#         for frame in simulation_result.particles_by_frame:
-#             position_evolution.append(frame.particles[0].getPosition()[0])
-#             time_evolution.append(frame.time)
-
-#         inputs.append(time_evolution)
-#         curves.append(position_evolution)
-#         legends.append(simulation_result.method_name + " deltaT= " + str(simulation_result.simulation_deltaT))
-
-#     #Finalmente, agregamos la data de la solucion analitica
-#     inputs.append(inputs[-1])
-#     curves.append([get_analytic(time,simulation_result.A,simulation_result.K,simulation_result.gamma,simulation_result.mass) for time in inputs[-1]])
-#     legends.append("Analytic")
-
-    plot_curves_with_legend(inputs,curves, legends, "Time", "Position")
+    plot_curves_with_legend(inputs,curves, legends, "Time(s)", "Position(m)")
 
 def plot_error_graph(simulation_results_dict):
     #Primero, creamos el nuevo diccionario a utilizar ( {algoritmo: {deltaT : error}})
@@ -110,7 +86,7 @@ def plot_error_graph(simulation_results_dict):
     # print(inputs)
     # print(curves)
     # print(legends)
-    plot_curves_with_legend(inputs,curves, legends, "deltaT", "Cuadratic error",log_scale=True)
+    plot_curves_with_legend(inputs,curves, legends, "deltaT (s)", "Cuadratic error (m**2)",log_scale=True)
 
         
 
