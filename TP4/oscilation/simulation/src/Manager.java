@@ -15,7 +15,7 @@ public class Manager {
         double initialSimDeltaT = 0.01;
         for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))>Constants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new OscillationParameters(simDeltaT, Constants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithm.Type.BEEMAN));
+                    IntegrationAlgorithm.Type.VERLET));
 
         simulationParameters.forEach(parameters -> {
             Simulation simulation = null;
