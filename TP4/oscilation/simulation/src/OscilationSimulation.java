@@ -11,7 +11,7 @@ public class OscilationSimulation {
 
     private IntegrationAlgorithmImp integrationAlgorithmImp;
 
-    public OscilationSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type type) {
+    public OscilationSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
         this.p = new Particle(
                         OscilationConstants.INITIAL_X,
                         0.,

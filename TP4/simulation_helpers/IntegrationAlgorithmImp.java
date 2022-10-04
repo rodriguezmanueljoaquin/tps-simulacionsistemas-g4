@@ -10,6 +10,10 @@ public abstract class IntegrationAlgorithmImp {
         this.outputDeltaT = outputDeltaT;
     }
 
+    public enum Type {
+        EULER, BEEMAN, VERLET, GEAR
+    }
+
     protected abstract double getNewPosition();
 
     protected abstract double getNewVelocity();

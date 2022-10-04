@@ -10,15 +10,23 @@ public class VerletAlgorithm extends IntegrationAlgorithmImp{
 
     @Override
     protected double getNewPosition() {
-        return IntegrationAlgorithm.verletGetPosition(p.getX(),prevPos,currentAcceleration,simulationDeltaT);
+        return getPosition(p.getX(),prevPos,currentAcceleration,simulationDeltaT);
     }
 
     @Override
     protected double getNewVelocity() {
         double newPosition = getNewPosition();
-        double newVel = IntegrationAlgorithm.verletGetVelocity(newPosition,prevPos,simulationDeltaT);
+        double newVel = getVelocity(newPosition,prevPos,simulationDeltaT);
         prevPos = p.getX();
         currentAcceleration = getForce(newPosition, newVel)/p.getMass();
         return newVel;
+    }
+
+    private double getPosition(double currentPosition, double prevPosition, double currentAcceleration, double deltaT) {
+        return 2 * currentPosition - prevPosition + Math.pow(deltaT, 2) * currentAcceleration;
+    }
+
+    private double getVelocity(double nextPosition, double prevPosition, double deltaT) {
+        return (nextPosition - prevPosition)/(2.*deltaT);
     }
 }
