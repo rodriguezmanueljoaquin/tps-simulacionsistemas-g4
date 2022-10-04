@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
-public class Manager {
+public class OscilationManager {
     public static void main(String[] args) {
         String RESULTS_PATH = "oscilation/results/";
 
@@ -13,28 +13,27 @@ public class Manager {
 
         ArrayList<OscillationParameters> simulationParameters = new ArrayList<>();
         double initialSimDeltaT = 0.01;
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> ConstantsOsc.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, ConstantsOsc.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> OscilationConstants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.BEEMAN));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> ConstantsOsc.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, ConstantsOsc.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> OscilationConstants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.VERLET));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> ConstantsOsc.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new OscillationParameters(simDeltaT, ConstantsOsc.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> OscilationConstants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new OscillationParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.GEAR));
 
         simulationParameters.forEach(parameters -> {
-            Simulation simulation = null;
+            OscilationSimulation simulation = null;
             try {
                 String path = String.format(Locale.ENGLISH, "out_%s_%f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
                 new File(RESULTS_PATH + path).mkdir();
-                Simulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH, parameters.simulationDeltaT);
+                OscilationSimulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH, parameters.simulationDeltaT);
 
-                Random random = new Random(ConstantsOsc.RANDOM_SEED);
                 String dynamicsPath = path + "/dynamics";
                 new File(RESULTS_PATH + dynamicsPath).mkdir();
 
-                simulation =new Simulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
+                simulation =new OscilationSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
 
                 simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -42,9 +41,7 @@ public class Manager {
             }
 
         });
-
     }
-
 
     private static class OscillationParameters {
         public double simulationDeltaT;

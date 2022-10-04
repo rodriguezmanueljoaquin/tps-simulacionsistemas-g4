@@ -14,9 +14,7 @@ public abstract class IntegrationAlgorithmImp {
 
     protected abstract double getNewVelocity();
 
-
     protected double getForce(double position, double velocity){
         return (-Constants.K * position - Constants.GAMMA * velocity);
     }
-
 }

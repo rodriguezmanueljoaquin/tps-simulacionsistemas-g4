@@ -1,9 +1,10 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Locale;
 
-public class Simulation {
+public class SpaceSimulation {
     private Particle p;
     private double simulationDeltaT;
     private double outputDeltaT;
@@ -11,15 +12,17 @@ public class Simulation {
 
     private IntegrationAlgorithmImp integrationAlgorithmImp;
 
-    public Simulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type type) {
-        this.integrationAlgorithmImp = integrationAlgorithmImp;
-        this.p = new Particle(
-                        ConstantsOsc.INITIAL_X,
-                        0.,
-                        0.,
-                        -ConstantsOsc.A * Constants.GAMMA/(2* ConstantsOsc.PARTICLE_MASS), // TODO: SE DEBERIA CALCULAR SEGUN FUNCION DE PPT
+    private Particle sun;
+    private List<Particle> objects;
+
+    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type type) {
+        this.sun = new Particle(
                         0,
-                        ConstantsOsc.PARTICLE_MASS);
+                        0.,
+                        0.,
+                        0,
+                        0,
+                        4.260 * Math.pow(10,9));
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;
@@ -37,13 +40,11 @@ public class Simulation {
         }
     }
 
-
-
     public void nextIteration() {
         double newPosition, newVelocity;
         double iterationTime = this.currentSimulationTime;
         for (;
-             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= ConstantsOsc.FINAL_TIME;
+             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= OscilationConstants.FINAL_TIME;
              iterationTime += this.simulationDeltaT) {
             newPosition = integrationAlgorithmImp.getNewPosition();
             newVelocity = integrationAlgorithmImp.getNewVelocity();
@@ -58,7 +59,7 @@ public class Simulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, ConstantsOsc.PARTICLE_MASS, Constants.K, Constants.GAMMA, ConstantsOsc.A, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, OscilationConstants.PARTICLE_MASS, Constants.K, Constants.GAMMA, OscilationConstants.A, simulationDeltaT));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
@@ -68,11 +69,8 @@ public class Simulation {
         System.out.println("\tCreating dynamic file. . .");
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
-        for (double i = 0; i <= ConstantsOsc.FINAL_TIME; i += this.outputDeltaT) {
-            //writer.println(this.currentSimulationTime);
+        for (double i = 0; i <= OscilationConstants.FINAL_TIME; i += this.outputDeltaT) {
             writer.write(this.currentSimulationTime +"\n"+ p.getX() + ";" + p.getxVelocity() + "\n");
-           /* writer.println(String.format(Locale.ENGLISH, "%f;%f",
-                    p.getX(), p.getxVelocity()));*/
             nextIteration();
         }
         writer.close();

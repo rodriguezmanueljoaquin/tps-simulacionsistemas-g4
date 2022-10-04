@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GearAlgorithm extends IntegrationAlgorithmImp{
-
     private double currentAcceleration;
     private List<Double> posCorrectedDerivatives;
 
@@ -11,7 +10,6 @@ public class GearAlgorithm extends IntegrationAlgorithmImp{
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
         posCorrectedDerivatives = new ArrayList<>();
     }
-
 
     @Override
     protected double getNewPosition() {
@@ -44,8 +42,6 @@ public class GearAlgorithm extends IntegrationAlgorithmImp{
         posDerivativeEvaluations.add(getDerivative(posDerivativeEvaluations.get(3),posDerivativeEvaluations.get(4)));
         //Retornamos la lista
         return posDerivativeEvaluations;
-
-
     }
 
     private void calculateCorrectedDerivatives(){
@@ -63,7 +59,5 @@ public class GearAlgorithm extends IntegrationAlgorithmImp{
     private double getDerivative(double previousPreviousDerivative, double previousDerivative){
         return (-Constants.K*previousPreviousDerivative-Constants.GAMMA*previousDerivative)/p.getMass();
     }
-
-
 
 }
