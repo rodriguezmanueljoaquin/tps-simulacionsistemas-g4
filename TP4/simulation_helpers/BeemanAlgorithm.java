@@ -3,7 +3,7 @@ public class BeemanAlgorithm extends IntegrationAlgorithmImp {
     public BeemanAlgorithm(Double simulationDeltaT, Double outputDeltaT , Particle p) {
         super(simulationDeltaT, outputDeltaT,p);
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
-        previousAcceleration = 0; //TODO: ???
+        previousAcceleration = currentAcceleration;
     }
 
     @Override
