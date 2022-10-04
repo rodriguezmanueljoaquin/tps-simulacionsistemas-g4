@@ -16,7 +16,7 @@ public class SpaceSimulation {
     private Particle sun;
     private List<Particle> objects;
 
-    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type type) {
+    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
         this.sun = new Particle(
                         0,
                         0.,
@@ -65,7 +65,7 @@ public class SpaceSimulation {
         double newPosition, newVelocity;
         double iterationTime = this.currentSimulationTime;
         for (;
-             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= OscilationConstants.FINAL_TIME;
+             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME;
              iterationTime += this.simulationDeltaT) {
             newPosition = integrationAlgorithmImp.getNewPosition();
             newVelocity = integrationAlgorithmImp.getNewVelocity();
@@ -80,7 +80,7 @@ public class SpaceSimulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, OscilationConstants.PARTICLE_MASS, Constants.K, Constants.GAMMA, OscilationConstants.A, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, SpaceConstants.PARTICLE_MASS, Constants.K, Constants.GAMMA, SpaceConstants.A, simulationDeltaT));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
@@ -90,7 +90,7 @@ public class SpaceSimulation {
         System.out.println("\tCreating dynamic file. . .");
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
-        for (double i = 0; i <= OscilationConstants.FINAL_TIME; i += this.outputDeltaT) {
+        for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
             writer.write(this.currentSimulationTime +"\n"+ p.getX() + ";" + p.getxVelocity() + "\n");
             nextIteration();
         }

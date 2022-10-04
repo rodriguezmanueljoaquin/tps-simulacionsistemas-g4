@@ -15,13 +15,13 @@ public class SpaceManager {
         double initialSimDeltaT = 0.01;
         for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithm.Type.BEEMAN));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new SpaceParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithm.Type.VERLET));
+                    IntegrationAlgorithmImp.Type.BEEMAN));
         for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithm.Type.GEAR));
+                    IntegrationAlgorithmImp.Type.VERLET));
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
+                    IntegrationAlgorithmImp.Type.GEAR));
 
         simulationParameters.forEach(parameters -> {
             SpaceSimulation simulation = null;
@@ -45,9 +45,9 @@ public class SpaceManager {
     private static class SpaceParameters {
         public double simulationDeltaT;
         public double outputDeltaT;
-        public IntegrationAlgorithm.Type algorithmType;
+        public IntegrationAlgorithmImp.Type algorithmType;
 
-        public SpaceParameters(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithm.Type algorithmType) {
+        public SpaceParameters(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type algorithmType) {
             this.simulationDeltaT = simulationDeltaT;
             this.outputDeltaT = outputDeltaT;
             this.algorithmType = algorithmType;
