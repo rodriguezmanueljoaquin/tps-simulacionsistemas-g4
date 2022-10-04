@@ -9,17 +9,17 @@ public class Particle {
     private double radius;
     private double mass;
 
-    public Particle(double x, double y, double angle, double velocity, double radius, double mass) {
+    public Particle(double x, double y, double xVelocity, double yVelocity, double radius, double mass) {
         this.x = x;
         this.y = y;
-        this.xVelocity = velocity * Math.cos(angle);
-        this.yVelocity = velocity * Math.sin(angle);
-        this.velocity = velocity;
+        this.xVelocity = xVelocity;
+        this.yVelocity = yVelocity;
         this.radius = radius;
         this.mass = mass;
 
         this.id = count++;
     }
+
 
     public Particle(double x, double y, double angle) {
         this.x = x;

@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,6 +24,26 @@ public class SpaceSimulation {
                         0,
                         0,
                         4.260 * Math.pow(10,9));
+
+        List<String> planets = new ArrayList<>();
+        planets.add("earth");
+        planets.add("venus");
+        for (String planet: planets) {
+            Pair<Double, Double> position = HorizonResultsReader.GetPosition("space_mission/datasets/horizons_results_" + planet + ".txt");
+            Pair<Double, Double> velocity = HorizonResultsReader.GetVelocity("space_mission/datasets/horizons_results_" + planet + ".txt");
+            objects.add(
+              new Particle(
+                      position.getLeft(),
+                      position.getRight(),
+                      velocity.getLeft(),
+                      velocity.getRight(),
+                      0,
+                      0)
+            );
+        }
+
+        System.out.println(planets);
+
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;

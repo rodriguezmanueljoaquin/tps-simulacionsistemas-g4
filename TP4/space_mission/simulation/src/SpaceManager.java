@@ -13,14 +13,14 @@ public class SpaceManager {
 
         ArrayList<SpaceParameters> simulationParameters = new ArrayList<>();
         double initialSimDeltaT = 0.01;
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> OscilationConstants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new SpaceParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.BEEMAN));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> OscilationConstants.EPSILON ; simDeltaT /= 10)
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.VERLET));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> OscilationConstants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new SpaceParameters(simDeltaT, OscilationConstants.OUTPUT_DELTA_T,
+        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
+            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithm.Type.GEAR));
 
         simulationParameters.forEach(parameters -> {

@@ -15,8 +15,8 @@ public class OscilationSimulation {
         this.p = new Particle(
                         OscilationConstants.INITIAL_X,
                         0.,
-                        0.,
-                        -OscilationConstants.A * Constants.GAMMA/(2* OscilationConstants.PARTICLE_MASS), // TODO: SE DEBERIA CALCULAR SEGUN FUNCION DE PPT
+                -OscilationConstants.A * Constants.GAMMA/(2* OscilationConstants.PARTICLE_MASS),
+                        0,
                         0,
                         OscilationConstants.PARTICLE_MASS);
         this.simulationDeltaT = simulationDeltaT;
