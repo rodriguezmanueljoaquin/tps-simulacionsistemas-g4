@@ -14,16 +14,20 @@ public class SpaceSimulation {
     private IntegrationAlgorithmImp integrationAlgorithmImp;
 
     private Particle sun;
-    private List<Particle> objects;
+    private List<Particle> objects = new ArrayList<>();
 
     public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
+        this.simulationDeltaT = simulationDeltaT;
+        this.outputDeltaT = outputDeltaT;
+        this.currentSimulationTime = 0.;
+
         this.sun = new Particle(
                         0,
                         0.,
                         0.,
                         0,
-                        0,
-                        4.260 * Math.pow(10,9));
+                        SpaceConstants.SUN_RADIUS,
+                        SpaceConstants.SUN_MASS);
 
         List<String> planets = new ArrayList<>();
         planets.add("earth");
@@ -37,28 +41,22 @@ public class SpaceSimulation {
                       position.getRight(),
                       velocity.getLeft(),
                       velocity.getRight(),
-                      0,
-                      0)
+                      planet.equals(planets.get(0))? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
+                      planet.equals(planets.get(0))? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS)
             );
         }
 
-        System.out.println(planets);
-
-        this.simulationDeltaT = simulationDeltaT;
-        this.outputDeltaT = outputDeltaT;
-        this.currentSimulationTime = 0.;
-
-        switch (type){
-            case BEEMAN:
-                integrationAlgorithmImp = new BeemanAlgorithm(simulationDeltaT, outputDeltaT, p);
-                break;
-            case VERLET:
-                integrationAlgorithmImp =  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
-                break;
-            default:
-                integrationAlgorithmImp =  new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
-
-        }
+        // un integration algorithm para cada posicion, velocidad, de cada particula?
+//        switch (type){
+//            case BEEMAN:
+//                integrationAlgorithmImp = new BeemanAlgorithm(simulationDeltaT, outputDeltaT, p);
+//                break;
+//            case VERLET:
+//                integrationAlgorithmImp =  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
+//                break;
+//            default:
+//                integrationAlgorithmImp =  new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
+//        }
     }
 
     public void nextIteration() {
