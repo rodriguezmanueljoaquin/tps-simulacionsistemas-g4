@@ -21,8 +21,8 @@ public class HorizonResultsReader {
                 line = scanner.nextLine();
 
             tokens = line.split("=");
-            double first = Double.parseDouble(tokens[0].split(" ")[0]);
-            double second = Double.parseDouble(tokens[1].split(" ")[0]);
+            double first = Double.parseDouble(tokens[1].split("Y|VY")[0]);
+            double second = Double.parseDouble(tokens[2].split("Z|VZ")[0]);
 
             return new Pair<>(first, second);
         } catch (FileNotFoundException e) {
