@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.stream.Stream;
+
 public class Particle {
     private double x;
     private double y;
@@ -79,6 +82,30 @@ public class Particle {
         this.yVelocity = yVelocity;
     }
 
+
+    public double forceGravity(Particle p){
+        return Constants.G*this.getMass()* p.getMass()/(Math.pow(calculateDistanceTo(p),2));
+    }
+
+    public double forceX(Particle p){
+            return forceGravity(p)*(this.getX() - p.getX())/calculateDistanceTo(p);
+    }
+
+    public double forceY(Particle p){
+        return forceGravity(p)*(this.getY() - p.getY())/calculateDistanceTo(p);
+    }
+
+    public double totalForceX(List<Particle> particles){
+        return particles.stream().mapToDouble(particle -> forceX(particle)).sum();
+    }
+
+    public double totalForceY(List<Particle> particles){
+        return particles.stream().mapToDouble(particle -> forceY(particle)).sum();
+    }
+
+    public double totalForce(List<Particle> particles){
+        return particles.stream().mapToDouble(particle -> forceGravity(particle)).sum();
+    }
     @Override
     public String toString() {
         return "Particle{" +

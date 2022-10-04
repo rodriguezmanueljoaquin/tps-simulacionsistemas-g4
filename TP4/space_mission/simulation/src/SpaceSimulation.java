@@ -16,6 +16,8 @@ public class SpaceSimulation {
     private Particle sun;
     private List<Particle> objects;
 
+    private Particle spaceShip;
+
     public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
         this.sun = new Particle(
                         0,
@@ -41,8 +43,8 @@ public class SpaceSimulation {
                       0)
             );
         }
-
         System.out.println(planets);
+        this.spaceShip = new Particle(0,0,15.12,0,0,2*Math.pow(10,5)); //TODO: VER POSICIONES INICIALES Y RADIO
 
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
