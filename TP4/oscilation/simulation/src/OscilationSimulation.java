@@ -15,7 +15,7 @@ public class OscilationSimulation {
         this.p = new Particle(
                         OscilationConstants.INITIAL_X,
                         0.,
-                -OscilationConstants.A * Constants.GAMMA/(2* OscilationConstants.PARTICLE_MASS),
+                -Constants.A * Constants.GAMMA/(2* OscilationConstants.PARTICLE_MASS),
                         0,
                         0,
                         OscilationConstants.PARTICLE_MASS);
@@ -55,7 +55,7 @@ public class OscilationSimulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, OscilationConstants.PARTICLE_MASS, Constants.K, Constants.GAMMA, OscilationConstants.A, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, OscilationConstants.PARTICLE_MASS, Constants.K, Constants.GAMMA, Constants.A, simulationDeltaT));
         writer.close();
 
         System.out.println("\tStatic file successfully created");

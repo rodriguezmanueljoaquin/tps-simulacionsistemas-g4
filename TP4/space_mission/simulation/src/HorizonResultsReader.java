@@ -1,13 +1,12 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class HorizonResultsReader {
     private static final String POSITIONSANDVELOCITIESSEGMENT_ID = "$$SOE";
 
-    private static Pair<Double, Double> GetDoublesAfterNLinesOnSegment(String path, String segmentIdentifier, Integer skips){
+    private static Pair<Double, Double> getDoublesAfterNLinesOnSegment(String path, String segmentIdentifier, Integer skips){
         try {
             File file = new File(path);
             Scanner scanner = new Scanner(file);
@@ -33,12 +32,12 @@ public class HorizonResultsReader {
         }
     }
 
-    public static Pair<Double, Double> GetPosition(String path) {
-        return GetDoublesAfterNLinesOnSegment(path, POSITIONSANDVELOCITIESSEGMENT_ID, 2);
+    public static Pair<Double, Double> getPosition(String path) {
+        return getDoublesAfterNLinesOnSegment(path, POSITIONSANDVELOCITIESSEGMENT_ID, 2);
     }
 
-    public static Pair<Double, Double> GetVelocity(String path) {
-        return GetDoublesAfterNLinesOnSegment(path, POSITIONSANDVELOCITIESSEGMENT_ID, 3);
+    public static Pair<Double, Double> getVelocity(String path) {
+        return getDoublesAfterNLinesOnSegment(path, POSITIONSANDVELOCITIESSEGMENT_ID, 3);
     }
 
 }

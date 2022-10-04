@@ -35,8 +35,8 @@ public class SpaceSimulation {
         planets.add("earth");
         planets.add("venus");
         for (String planet: planets) {
-            Pair<Double, Double> position = HorizonResultsReader.GetPosition("space_mission/datasets/horizons_results_" + planet + ".txt");
-            Pair<Double, Double> velocity = HorizonResultsReader.GetVelocity("space_mission/datasets/horizons_results_" + planet + ".txt");
+            Pair<Double, Double> position = HorizonResultsReader.getPosition("space_mission/datasets/horizons_results_" + planet + ".txt");
+            Pair<Double, Double> velocity = HorizonResultsReader.getVelocity("space_mission/datasets/horizons_results_" + planet + ".txt");
             objects.add(
               new Particle(
                       position.getLeft(),
@@ -83,7 +83,7 @@ public class SpaceSimulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%f\n%d\n%f", algorithmName, SpaceConstants.PARTICLE_MASS, Constants.K, Constants.GAMMA, SpaceConstants.A, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%d\n%f", algorithmName, Constants.K, Constants.GAMMA, Constants.A, simulationDeltaT));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
