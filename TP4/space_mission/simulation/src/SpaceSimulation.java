@@ -1,9 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class SpaceSimulation {
     private Particle p;
@@ -14,7 +12,7 @@ public class SpaceSimulation {
     private IntegrationAlgorithmImp integrationAlgorithmImp;
 
     private Particle sun;
-    private List<Particle> objects = new ArrayList<>();
+    private Map<String ,Particle> objects = new HashMap<>();
 
     private Particle spaceShip;
 
@@ -31,24 +29,27 @@ public class SpaceSimulation {
                         SpaceConstants.SUN_RADIUS,
                         SpaceConstants.SUN_MASS);
 
-        List<String> planets = new ArrayList<>();
-        planets.add("earth");
-        planets.add("venus");
-        for (String planet: planets) {
-            Pair<Double, Double> position = HorizonResultsReader.getPosition("space_mission/datasets/horizons_results_" + planet + ".txt");
-            Pair<Double, Double> velocity = HorizonResultsReader.getVelocity("space_mission/datasets/horizons_results_" + planet + ".txt");
-            objects.add(
+        List<String> planetNames = new ArrayList<>();
+        planetNames.add("earth");
+        planetNames.add("venus");
+        for (String planetName: planetNames) {
+            Pair<Double, Double> position = HorizonResultsReader.getPosition("space_mission/datasets/horizons_results_" + planetName + ".txt");
+            Pair<Double, Double> velocity = HorizonResultsReader.getVelocity("space_mission/datasets/horizons_results_" + planetName + ".txt");
+            objects.put(planetName,
               new Particle(
                       position.getLeft(),
                       position.getRight(),
                       velocity.getLeft(),
                       velocity.getRight(),
-                      planet.equals(planets.get(0))? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
-                      planet.equals(planets.get(0))? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS)
+                      planetName.equals(planetNames.get(0))? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
+                      planetName.equals(planetNames.get(0))? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS)
             );
         }
-        System.out.println(planets);
-        this.spaceShip = new Particle(0,0,15.12,0,0,2*Math.pow(10,5)); //TODO: VER POSICIONES INICIALES Y RADIO
+        this.spaceShip = new Particle(objects.get("earth").getX(),
+                objects.get("earth").getY() - 1500,
+                8 + 7.12 + objects.get("earth").getxVelocity()
+                , 0,0,
+                2*Math.pow(10,5)); //TODO: VER POSICIONES INICIALES Y RADIO
 
 
         // un integration algorithm para cada posicion, velocidad, de cada particula?
