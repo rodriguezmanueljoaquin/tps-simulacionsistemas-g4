@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 public class SpaceSimulation {
-    private Particle p;
     private double simulationDeltaT;
     private double outputDeltaT;
     private double currentSimulationTime;
@@ -14,7 +13,6 @@ public class SpaceSimulation {
     private Particle sun;
     private Map<String ,Particle> objects = new HashMap<>();
 
-    private Particle spaceShip;
 
     public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
         this.simulationDeltaT = simulationDeltaT;
@@ -45,11 +43,14 @@ public class SpaceSimulation {
                       planetName.equals(planetNames.get(0))? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS)
             );
         }
-        this.spaceShip = new Particle(objects.get("earth").getX(),
+        double vAbsEarth = Math.sqrt(Math.pow(objects.get("earth").getxVelocity(),2) + Math.pow(objects.get("earth").getyVelocity(),2));
+        double vxVersor = objects.get("earth").getxVelocity()/vAbsEarth;
+        double vyVersor = objects.get("earth").getyVelocity()/vAbsEarth;
+        objects.put("spaceship",new Particle(objects.get("earth").getX(),
                 objects.get("earth").getY() - 1500,
-                8 + 7.12 + objects.get("earth").getxVelocity()
-                , 0,0,
-                2*Math.pow(10,5)); //TODO: VER POSICIONES INICIALES Y RADIO
+                objects.get("earth").getxVelocity() + (8 + 7.12)*vxVersor
+                , objects.get("earth").getyVelocity() + (8 + 7.12)*vyVersor ,0,
+                2*Math.pow(10,5))); //TODO: VER RADIO
 
 
         // un integration algorithm para cada posicion, velocidad, de cada particula?
@@ -68,14 +69,14 @@ public class SpaceSimulation {
     public void nextIteration() {
         double newPosition, newVelocity;
         double iterationTime = this.currentSimulationTime;
-        for (;
+   /*     for (;
              iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME;
              iterationTime += this.simulationDeltaT) {
             newPosition = integrationAlgorithmImp.getNewPosition();
             newVelocity = integrationAlgorithmImp.getNewVelocity();
             this.p.setX(newPosition);
             this.p.setxVelocity(newVelocity);
-        }
+        }*/
 
         currentSimulationTime = iterationTime;
     }
@@ -95,7 +96,7 @@ public class SpaceSimulation {
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
         for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
-            writer.write(this.currentSimulationTime +"\n"+ p.getX() + ";" + p.getxVelocity() + "\n");
+            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getX()  + ";" + objects.get("earth").getY()  + objects.get("earth").getxVelocity() + objects.get("earth").getyVelocity() +  "\n");
             nextIteration();
         }
         writer.close();

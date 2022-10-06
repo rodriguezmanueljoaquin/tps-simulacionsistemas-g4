@@ -13,18 +13,18 @@ public class SpaceManager {
 
         ArrayList<SpaceParameters> simulationParameters = new ArrayList<>();
         double initialSimDeltaT = 0.01;
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
+    /*    for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithmImp.Type.BEEMAN));
         for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithmImp.Type.VERLET));
+                    IntegrationAlgorithmImp.Type.VERLET));*/
         for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithmImp.Type.GEAR));
 
         simulationParameters.forEach(parameters -> {
-            SpaceSimulation simulation = null;
+
             try {
                 String path = String.format(Locale.ENGLISH, "out_%s_%f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
                 new File(RESULTS_PATH + path).mkdir();
@@ -33,7 +33,7 @@ public class SpaceManager {
                 String dynamicsPath = path + "/dynamics";
                 new File(RESULTS_PATH + dynamicsPath).mkdir();
 
-                simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
+                SpaceSimulation simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
 
                 simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
