@@ -29,7 +29,7 @@ hs_err_pid*
 *.iml
 
 # output files
-oscilation/results/*.txt
+*/results/*
 *xyz
 /visualization/ovito_input/*
 out/*
