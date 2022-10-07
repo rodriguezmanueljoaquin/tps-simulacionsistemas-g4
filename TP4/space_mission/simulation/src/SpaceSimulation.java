@@ -8,10 +8,8 @@ public class SpaceSimulation {
     private double outputDeltaT;
     private double currentSimulationTime;
 
-    private IntegrationAlgorithmImp integrationAlgorithmImp;
-
     private Particle sun;
-    private Map<String ,Particle> objects = new HashMap<>();
+    private Map<String ,Pair<Particle,Pair<IntegrationAlgorithmImp,IntegrationAlgorithmImp>>> objects = new HashMap<>();
 
 
     public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
@@ -20,64 +18,80 @@ public class SpaceSimulation {
         this.currentSimulationTime = 0.;
 
         this.sun = new Particle(
-                        0,
-                        0.,
-                        0.,
-                        0,
-                        SpaceConstants.SUN_RADIUS,
-                        SpaceConstants.SUN_MASS);
+                0,
+                0.,
+                0.,
+                0,
+                SpaceConstants.SUN_RADIUS,
+                SpaceConstants.SUN_MASS);
 
         List<String> planetNames = new ArrayList<>();
         planetNames.add("earth");
         planetNames.add("venus");
-        for (String planetName: planetNames) {
+        for (String planetName : planetNames) {
             Pair<Double, Double> position = HorizonResultsReader.getPosition("space_mission/datasets/horizons_results_" + planetName + ".txt");
             Pair<Double, Double> velocity = HorizonResultsReader.getVelocity("space_mission/datasets/horizons_results_" + planetName + ".txt");
-            objects.put(planetName,
-              new Particle(
-                      position.getLeft(),
-                      position.getRight(),
-                      velocity.getLeft(),
-                      velocity.getRight(),
-                      planetName.equals(planetNames.get(0))? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
-                      planetName.equals(planetNames.get(0))? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS)
-            );
+            Particle p = new Particle(
+                    position.getLeft(),
+                    position.getRight(),
+                    velocity.getLeft(),
+                    velocity.getRight(),
+                    planetName.equals(planetNames.get(0)) ? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
+                    planetName.equals(planetNames.get(0)) ? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS);
+
+            Particle p2 = p;
+            p2.setX(p2.getY());
+            p2.setxVelocity(p2.getyVelocity());
+            objects.put(planetName, new Pair<>(p,new Pair<>( selectMethod(type, p),selectMethod(type,p2))));
         }
-        double vAbsEarth = Math.sqrt(Math.pow(objects.get("earth").getxVelocity(),2) + Math.pow(objects.get("earth").getyVelocity(),2));
-        double vxVersor = objects.get("earth").getxVelocity()/vAbsEarth;
-        double vyVersor = objects.get("earth").getyVelocity()/vAbsEarth;
-        objects.put("spaceship",new Particle(objects.get("earth").getX(),
-                objects.get("earth").getY() - 1500,
-                objects.get("earth").getxVelocity() + (8 + 7.12)*vxVersor
-                , objects.get("earth").getyVelocity() + (8 + 7.12)*vyVersor ,0,
-                2*Math.pow(10,5))); //TODO: VER RADIO
-
-
-        // un integration algorithm para cada posicion, velocidad, de cada particula?
-//        switch (type){
-//            case BEEMAN:
-//                integrationAlgorithmImp = new BeemanAlgorithm(simulationDeltaT, outputDeltaT, p);
-//                break;
-//            case VERLET:
-//                integrationAlgorithmImp =  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
-//                break;
-//            default:
-//                integrationAlgorithmImp =  new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
-//        }
+        double vAbsEarth = Math.sqrt(Math.pow(objects.get("earth").getLeft().getxVelocity(), 2) + Math.pow(objects.get("earth").getLeft().getyVelocity(), 2));
+        double vxVersor = objects.get("earth").getLeft().getxVelocity() / vAbsEarth;
+        double vyVersor = objects.get("earth").getLeft().getyVelocity() / vAbsEarth;
+        Particle p = new Particle(objects.get("earth").getLeft().getX(),
+                objects.get("earth").getLeft().getY() - 1500,
+                objects.get("earth").getLeft().getxVelocity() + (8 + 7.12) * vxVersor
+                , objects.get("earth").getLeft().getyVelocity() + (8 + 7.12) * vyVersor, 0,
+                2 * Math.pow(10, 5));//TODO: VER RADIO
+        Particle p2 = p;
+        p2.setX(p2.getY());
+        p2.setxVelocity(p2.getyVelocity());
+        objects.put("spaceship", new Pair<>(p, new Pair<>(selectMethod(type, p),selectMethod(type,p2))));
     }
 
-    public void nextIteration() {
-        double newPosition, newVelocity;
-        double iterationTime = this.currentSimulationTime;
-   /*     for (;
-             iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME;
-             iterationTime += this.simulationDeltaT) {
-            newPosition = integrationAlgorithmImp.getNewPosition();
-            newVelocity = integrationAlgorithmImp.getNewVelocity();
-            this.p.setX(newPosition);
-            this.p.setxVelocity(newVelocity);
-        }*/
 
+    private IntegrationAlgorithmImp selectMethod(IntegrationAlgorithmImp.Type type, Particle p){
+    switch (type){
+        case BEEMAN:
+               return new BeemanAlgorithm(simulationDeltaT, outputDeltaT, p);
+        case VERLET:
+               return  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
+        default:
+               return new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
+       }
+    }
+    public void nextIteration() {
+        double iterationTime = 0;
+        for(String st : objects.keySet()){
+            double newPosition, newVelocity;
+            iterationTime = this.currentSimulationTime;
+            while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
+                Particle p = objects.get(st).getLeft();
+                IntegrationAlgorithmImp integrationAlgorithmImpX = objects.get(st).getRight().getLeft();
+                IntegrationAlgorithmImp integrationAlgorithmImpY = objects.get(st).getRight().getRight();
+                newPosition = integrationAlgorithmImpX.getNewPosition();
+                newVelocity = integrationAlgorithmImpX.getNewVelocity();
+                p.setX(newPosition);
+                p.setxVelocity(newVelocity);
+                newPosition = integrationAlgorithmImpY.getNewPosition();
+                newVelocity = integrationAlgorithmImpY.getNewVelocity();
+                p.setY(newPosition);
+                p.setyVelocity(newVelocity);
+                iterationTime+=this.simulationDeltaT;
+            }
+
+
+
+        }
         currentSimulationTime = iterationTime;
     }
 
@@ -96,7 +110,9 @@ public class SpaceSimulation {
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
         for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
-            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getX()  + ";" + objects.get("earth").getY()  + objects.get("earth").getxVelocity() + objects.get("earth").getyVelocity() +  "\n");
+            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getLeft().getX()  + ";" + objects.get("earth").getLeft().getY() + ";" + objects.get("earth").getLeft().getxVelocity() + ";" + objects.get("earth").getLeft().getyVelocity() +  "\n");
+            writer.write("v " + objects.get("venus").getLeft().getX()  + ";" + objects.get("venus").getLeft().getY()  + ";" + objects.get("venus").getLeft().getxVelocity() + ";" + objects.get("venus").getLeft().getyVelocity() +  "\n");
+            writer.write( "s " + objects.get("spaceship").getLeft().getX()  + ";" + objects.get("spaceship").getLeft().getY()  + ";" +objects.get("spaceship").getLeft().getxVelocity() + ";" + objects.get("spaceship").getLeft().getyVelocity() +  "\n");
             nextIteration();
         }
         writer.close();
