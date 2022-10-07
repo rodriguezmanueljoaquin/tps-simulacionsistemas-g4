@@ -27,13 +27,14 @@ public class SpaceManager {
 
             try {
                 String path = String.format(Locale.ENGLISH, "out_%s_%f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
+                SpaceSimulation simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
                 new File(RESULTS_PATH + path).mkdir();
                 SpaceSimulation.createStaticFile(path, parameters.algorithmType.toString(), RESULTS_PATH, parameters.simulationDeltaT);
 
                 String dynamicsPath = path + "/dynamics";
                 new File(RESULTS_PATH + dynamicsPath).mkdir();
 
-                SpaceSimulation simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.algorithmType);
+
 
                 simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {

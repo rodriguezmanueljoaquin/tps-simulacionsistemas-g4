@@ -8,7 +8,7 @@ public class SpaceSimulation {
     private double outputDeltaT;
     private double currentSimulationTime;
 
-    private Particle sun;
+    private static Particle sun;
     private Map<String ,Pair<Particle,Pair<IntegrationAlgorithmImp,IntegrationAlgorithmImp>>> objects = new HashMap<>();
 
 
@@ -100,6 +100,10 @@ public class SpaceSimulation {
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
         writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%d\n%f", algorithmName, Constants.K, Constants.GAMMA, Constants.A, simulationDeltaT));
+        writer.write("sun " + sun.getX()  + ";" + sun.getY() + ";" + sun.getRadius() +  "\n");
+        writer.write("e " + SpaceConstants.EARTH_RADIUS +  "\n");
+        writer.write("v " + SpaceConstants.VENUS_RADIUS + "\n");
+        writer.write("s " + 1 +  "\n"); //TODO RADIO SPACESHIP?
         writer.close();
 
         System.out.println("\tStatic file successfully created");
