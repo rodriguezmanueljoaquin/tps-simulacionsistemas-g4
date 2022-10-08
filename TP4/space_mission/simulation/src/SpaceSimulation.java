@@ -99,7 +99,7 @@ public class SpaceSimulation {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.println(String.format(Locale.ENGLISH, "%s\n%f\n%f\n%d\n%f", algorithmName, Constants.K, Constants.GAMMA, Constants.A, simulationDeltaT));
+        writer.println(String.format(Locale.ENGLISH, "%s\n%f", algorithmName, simulationDeltaT));
         writer.write("sun " + sun.getX()  + ";" + sun.getY() + ";" + sun.getRadius() +  "\n");
         writer.write("e " + SpaceConstants.EARTH_RADIUS +  "\n");
         writer.write("v " + SpaceConstants.VENUS_RADIUS + "\n");
