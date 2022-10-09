@@ -30,8 +30,11 @@ public class OscilationSimulation {
             case VERLET:
                 integrationAlgorithmImp =  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
                 break;
-            default:
+            case GEAR:
                 integrationAlgorithmImp =  new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
+                break;
+            default:
+                integrationAlgorithmImp = new EulerAlgorithm(simulationDeltaT,outputDeltaT,p);
 
         }
     }

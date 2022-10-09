@@ -18,4 +18,4 @@ def get_cuadratic_error(simulation_result):
         
     
     
-    return error_sum/(N*2)
+    return error_sum/(N*frames_count)
