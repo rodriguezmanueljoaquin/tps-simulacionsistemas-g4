@@ -14,6 +14,12 @@ class SimulationResult:
         self.simulation_deltaT = simulation_deltaT
         self.N = 1
 
+    def __str__(self):
+        return "{mass="+str(self.mass)+";K="+str(self.K)+";gamma="+str(self.gamma)+"A="+str(self.A)+";simulation_deltaT="+str(self.simulation_deltaT)+";N="+str(self.N)+";method_name="+str(self.method_name)+"}"
+
+    def __repr__(self):
+        return self.__str__()
+
 class ParticlesFrame:
     def __init__(self):
         self.particles = list()

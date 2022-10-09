@@ -1,9 +1,11 @@
 public class BeemanAlgorithm extends IntegrationAlgorithmImp {
     private double currentAcceleration, previousAcceleration;
+
     public BeemanAlgorithm(Double simulationDeltaT, Double outputDeltaT , Particle p) {
         super(simulationDeltaT, outputDeltaT,p);
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
-        previousAcceleration = currentAcceleration;
+        IntegrationAlgorithmImp eulerIntegrationAlgorithm = new EulerAlgorithm(-simulationDeltaT, outputDeltaT, p);
+        previousAcceleration = getForce(eulerIntegrationAlgorithm.getNewPosition(), eulerIntegrationAlgorithm.getNewVelocity())/p.getMass();
     }
 
     @Override

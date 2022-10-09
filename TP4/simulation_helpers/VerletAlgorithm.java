@@ -5,7 +5,8 @@ public class VerletAlgorithm extends IntegrationAlgorithmImp{
     public VerletAlgorithm(double simulationDeltaT, double outputDeltaT, Particle p) {
         super(simulationDeltaT,outputDeltaT,p);
         currentAcceleration = getForce(p.getX(), p.getxVelocity())/p.getMass();
-        prevPos = p.getX() - p.getxVelocity() *simulationDeltaT;
+        IntegrationAlgorithmImp eulerIntegrationAlgorithm = new EulerAlgorithm(-simulationDeltaT, outputDeltaT, p);
+        prevPos = eulerIntegrationAlgorithm.getNewPosition();
     }
 
     @Override

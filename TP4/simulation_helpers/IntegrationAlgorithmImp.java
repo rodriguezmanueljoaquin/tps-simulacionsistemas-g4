@@ -11,7 +11,7 @@ public abstract class IntegrationAlgorithmImp {
     }
 
     public enum Type {
-        BEEMAN, VERLET, GEAR
+        EULER,BEEMAN, VERLET, GEAR
     }
 
     protected abstract double getNewPosition();
