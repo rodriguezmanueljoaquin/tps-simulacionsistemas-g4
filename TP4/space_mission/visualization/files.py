@@ -116,17 +116,17 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
             ##Leemos las posiciones de los planetas y de la nave
             #Tierra
             line = file.readline()
-            earth = __get_space_particle(line)
+            earth = __get_space_particle(line,simulation_result.earth_radius)
             #Venus
             line = file.readline()
-            venus = __get_space_particle(line)
+            venus = __get_space_particle(line, simulation_result.earth_radius)
             #Nave
             line = file.readline()
-            spaceship = __get_space_particle(line)
+            spaceship = __get_space_particle(line, 2000)
             ##Las agregamos a la lista correspondiente en el orden: Tierra, Venus y nave
             particles_frame.particles.append(earth)
             particles_frame.particles.append(venus)
-            particles_frame.particles.append(spaceship)
+            #particles_frame.particles.append(spaceship)
 
             simulation_result.particles_by_frame.append(particles_frame)
 
@@ -134,11 +134,11 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
 
     return simulation_result
 
-def __get_space_particle(line):
+def __get_space_particle(line, radius):
     id = line.split()[0]
     data = line.split()[1].strip().split(";")
     x = float(data[0])
     y = float(data[1])
     vx = float(data[2])
     vy = float(data[3].strip())
-    return Particle(id,x,y,vx,vy)
+    return Particle(id,x,y,vx,vy,radius)

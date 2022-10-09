@@ -14,19 +14,17 @@ def exportOvito(simulation_result):
     if(not os.path.exists(ovitoFolderName)):
         os.makedirs(ovitoFolderName)
     print('Generating ovito file. . .')
-    exportParticles(simulation_result.particles_by_frame,simulation_result.simulation_deltaT,simulation_result.method_name)
+    exportParticles(simulation_result.particles_by_frame,simulation_result.simulation_deltaT,simulation_result.method_name, simulation_result.sun_position[0],simulation_result.sun_position[1], simulation_result.sun_radius)
     print('Ovito file successfully generated')
 
 
-def exportParticles(particles_by_frame,simulation_deltaT,method_name):
+def exportParticles(particles_by_frame,simulation_deltaT,method_name, sun_x, sun_y, sun_radius):
     file = open("{}/particles_{}_{}.xyz".format(ovitoFolderName, simulation_deltaT, method_name), "w")
     for particle_frame in particles_by_frame:
         n = len(particle_frame.particles)
-        file.write("{}\ncomment\n".format(n))
+        file.write("{}\ncomment\n".format(n + 1))
+        file.write("{} {} {} {} {} {}\n".format(sun_x, sun_y, 0, 0, sun_radius,sun_radius))
         for particle in particle_frame.particles:
-            colorMap=cm.get_cmap('Pastel1', n)
-            c = colorMap(math.atan2(particle.vely,particle.velx))
-             
-            file.write("{} {} {} {} {} {} {} {}\n".format(particle.x, particle.y, particle.velx, particle.vely, c[0],c[1],c[2],(math.atan2(particle.vely,particle.velx))/pi))
+            file.write("{} {} {} {} {} {}\n".format(particle.x, particle.y, particle.velx, particle.vely, particle.radius*10,particle.radius*10))
     file.close()
 

@@ -39,9 +39,7 @@ public class SpaceSimulation {
                     planetName.equals(planetNames.get(0)) ? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
                     planetName.equals(planetNames.get(0)) ? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS);
 
-            Particle p2 = p;
-            p2.setX(p2.getY());
-            p2.setxVelocity(p2.getyVelocity());
+            Particle p2 = new Particle(p.getY(),p.getY(),p.getyVelocity(),p.getyVelocity(),p.getRadius(),p.getMass());
             objects.put(planetName, new Pair<>(p,new Pair<>( selectMethod(type, p),selectMethod(type,p2))));
         }
         Particle earth = objects.get("earth").getLeft();
@@ -53,9 +51,7 @@ public class SpaceSimulation {
                 earth.getxVelocity() + (8 + 7.12) * tx
                 , earth.getyVelocity() + (8 + 7.12) * ty, 0,
                 2 * Math.pow(10, 5));//TODO: VER RADIO
-        Particle p2 = p;
-        p2.setX(p2.getY());
-        p2.setxVelocity(p2.getyVelocity());
+        Particle p2 = new Particle(p.getY(),p.getY(),p.getyVelocity(),p.getyVelocity(),p.getRadius(),p.getMass());
         objects.put("spaceship", new Pair<>(p, new Pair<>(selectMethod(type, p),selectMethod(type,p2))));
     }
 

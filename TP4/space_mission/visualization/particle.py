@@ -4,12 +4,13 @@ import random
 
 class Particle:    
     
-    def __init__(self,id,x,y,velx,vely):
+    def __init__(self,id,x,y,velx,vely,radius):
         self.id = id
         self.x = x
         self.y = y
         self.velx = velx
         self.vely = vely
+        self.radius = radius
 
     def __eq__(self, other):
         return self.id == other.id
