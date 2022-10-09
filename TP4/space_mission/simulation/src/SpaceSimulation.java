@@ -44,13 +44,14 @@ public class SpaceSimulation {
             p2.setxVelocity(p2.getyVelocity());
             objects.put(planetName, new Pair<>(p,new Pair<>( selectMethod(type, p),selectMethod(type,p2))));
         }
-        double vAbsEarth = Math.sqrt(Math.pow(objects.get("earth").getLeft().getxVelocity(), 2) + Math.pow(objects.get("earth").getLeft().getyVelocity(), 2));
-        double vxVersor = objects.get("earth").getLeft().getxVelocity() / vAbsEarth;
-        double vyVersor = objects.get("earth").getLeft().getyVelocity() / vAbsEarth;
-        Particle p = new Particle(objects.get("earth").getLeft().getX(),
-                objects.get("earth").getLeft().getY() - 1500,
-                objects.get("earth").getLeft().getxVelocity() + (8 + 7.12) * vxVersor
-                , objects.get("earth").getLeft().getyVelocity() + (8 + 7.12) * vyVersor, 0,
+        Particle earth = objects.get("earth").getLeft();
+        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
+        double tx = earth.getxVelocity() / vAbsEarth;
+        double ty = earth.getyVelocity() / vAbsEarth;
+        Particle p = new Particle(earth.getX(),
+                earth.getY() - 1500,
+                earth.getxVelocity() + (8 + 7.12) * tx
+                , earth.getyVelocity() + (8 + 7.12) * ty, 0,
                 2 * Math.pow(10, 5));//TODO: VER RADIO
         Particle p2 = p;
         p2.setX(p2.getY());
