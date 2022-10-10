@@ -95,7 +95,8 @@ public class SpaceSimulation {
     public void nextIteration() {
 
         double iterationTime = this.currentSimulationTime;
-        while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
+//        while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
+        while(Math.abs(iterationTime - (this.currentSimulationTime + this.outputDeltaT))>=SpaceConstants.EPSILON  && Math.abs(iterationTime - SpaceConstants.FINAL_TIME)>=SpaceConstants.EPSILON){
             //Primero,armamos un mapa con las particulas en el estado siguiente
             Map<String,Particle> nextObjects = new HashMap<>();
             for(String planetName : objects.keySet()){
@@ -161,10 +162,9 @@ public class SpaceSimulation {
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
         for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
-            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getX()  + ";" + objects.get("earth").getY() + ";" + objects.get("earth").getxVelocity() + ";" + objects.get("earth").getyVelocity() +  "\n");
-            writer.write("v " + objects.get("venus").getX()  + ";" + objects.get("venus").getY()  + ";" + objects.get("venus").getxVelocity() + ";" + objects.get("venus").getyVelocity() +  "\n");
-//            writer.write( "s " + objects.get("spaceship").getX()  + ";" + objects.get("spaceship").getY()  + ";" +objects.get("spaceship").getxVelocity() + ";" + objects.get("spaceship").getyVelocity() +  "\n");
-            writer.write("s " + objects.get("venus").getX()  + ";" + objects.get("venus").getY()  + ";" + objects.get("venus").getxVelocity() + ";" + objects.get("venus").getyVelocity() +  "\n");
+            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getX()  + ";" + objects.get("earth").getY() + ";" + objects.get("earth").getxVelocity() + ";" + objects.get("earth").getyVelocity() + "\n");
+            writer.write("v " + objects.get("venus").getX()  + ";" + objects.get("venus").getY()  + ";" + objects.get("venus").getxVelocity() + ";" + objects.get("venus").getyVelocity()  +  "\n");
+//            writer.write("s " + objects.get("spaceship").getX()  + ";" + objects.get("spaceship").getY()  + ";" + objects.get("spaceship").getxVelocity() + ";" + objects.get("spaceship").getyVelocity() +  "\n");
             nextIteration();
         }
         writer.close();

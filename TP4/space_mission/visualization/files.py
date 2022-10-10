@@ -121,8 +121,8 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
             line = file.readline()
             venus = __get_space_particle(line, simulation_result.earth_radius)
             #Nave
-            line = file.readline()
-            spaceship = __get_space_particle(line, 2000)
+            # line = file.readline()
+            # spaceship = __get_space_particle(line, 2000)
             ##Las agregamos a la lista correspondiente en el orden: Tierra, Venus y nave
             particles_frame.particles.append(earth)
             particles_frame.particles.append(venus)

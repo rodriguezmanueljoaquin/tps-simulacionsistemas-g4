@@ -38,27 +38,42 @@ public class SpaceMissionHelper {
 
     //Metodos para calculo de fuerza
 
-    private static double forceGravity(Particle currentParticle, Particle otherParticle){
-        return Constants.G*currentParticle.getMass()* otherParticle.getMass()/(Math.pow(currentParticle.calculateDistanceToWithoutRadius(otherParticle),2));
+    private static double forceGravity(Particle otherParticle, Particle currentParticle){
+        return Constants.G*otherParticle.getMass()* currentParticle.getMass()/(Math.pow(otherParticle.calculateDistanceToWithoutRadius(currentParticle),2));
     }
 
-    private static double forceX(Particle currentParticle, Particle otherParticle){
-        return forceGravity(currentParticle, otherParticle)*(currentParticle.getX() - otherParticle.getX())/ currentParticle.calculateDistanceToWithoutRadius(otherParticle);
+    private static double forceX(Particle otherParticle, Particle currentParticle){
+        return forceGravity(otherParticle, currentParticle)*(otherParticle.getX() - currentParticle.getX())/ otherParticle.calculateDistanceToWithoutRadius(currentParticle);
     }
 
-    private static double forceY(Particle currentParticle, Particle otherParticle){
-        return forceGravity(currentParticle,otherParticle)*(currentParticle.getY() - otherParticle.getY())/currentParticle.calculateDistanceToWithoutRadius(otherParticle);
+    private static double forceY(Particle otherParticle, Particle currentParticle){
+        return forceGravity(otherParticle,currentParticle)*(otherParticle.getY() - currentParticle.getY())/otherParticle.calculateDistanceToWithoutRadius(currentParticle);
     }
 
     public static double totalForceX(Particle currentParticle, List<Particle> particles){
-        return particles.stream().mapToDouble(particle -> forceX(currentParticle,particle)).sum();
+//        return particles.stream().mapToDouble(particle -> forceX(currentParticle,particle)).sum();
+        double totalForceX = 0.0;
+        for(Particle particle : particles){
+            totalForceX += forceX(particle,currentParticle);
+        }
+        return totalForceX;
     }
 
     public static double totalForceY(Particle currentParticle, List<Particle> particles){
-        return particles.stream().mapToDouble(particle -> forceY(currentParticle,particle)).sum();
+//        return particles.stream().mapToDouble(particle -> forceY(currentParticle,particle)).sum();
+        double totalForceY = 0.0;
+        for(Particle particle : particles){
+            totalForceY += forceY(particle,currentParticle);
+        }
+        return totalForceY;
     }
 
     public static double totalForce(Particle currentParticle, List<Particle> particles){
-        return particles.stream().mapToDouble(particle -> forceGravity(currentParticle,particle)).sum();
+//        return particles.stream().mapToDouble(particle -> forceGravity(currentParticle,particle)).sum();
+        double totalForce = 0.0;
+        for(Particle particle : particles){
+            totalForce += forceGravity(particle,currentParticle);
+        }
+        return totalForce;
     }
 }
