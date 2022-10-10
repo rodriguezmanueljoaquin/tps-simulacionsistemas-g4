@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Particle {
@@ -11,6 +12,10 @@ public class Particle {
     private double velocity;
     private double radius;
     private double mass;
+    private double xAcceleration;
+    private double yAcceleration;
+    private double xPrevAcceleration;
+    private double yPrevAcceleration;
 
     public Particle(double x, double y, double xVelocity, double yVelocity, double radius, double mass) {
         this.x = x;
@@ -34,6 +39,10 @@ public class Particle {
 
     public double calculateDistanceTo(Particle other) {
         return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - other.getRadius() - radius;
+    }
+
+    public double calculateDistanceToWithoutRadius(Particle other) {
+        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY());
     }
 
     public double getX() {
@@ -82,30 +91,55 @@ public class Particle {
         this.yVelocity = yVelocity;
     }
 
-
-    public double forceGravity(Particle p){
-        return Constants.G*this.getMass()* p.getMass()/(Math.pow(calculateDistanceTo(p),2));
+    //Prueba
+    public double getXAcceleration() {
+        return xAcceleration;
     }
 
-    public double forceX(Particle p){
-            return forceGravity(p)*(this.getX() - p.getX())/calculateDistanceTo(p);
+    public void setXAcceleration(double xAcceleration) {
+        this.xAcceleration = xAcceleration;
     }
 
-    public double forceY(Particle p){
-        return forceGravity(p)*(this.getY() - p.getY())/calculateDistanceTo(p);
+    public double getYAcceleration() {
+        return yAcceleration;
     }
 
-    public double totalForceX(List<Particle> particles){
-        return particles.stream().mapToDouble(particle -> forceX(particle)).sum();
+    public void setYAcceleration(double yAcceleration) {
+        this.yAcceleration = yAcceleration;
     }
 
-    public double totalForceY(List<Particle> particles){
-        return particles.stream().mapToDouble(particle -> forceY(particle)).sum();
+    public double getXPrevAcceleration() {
+        return xPrevAcceleration;
     }
 
-    public double totalForce(List<Particle> particles){
-        return particles.stream().mapToDouble(particle -> forceGravity(particle)).sum();
+    public void setXPrevAcceleration(double xPrevAcceleration) {
+        this.xPrevAcceleration = xPrevAcceleration;
     }
+
+    public double getYPrevAcceleration() {
+        return yPrevAcceleration;
+    }
+
+    public void setYPrevAcceleration(double yPrevAcceleration) {
+        this.yPrevAcceleration = yPrevAcceleration;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Particle))
+            return false;
+        Particle particle = (Particle) o;
+        return Objects.equals(id, particle.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     @Override
     public String toString() {
         return "Particle{" +

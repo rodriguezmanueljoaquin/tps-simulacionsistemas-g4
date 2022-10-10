@@ -40,7 +40,7 @@ if __name__ == "__main__":
         ##Luego, realizamos la accion correspondiente
         if(action=='animate'):
         # ANIMACION:
-            simulation_result = simulations_results_dict[(86400,'GEAR')][0]
+            simulation_result = simulations_results_dict[(800,'BEEMAN')][0]
             exportOvito.exportOvito(simulation_result)
              # simulation_result = simulations_results_dict[(math.pow(10,-5),'GEAR')][0]
              # exportOvito.exportOvito(simulation_result)

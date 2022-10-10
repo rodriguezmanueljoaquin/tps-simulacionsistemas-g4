@@ -2,6 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpaceSimulation {
     private double simulationDeltaT;
@@ -9,7 +10,7 @@ public class SpaceSimulation {
     private double currentSimulationTime;
 
     private static Particle sun;
-    private Map<String ,Pair<Particle,Pair<IntegrationAlgorithmImp,IntegrationAlgorithmImp>>> objects = new HashMap<>();
+    private Map<String ,Particle> objects = new HashMap<>();
 
 
     public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
@@ -39,10 +40,9 @@ public class SpaceSimulation {
                     planetName.equals(planetNames.get(0)) ? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
                     planetName.equals(planetNames.get(0)) ? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS);
 
-            Particle p2 = new Particle(p.getY(),p.getY(),p.getyVelocity(),p.getyVelocity(),p.getRadius(),p.getMass());
-            objects.put(planetName, new Pair<>(p,new Pair<>( selectMethod(type, p),selectMethod(type,p2))));
+            objects.put(planetName,p);
         }
-        Particle earth = objects.get("earth").getLeft();
+        Particle earth = objects.get("earth");
         double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
         double tx = earth.getxVelocity() / vAbsEarth;
         double ty = earth.getyVelocity() / vAbsEarth;
@@ -51,44 +51,94 @@ public class SpaceSimulation {
                 earth.getxVelocity() + (8 + 7.12) * tx
                 , earth.getyVelocity() + (8 + 7.12) * ty, 0,
                 2 * Math.pow(10, 5));//TODO: VER RADIO
-        Particle p2 = new Particle(p.getY(),p.getY(),p.getyVelocity(),p.getyVelocity(),p.getRadius(),p.getMass());
-        objects.put("spaceship", new Pair<>(p, new Pair<>(selectMethod(type, p),selectMethod(type,p2))));
+//        objects.put("spaceship", p);
+//    }
+        //Inicializamos las aceleraciones de los planetas
+        initializeParticlesAccelerations();
+    }
+
+    private void initializeParticlesAccelerations(){
+        //Primero, armamos una lista de los planetas con el sol
+        List<Particle> planetsWithSun = getPlanetsWithSun(new ArrayList<>(objects.values()));
+        //Luego, creamos un mapa con las particulas en estado previo
+        Map<String,Particle> previousObjects = new HashMap<>();
+        //Por cada particula, calculamos su aceleracion (en x y en y), y sus posiciones y velocidades previas con Euler
+        for (String objectName : objects.keySet()){
+            Particle currentParticle = objects.get(objectName);
+            List<Particle> otherParticles = planetsWithSun.stream().filter(p->!p.equals(currentParticle)).collect(Collectors.toList());
+            currentParticle.setXAcceleration(SpaceMissionHelper.totalForceX(currentParticle,otherParticles)/currentParticle.getMass());
+            currentParticle.setYAcceleration(SpaceMissionHelper.totalForceY(currentParticle,otherParticles)/currentParticle.getMass());
+            double prevXPosition = SpaceMissionHelper.getEulerPosition(currentParticle.getX(),currentParticle.getxVelocity(), currentParticle.getXAcceleration(),-simulationDeltaT,false);
+            double prevYPosition = SpaceMissionHelper.getEulerPosition(currentParticle.getY(),currentParticle.getyVelocity(), currentParticle.getYAcceleration(),-simulationDeltaT,false);
+            double prevXVelocity = SpaceMissionHelper.getEulerVelocity(currentParticle.getxVelocity(),currentParticle.getXAcceleration(),-simulationDeltaT);
+            double prevYVelocity = SpaceMissionHelper.getEulerVelocity(currentParticle.getyVelocity(),currentParticle.getYAcceleration(),-simulationDeltaT);
+            previousObjects.put(objectName,new Particle(prevXPosition,prevYPosition,prevXVelocity,prevYVelocity,currentParticle.getRadius(),currentParticle.getMass()));
+        }
+        //Luego, actualizamos la lista de planetas con el sol para que utlice los planetas con estado previo, y calculamos las aceleraciones previas
+        planetsWithSun= getPlanetsWithSun(new ArrayList<>(previousObjects.values()));
+        for (String objectName : objects.keySet()){
+            Particle currentParticle = objects.get(objectName);
+            Particle currentPreviousParticle = previousObjects.get(objectName);
+            List<Particle> otherPreviousParticles = planetsWithSun.stream().filter(p->!p.equals(currentPreviousParticle)).collect(Collectors.toList());
+            currentParticle.setXPrevAcceleration(SpaceMissionHelper.totalForceX(currentPreviousParticle,otherPreviousParticles)/currentPreviousParticle.getMass());
+            currentParticle.setYPrevAcceleration(SpaceMissionHelper.totalForceY(currentPreviousParticle,otherPreviousParticles)/currentPreviousParticle.getMass());
+        }
+    }
+
+    private List<Particle> getPlanetsWithSun(List<Particle> planets){
+        List<Particle> planetsWithSun = new ArrayList<>(planets);
+        planetsWithSun.add(sun);
+        return planetsWithSun;
     }
 
 
-    private IntegrationAlgorithmImp selectMethod(IntegrationAlgorithmImp.Type type, Particle p){
-    switch (type){
-        case BEEMAN:
-               return new BeemanAlgorithm(simulationDeltaT, outputDeltaT, p);
-        case VERLET:
-               return  new VerletAlgorithm(simulationDeltaT,outputDeltaT, p);
-        default:
-               return new GearAlgorithm(simulationDeltaT,outputDeltaT, p);
-       }
-    }
     public void nextIteration() {
-        double iterationTime = 0;
-        for(String st : objects.keySet()){
-            double newPosition, newVelocity;
-            iterationTime = this.currentSimulationTime;
-            while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
-                Particle p = objects.get(st).getLeft();
-                IntegrationAlgorithmImp integrationAlgorithmImpX = objects.get(st).getRight().getLeft();
-                IntegrationAlgorithmImp integrationAlgorithmImpY = objects.get(st).getRight().getRight();
-                newPosition = integrationAlgorithmImpX.getNewPosition();
-                newVelocity = integrationAlgorithmImpX.getNewVelocity();
-                p.setX(newPosition);
-                p.setxVelocity(newVelocity);
-                newPosition = integrationAlgorithmImpY.getNewPosition();
-                newVelocity = integrationAlgorithmImpY.getNewVelocity();
-                p.setY(newPosition);
-                p.setyVelocity(newVelocity);
-                iterationTime+=this.simulationDeltaT;
+
+        double iterationTime = this.currentSimulationTime;
+        while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
+            //Primero,armamos un mapa con las particulas en el estado siguiente
+            Map<String,Particle> nextObjects = new HashMap<>();
+            for(String planetName : objects.keySet()){
+                Particle p = objects.get(planetName);
+                double nextXPosition = SpaceMissionHelper.getBeemanPosition(p.getX(),p.getxVelocity(),p.getXAcceleration(),p.getXPrevAcceleration(),simulationDeltaT);
+                double nextYPosition = SpaceMissionHelper.getBeemanPosition(p.getY(),p.getyVelocity(),p.getYAcceleration(),p.getYPrevAcceleration(),simulationDeltaT);
+                double nextXVelocity = SpaceMissionHelper.getBeemanPredictedVelocity(p.getxVelocity(),p.getXAcceleration(),p.getXPrevAcceleration(),simulationDeltaT);
+                double nextYVelocity = SpaceMissionHelper.getBeemanPredictedVelocity(p.getyVelocity(),p.getYAcceleration(),p.getYPrevAcceleration(),simulationDeltaT);
+                nextObjects.put(planetName,new Particle(nextXPosition,nextYPosition,nextXVelocity,nextYVelocity,p.getRadius(),p.getMass()));
+            }
+            //Luego, actualizamos las posiciones y velocidades de todos los planetas
+            for(String st : objects.keySet()){
+                //Tomamos la particula correspondiente
+                Particle currentParticle = objects.get(st);
+                //Actualizamos la posicion (en X e Y)
+                currentParticle.setX(nextObjects.get(st).getX());
+                currentParticle.setY(nextObjects.get(st).getY());
+                //Calculamos las aceleraciones de los planetas en el estado siguiente
+                for(String planetName : nextObjects.keySet()){
+                    Particle currentNextParticle = nextObjects.get(planetName);
+                    List<Particle> otherNextParticles = getPlanetsWithSun(new ArrayList<>(nextObjects.values())).stream().filter(p->!p.equals(currentNextParticle)).collect(Collectors.toList());
+                    currentNextParticle.setXAcceleration(SpaceMissionHelper.totalForceX(currentNextParticle,otherNextParticles)/currentNextParticle.getMass());
+                    currentNextParticle.setYAcceleration(SpaceMissionHelper.totalForceY(currentNextParticle,otherNextParticles)/currentNextParticle.getMass());
+                }
+                //Actualizamos la velocidad (en X e Y)
+                Particle currentParticleNextState = nextObjects.get(st);
+                currentParticle.setxVelocity(SpaceMissionHelper.getBeemanCorrectedVelocity(currentParticle.getxVelocity(),currentParticleNextState.getXAcceleration(),currentParticle.getXAcceleration(),currentParticle.getXPrevAcceleration(),simulationDeltaT));
+                currentParticle.setyVelocity(SpaceMissionHelper.getBeemanCorrectedVelocity(currentParticle.getyVelocity(),currentParticleNextState.getYAcceleration(),currentParticle.getYAcceleration(),currentParticle.getYPrevAcceleration(),simulationDeltaT));
+            }
+            //Luego, actualizamos las aceleraciones previa y actual (en X e Y) y el tiempo de iteracion
+            for(String st : objects.keySet()){
+                //Tomamos la particula correspondiente y la lista de particulas sin ella con el sol
+                Particle currentParticle = objects.get(st);
+                List<Particle> otherParticles = getPlanetsWithSun(new ArrayList<>(objects.values())).stream().filter(p->!p.equals(currentParticle)).collect(Collectors.toList());
+                currentParticle.setXPrevAcceleration(currentParticle.getXAcceleration());
+                currentParticle.setYPrevAcceleration(currentParticle.getYAcceleration());
+                currentParticle.setXAcceleration(SpaceMissionHelper.totalForceX(currentParticle,otherParticles)/currentParticle.getMass());
+                currentParticle.setYAcceleration(SpaceMissionHelper.totalForceY(currentParticle,otherParticles)/currentParticle.getMass());
             }
 
-
-
+            iterationTime+=this.simulationDeltaT;
         }
+
         currentSimulationTime = iterationTime;
     }
 
@@ -111,9 +161,10 @@ public class SpaceSimulation {
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/dynamic" + ".txt", "UTF-8");
 
         for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
-            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getLeft().getX()  + ";" + objects.get("earth").getLeft().getY() + ";" + objects.get("earth").getLeft().getxVelocity() + ";" + objects.get("earth").getLeft().getyVelocity() +  "\n");
-            writer.write("v " + objects.get("venus").getLeft().getX()  + ";" + objects.get("venus").getLeft().getY()  + ";" + objects.get("venus").getLeft().getxVelocity() + ";" + objects.get("venus").getLeft().getyVelocity() +  "\n");
-            writer.write( "s " + objects.get("spaceship").getLeft().getX()  + ";" + objects.get("spaceship").getLeft().getY()  + ";" +objects.get("spaceship").getLeft().getxVelocity() + ";" + objects.get("spaceship").getLeft().getyVelocity() +  "\n");
+            writer.write(this.currentSimulationTime +"\n"+ "e " + objects.get("earth").getX()  + ";" + objects.get("earth").getY() + ";" + objects.get("earth").getxVelocity() + ";" + objects.get("earth").getyVelocity() +  "\n");
+            writer.write("v " + objects.get("venus").getX()  + ";" + objects.get("venus").getY()  + ";" + objects.get("venus").getxVelocity() + ";" + objects.get("venus").getyVelocity() +  "\n");
+//            writer.write( "s " + objects.get("spaceship").getX()  + ";" + objects.get("spaceship").getY()  + ";" +objects.get("spaceship").getxVelocity() + ";" + objects.get("spaceship").getyVelocity() +  "\n");
+            writer.write("s " + objects.get("venus").getX()  + ";" + objects.get("venus").getY()  + ";" + objects.get("venus").getxVelocity() + ";" + objects.get("venus").getyVelocity() +  "\n");
             nextIteration();
         }
         writer.close();

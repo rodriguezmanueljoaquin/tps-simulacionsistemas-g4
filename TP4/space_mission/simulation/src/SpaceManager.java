@@ -19,9 +19,12 @@ public class SpaceManager {
         for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
             simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
                     IntegrationAlgorithmImp.Type.VERLET));*/
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithmImp.Type.GEAR));
+//        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
+//            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
+//                    IntegrationAlgorithmImp.Type.GEAR));
+
+        simulationParameters.add(new SpaceParameters(800., 800.,
+                IntegrationAlgorithmImp.Type.BEEMAN));
 
         simulationParameters.forEach(parameters -> {
 
