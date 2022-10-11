@@ -4,10 +4,11 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, simulation_deltaT, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
+    def __init__(self, method_name, simulation_deltaT, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.simulation_deltaT = simulation_deltaT
+        self.sun_id = sun_id
         self.sun_position = (sun_x,sun_y)
         self.sun_radius = sun_radius
         self.earth_radius = earth_radius
@@ -82,6 +83,7 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     simulation_deltaT = float(line.strip())
     line = file.readline()
+    sun_id = int(line.split()[0])
     sun_data = line.split()[1].split(";")
     sun_x = float(sun_data[0])
     sun_y = float(sun_data[1])
@@ -97,7 +99,7 @@ def __read_static_input_file(static_input_file_path):
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, simulation_deltaT, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
+    return SimulationResult(method_name, simulation_deltaT, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True
@@ -135,7 +137,7 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     return simulation_result
 
 def __get_space_particle(line, radius):
-    id = line.split()[0]
+    id = int(line.split()[0])
     data = line.split()[1].strip().split(";")
     x = float(data[0])
     y = float(data[1])
