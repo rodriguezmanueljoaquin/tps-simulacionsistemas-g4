@@ -12,35 +12,19 @@ public class SpaceManager {
         new File(RESULTS_PATH).mkdir();
 
         ArrayList<SpaceParameters> simulationParameters = new ArrayList<>();
-        double initialSimDeltaT = 0.01;
-    /*    for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithmImp.Type.BEEMAN));
-        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
-            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-                    IntegrationAlgorithmImp.Type.VERLET));*/
-//        for (double simDeltaT = initialSimDeltaT; Math.abs(simDeltaT-Math.pow(10,-7))> SpaceConstants.EPSILON ; simDeltaT /= 10)
-//            simulationParameters.add(new SpaceParameters(simDeltaT, SpaceConstants.OUTPUT_DELTA_T,
-//                    IntegrationAlgorithmImp.Type.GEAR));
-
-//        simulationParameters.add(new SpaceParameters(800., 800.,
-//                IntegrationAlgorithmImp.Type.BEEMAN));
-        simulationParameters.add(new SpaceParameters(800., 800.,
-                0.0));
+        for(double i = 0; i < 60*60*24*365 ; i += 60*60*24*30)
+            simulationParameters.add(new SpaceParameters(800., 800., i));
 
         simulationParameters.forEach(parameters -> {
-
             try {
-//                String path = String.format(Locale.ENGLISH, "out_%s_%f", parameters.algorithmType.toString(), parameters.simulationDeltaT);
-                String path = String.format(Locale.ENGLISH, "out_%f_%f", parameters.secondsToDeparture, parameters.simulationDeltaT);
+                String path = String.format(Locale.ENGLISH, "out_%.0f_%.0f", parameters.secondsToDeparture, parameters.simulationDeltaT);
                 SpaceSimulation simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.secondsToDeparture);
                 new File(RESULTS_PATH + path).mkdir();
-                SpaceSimulation.createStaticFile(path, IntegrationAlgorithmImp.Type.BEEMAN.toString(), RESULTS_PATH, parameters.simulationDeltaT);
+                SpaceSimulation.createStaticFile(path, IntegrationAlgorithmImp.Type.BEEMAN.toString(),
+                        RESULTS_PATH, parameters.simulationDeltaT, parameters.secondsToDeparture);
 
                 String dynamicsPath = path + "/dynamics";
                 new File(RESULTS_PATH + dynamicsPath).mkdir();
-
-
 
                 simulation.createDynamicFile(dynamicsPath, RESULTS_PATH);
             } catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -52,14 +36,8 @@ public class SpaceManager {
     private static class SpaceParameters {
         public double simulationDeltaT;
         public double outputDeltaT;
-//        public IntegrationAlgorithmImp.Type algorithmType;
         public double secondsToDeparture;
 
-//        public SpaceParameters(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type algorithmType) {
-//            this.simulationDeltaT = simulationDeltaT;
-//            this.outputDeltaT = outputDeltaT;
-//            this.algorithmType = algorithmType;
-//        }
         public SpaceParameters(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture) {
             this.simulationDeltaT = simulationDeltaT;
             this.outputDeltaT = outputDeltaT;

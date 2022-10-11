@@ -40,16 +40,9 @@ if __name__ == "__main__":
         ##Luego, realizamos la accion correspondiente
         if(action=='animate'):
         # ANIMACION:
-            simulation_result = simulations_results_dict[(800,'BEEMAN')][0]
-            exportOvito.exportOvito(simulation_result)
-             # simulation_result = simulations_results_dict[(math.pow(10,-5),'GEAR')][0]
-             # exportOvito.exportOvito(simulation_result)
-             # simulation_result = simulations_results_dict[(math.pow(10,-4),'GEAR')][0]
-             # exportOvito.exportOvito(simulation_result)
-             # simulation_result = simulations_results_dict[(math.pow(10,-3),'GEAR')][0]
-             # exportOvito.exportOvito(simulation_result)
-             # simulation_result = simulations_results_dict[(math.pow(10,-2),'GEAR')][0]
-             # exportOvito.exportOvito(simulation_result)   
+            simulation_results = list(simulations_results_dict.values())
+            for simulation_result in simulation_results:
+                exportOvito.exportOvito(simulation_result[0])
 
         else:
         # GRAFICACION:

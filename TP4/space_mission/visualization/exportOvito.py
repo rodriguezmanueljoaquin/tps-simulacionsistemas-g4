@@ -14,12 +14,12 @@ def exportOvito(simulation_result):
     if(not os.path.exists(ovitoFolderName)):
         os.makedirs(ovitoFolderName)
     print('Generating ovito file. . .')
-    exportParticles(simulation_result.particles_by_frame,simulation_result.simulation_deltaT,simulation_result.method_name, simulation_result.sun_id, simulation_result.sun_position[0],simulation_result.sun_position[1], simulation_result.sun_radius)
+    exportParticles(simulation_result.particles_by_frame,simulation_result.simulation_deltaT,simulation_result.seconds_to_departure, simulation_result.sun_id, simulation_result.sun_position[0],simulation_result.sun_position[1], simulation_result.sun_radius)
     print('Ovito file successfully generated')
 
 
-def exportParticles(particles_by_frame,simulation_deltaT,method_name, sun_id, sun_x, sun_y, sun_radius):
-    file = open("{}/particles_{}_{}.xyz".format(ovitoFolderName, simulation_deltaT, method_name), "w")
+def exportParticles(particles_by_frame,simulation_deltaT,seconds_to_departure, sun_id, sun_x, sun_y, sun_radius):
+    file = open("{}/particles_{}_{}.xyz".format(ovitoFolderName, simulation_deltaT, seconds_to_departure), "w")
     for particle_frame in particles_by_frame:
         n = len(particle_frame.particles)
         file.write("{}\ncomment\n".format(n + 1))

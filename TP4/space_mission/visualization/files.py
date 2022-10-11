@@ -4,10 +4,13 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, simulation_deltaT, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
+    def __init__(self, method_name, simulation_deltaT, departure_date, departure_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.simulation_deltaT = simulation_deltaT
+        self.departure_date = departure_date
+        self.departure_time = departure_time
+        self.seconds_to_departure = seconds_to_departure
         self.sun_id = sun_id
         self.sun_position = (sun_x,sun_y)
         self.sun_radius = sun_radius
@@ -64,7 +67,7 @@ def read_input_files(input_files__directory_path):
                             simulation_results_list.append(simulation_result_dynamic)
                     print('\t\tDynamic files directory successfully read. . .')
 
-                    simulations_results_dict[(simulation_result_static.simulation_deltaT,simulation_result_static.method_name)] = simulation_results_list
+                    simulations_results_dict[(simulation_result_static.simulation_deltaT,simulation_result_static.seconds_to_departure)] = simulation_results_list
         print('\tDirectory successfully read. . .')
 
     print('Input files successfully read')
@@ -83,6 +86,12 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     simulation_deltaT = float(line.strip())
     line = file.readline()
+    full_date = line.strip().split(sep="T")
+    departure_date = full_date[0]
+    departure_time = full_date[1]
+    line = file.readline()
+    seconds_to_departure = float(line.strip())
+    line = file.readline()
     sun_id = int(line.split()[0])
     sun_data = line.split()[1].split(";")
     sun_x = float(sun_data[0])
@@ -99,7 +108,7 @@ def __read_static_input_file(static_input_file_path):
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, simulation_deltaT, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
+    return SimulationResult(method_name, simulation_deltaT, departure_date, departure_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True
