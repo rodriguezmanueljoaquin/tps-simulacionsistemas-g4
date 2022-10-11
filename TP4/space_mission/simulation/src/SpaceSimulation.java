@@ -8,15 +8,17 @@ public class SpaceSimulation {
     private double simulationDeltaT;
     private double outputDeltaT;
     private double currentSimulationTime;
+    private double secondsToDeparture;
 
     private static Particle sun;
     private Map<PlanetType ,Particle> objects = new HashMap<>();
 
 
-    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, IntegrationAlgorithmImp.Type type) {
+    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture) {
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;
+        this.secondsToDeparture = secondsToDeparture;
 
         this.sun = new Particle(
                 0,
@@ -25,7 +27,7 @@ public class SpaceSimulation {
                 0,
                 SpaceConstants.SUN_RADIUS,
                 SpaceConstants.SUN_MASS);
-        
+
         for (int i=1;i<=2;i++) {
             PlanetType planetType = PlanetType.values()[i];
             Pair<Double, Double> position = HorizonResultsReader.getPosition("space_mission/datasets/horizons_results_" + planetType.getPlanetName() + ".txt");
@@ -40,16 +42,16 @@ public class SpaceSimulation {
 
             objects.put(planetType,p);
         }
-        Particle earth = objects.get(PlanetType.EARTH);
-        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
-        double tx = earth.getxVelocity() / vAbsEarth;
-        double ty = earth.getyVelocity() / vAbsEarth;
-        Particle p = new Particle(earth.getX() - SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH*tx,
-                earth.getY() - SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH*ty,
-                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
-                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
-                2 * Math.pow(10, 5));//TODO: VER RADIO"spaceship"
-      // objects.put(PlanetType.SPACESHIP, p);
+//        Particle earth = objects.get(PlanetType.EARTH);
+//        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
+//        double tx = earth.getxVelocity() / vAbsEarth;
+//        double ty = earth.getyVelocity() / vAbsEarth;
+//        Particle p = new Particle(earth.getX() - SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH*tx,
+//                earth.getY() - SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH*ty,
+//                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
+//                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
+//                2 * Math.pow(10, 5));//TODO: VER RADIO"spaceship"
+//      // objects.put(PlanetType.SPACESHIP, p);
 //    }
         //Inicializamos las aceleraciones de los planetas
         initializeParticlesAccelerations();
@@ -89,13 +91,40 @@ public class SpaceSimulation {
         return planetsWithSun;
     }
 
+    private void launchSpaceship(){
+        Particle earth = objects.get(PlanetType.EARTH);
+        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
+        double tx = earth.getxVelocity() / vAbsEarth;
+        double ty = earth.getyVelocity() / vAbsEarth;
+        double distanceSpaceshipToEarth = SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH + SpaceConstants.EARTH_RADIUS;
+        Particle p = new Particle(earth.getX() - distanceSpaceshipToEarth*tx,
+                earth.getY() - distanceSpaceshipToEarth*ty,
+                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
+                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
+                2 * Math.pow(10, 5));//TODO: VER RADIO"spaceship"
+        objects.put(PlanetType.SPACESHIP, p);
+    }
+
+    private boolean continueIteration(Particle destiny){
+        return (objects.containsKey(PlanetType.SPACESHIP) && !hasArrived(objects.get(PlanetType.SPACESHIP), destiny) && timeSinceDeparture < SpaceConstants.MAX_TRIP_TIME)
+                || (!objects.containsKey(PlanetType.SPACESHIP));
+    }
+
+    private boolean hasArrived(Particle spaceship, Particle destiny){
+        return spaceship.calculateDistanceTo(destiny) < SpaceConstants.ARRIVAL_UMBRAL;
+    }
 
     public void nextIteration() {
 
         double iterationTime = this.currentSimulationTime;
 //        while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
         while(Math.abs(iterationTime - (this.currentSimulationTime + this.outputDeltaT))>=SpaceConstants.EPSILON  && Math.abs(iterationTime - SpaceConstants.FINAL_TIME)>=SpaceConstants.EPSILON){
-            //Primero,armamos un mapa con las particulas en el estado siguiente
+            //Primero, chequeamos si es el tiempo de despegue. En dicho caso, creamos la nave
+            if(Math.abs(iterationTime-this.secondsToDeparture)<SpaceConstants.EPSILON){
+                launchSpaceship();
+            }
+
+            //Luego,armamos un mapa con las particulas en el estado siguiente
             Map<PlanetType,Particle> nextObjects = new HashMap<>();
             for(PlanetType planetType : objects.keySet()){
                 Particle p = objects.get(planetType);
@@ -162,7 +191,12 @@ public class SpaceSimulation {
         for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
             writer.write(this.currentSimulationTime +"\n"+ PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX()  + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
             writer.write( PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX()  + ";" + objects.get(PlanetType.VENUS).getY()  + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity()  +  "\n");
-            //writer.write(PlanetType.SPACESHIP.ordinal() + " " + objects.get(PlanetType.SPACESHIP).getX()  + ";" + objects.get(PlanetType.SPACESHIP).getY()  + ";" + objects.get(PlanetType.SPACESHIP).getxVelocity() + ";" + objects.get(PlanetType.SPACESHIP).getyVelocity() +  "\n");
+            if(objects.containsKey(PlanetType.SPACESHIP)){
+                writer.write(PlanetType.SPACESHIP.ordinal() + " " + objects.get(PlanetType.SPACESHIP).getX()  + ";" + objects.get(PlanetType.SPACESHIP).getY()  + ";" + objects.get(PlanetType.SPACESHIP).getxVelocity() + ";" + objects.get(PlanetType.SPACESHIP).getyVelocity() +  "\n");
+            }
+            else{
+                writer.write("\n");
+            }
             nextIteration();
         }
         writer.close();
