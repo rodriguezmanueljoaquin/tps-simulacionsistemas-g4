@@ -9,6 +9,8 @@ public class SpaceConstants {
     public static final double EARTH_RADIUS = 6371.01;
     public static final double VENUS_RADIUS = 6051.84;
     public static final double DISTANCE_SPACE_STATION_TO_EARTH = 1500;
+    public static final double VELOCITY_LAUNCH = 8;
+    public static final double VELOCITY_SPACIAL_STATION = 7.12;
 
 
 

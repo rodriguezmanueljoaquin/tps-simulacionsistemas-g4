@@ -44,12 +44,12 @@ public class SpaceSimulation {
         double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
         double tx = earth.getxVelocity() / vAbsEarth;
         double ty = earth.getyVelocity() / vAbsEarth;
-        Particle p = new Particle(earth.getX(),
-                earth.getY() - 1500,
-                earth.getxVelocity() + (8 + 7.12) * tx
-                , earth.getyVelocity() + (8 + 7.12) * ty, 0,
-                2 * Math.pow(10, 5));//TODO: VER RADIO
-//        objects.put("spaceship", p);
+        Particle p = new Particle(earth.getX() - SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH*tx,
+                earth.getY() - SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH*ty,
+                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
+                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
+                2 * Math.pow(10, 5));//TODO: VER RADIO"spaceship"
+      // objects.put(PlanetType.SPACESHIP, p);
 //    }
         //Inicializamos las aceleraciones de los planetas
         initializeParticlesAccelerations();
@@ -162,7 +162,7 @@ public class SpaceSimulation {
         for (double i = 0; i <= SpaceConstants.FINAL_TIME; i += this.outputDeltaT) {
             writer.write(this.currentSimulationTime +"\n"+ PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX()  + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
             writer.write( PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX()  + ";" + objects.get(PlanetType.VENUS).getY()  + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity()  +  "\n");
-//            writer.write(PlanetType.SPACESHIP.ordinal() + " " + objects.get(PlanetType.SPACESHIP).getX()  + ";" + objects.get(PlanetType.SPACESHIP).getY()  + ";" + objects.get(PlanetType.SPACESHIP).getxVelocity() + ";" + objects.get(PlanetType.SPACESHIP).getyVelocity() +  "\n");
+            //writer.write(PlanetType.SPACESHIP.ordinal() + " " + objects.get(PlanetType.SPACESHIP).getX()  + ";" + objects.get(PlanetType.SPACESHIP).getY()  + ";" + objects.get(PlanetType.SPACESHIP).getxVelocity() + ";" + objects.get(PlanetType.SPACESHIP).getyVelocity() +  "\n");
             nextIteration();
         }
         writer.close();
