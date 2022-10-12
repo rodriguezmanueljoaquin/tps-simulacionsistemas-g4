@@ -23,7 +23,7 @@ def exportParticles(particles_by_frame,simulation_deltaT,seconds_to_departure, s
     for particle_frame in particles_by_frame:
         n = len(particle_frame.particles)
         file.write("{}\ncomment\n".format(n + 1))
-        file.write("{} {} {} {} {} {}\n".format(sun_id,sun_x, sun_y, 0, 0, sun_radius/10))
+        file.write("{} {} {} {} {} {}\n".format(sun_id,sun_x, sun_y, 0, 0, sun_radius/30))
         for particle in particle_frame.particles:
             file.write("{} {} {} {} {} {}\n".format(particle.id, particle.x, particle.y, particle.velx, particle.vely, particle.radius))
     file.close()

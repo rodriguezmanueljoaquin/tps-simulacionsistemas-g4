@@ -4,12 +4,12 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, simulation_deltaT, departure_date, departure_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
+    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.simulation_deltaT = simulation_deltaT
-        self.departure_date = departure_date
-        self.departure_time = departure_time
+        self.start_simulation_date = start_simulation_date
+        self.start_simulation_time = start_simulation_time
         self.seconds_to_departure = seconds_to_departure
         self.sun_id = sun_id
         self.sun_position = (sun_x,sun_y)
@@ -33,7 +33,7 @@ def read_input_files(input_files__directory_path):
 
     print('Reading input files. . .')
 
-    simulations_results_dict = dict()
+    simulations_results = list()
 
     dir_count = 0
     ##Iteramos en el path de los archivos de input
@@ -44,7 +44,6 @@ def read_input_files(input_files__directory_path):
 
         ##Por cada directorio, leemos los archivos estatico y dinamico correspondientes
         if(os.path.isdir(simulation_dir_path)):
-            simulationResultsList = list()
             simulation_result_static = None
             for input_file in sorted(os.listdir(simulation_dir_path),reverse=True):
                 ##Primero, leemos el archivo estatico
@@ -56,7 +55,7 @@ def read_input_files(input_files__directory_path):
                     ##Luego, leemos el directorio de archivos dinamicos
                     print('\t\tReading dynamic files directory. . .')
                     dynamic_files_dir_path = simulation_dir_path+"/"+input_file
-                    simulation_results_list = list()
+                    # simulation_results_list = list()
 
                     if(os.path.isdir(dynamic_files_dir_path)):
                          for dynamicFilePath in os.listdir(dynamic_files_dir_path):
@@ -64,15 +63,16 @@ def read_input_files(input_files__directory_path):
                             print('\t\t\tReading dynamic file. . .')
                             __read_dynamic_input_file(dynamic_files_dir_path+"/"+dynamicFilePath,simulation_result_dynamic)
                             print('\t\t\tDynamic file successfully read')
-                            simulation_results_list.append(simulation_result_dynamic)
+                            # simulation_results_list.append(simulation_result_dynamic)
                     print('\t\tDynamic files directory successfully read. . .')
 
-                    simulations_results_dict[(simulation_result_static.simulation_deltaT,simulation_result_static.seconds_to_departure)] = simulation_results_list
+                    # simulations_results.append(simulation_results_list) para varias ejecuciones habria que hacer esto
+                    simulations_results.append(simulation_result_dynamic)
         print('\tDirectory successfully read. . .')
 
     print('Input files successfully read')
 
-    return simulations_results_dict
+    return simulations_results
 
 def __read_static_input_file(static_input_file_path):
     lineCount = 0
@@ -87,8 +87,8 @@ def __read_static_input_file(static_input_file_path):
     simulation_deltaT = float(line.strip())
     line = file.readline()
     full_date = line.strip().split(sep="T")
-    departure_date = full_date[0]
-    departure_time = full_date[1]
+    start_simulation_date = full_date[0]
+    start_simulation_time = full_date[1]
     line = file.readline()
     seconds_to_departure = float(line.strip())
     line = file.readline()
@@ -108,7 +108,7 @@ def __read_static_input_file(static_input_file_path):
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, simulation_deltaT, departure_date, departure_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
+    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True

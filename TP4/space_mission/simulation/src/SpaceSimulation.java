@@ -82,15 +82,35 @@ public class SpaceSimulation {
 
     private void launchSpaceship(){
         Particle earth = objects.get(PlanetType.EARTH);
-        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
-        double tx = earth.getxVelocity() / vAbsEarth;
-        double ty = earth.getyVelocity() / vAbsEarth;
+//        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
+//        double tx = earth.getxVelocity() / vAbsEarth;
+//        double ty = earth.getyVelocity() / vAbsEarth;
+//        double distanceSpaceshipToEarth = SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH + SpaceConstants.EARTH_RADIUS;
+//        Particle p = new Particle(earth.getX() - distanceSpaceshipToEarth*tx,
+//                earth.getY() - distanceSpaceshipToEarth*ty,
+//                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
+//                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
+//                2 * Math.pow(10, 5));
+        //Primero, calculamos la distancia entre la tierra y el sol
+        double distanceSunToEarth = sun.calculateDistanceToWithoutRadius(earth);
+        //Luego, calculamos los versores correspondientes al vector normal
+        double rx = (earth.getX() - sun.getX()) / distanceSunToEarth;
+        double ry = (earth.getY() - sun.getY()) / distanceSunToEarth;
+
+        // calculamos versores correspondientes al vector tangencial a la orbita de la tierra
+        double tx = -ry;
+        double ty = rx;
+
         double distanceSpaceshipToEarth = SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH + SpaceConstants.EARTH_RADIUS;
-        Particle p = new Particle(earth.getX() - distanceSpaceshipToEarth*tx,
-                earth.getY() - distanceSpaceshipToEarth*ty,
-                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
-                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
-                2 * Math.pow(10, 5));//TODO: VER RADIO"spaceship"
+        double spaceshipX = earth.getX() - distanceSpaceshipToEarth * rx;
+        double spaceshipY = earth.getY() - distanceSpaceshipToEarth * ry;
+
+        double tangencialVelocity = SpaceConstants.VELOCITY_SPACIAL_STATION + SpaceConstants.VELOCITY_LAUNCH
+                + earth.getxVelocity() * tx + earth.getyVelocity() * ty;
+        double spaceshipVX = tangencialVelocity * tx;
+        double spaceshipVY = tangencialVelocity * ty;
+
+        Particle p = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, 0.01, 2 * Math.pow(10, 5));
         objects.put(PlanetType.SPACESHIP, p);
     }
 
@@ -110,7 +130,6 @@ public class SpaceSimulation {
     public void nextIteration() {
 
         double iterationTime = this.currentSimulationTime;
-//        while(iterationTime <= this.currentSimulationTime + this.outputDeltaT  && iterationTime <= SpaceConstants.FINAL_TIME){
         while(Math.abs(iterationTime - (this.currentSimulationTime + this.outputDeltaT))>=SpaceConstants.EPSILON
                 && continueIteration(objects.get(PlanetType.VENUS), Math.max(iterationTime - this.secondsToDeparture, 0))){
 

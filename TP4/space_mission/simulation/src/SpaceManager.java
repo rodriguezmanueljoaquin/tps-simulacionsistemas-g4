@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
@@ -11,9 +13,14 @@ public class SpaceManager {
 
         new File(RESULTS_PATH).mkdir();
 
+        // TESTING
+        LocalDateTime departureDate = LocalDateTime.parse("2023-07-18T00:00:00");
+        int seconds = (int) ChronoUnit.SECONDS.between(SpaceConstants.START_SIMULATION_DATE, departureDate);
+
         ArrayList<SpaceParameters> simulationParameters = new ArrayList<>();
-        for(double i = 0; i < 60*60*24*365 ; i += 60*60*24*30)
-            simulationParameters.add(new SpaceParameters(800., 800., i));
+        for(double i = 0; i < 60*60*24*1000 ; i += 60*60*24*10)
+            simulationParameters.add(new SpaceParameters(300., 900., i));
+//        simulationParameters.add(new SpaceParameters(300., 900., (double) 60*60*24*257));
 
         simulationParameters.forEach(parameters -> {
             try {
