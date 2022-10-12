@@ -117,14 +117,20 @@ public class SpaceSimulation {
     private boolean continueIteration(Particle destiny, Double timeSinceDeparture){
         return !objects.containsKey(PlanetType.SPACESHIP) ||
                 (!hasArrived(objects.get(PlanetType.SPACESHIP), destiny) &&
-                        Math.abs(SpaceConstants.MAX_TRIP_TIME - timeSinceDeparture) >= SpaceConstants.EPSILON);
+                        Math.abs(SpaceConstants.MAX_TRIP_TIME - timeSinceDeparture) >= SpaceConstants.EPSILON &&
+                            !spaceshipImpactOtherPlanets(objects.get(PlanetType.SPACESHIP),
+                                    getPlanetsWithSun(objects.values().stream()
+                                            .filter(p ->
+                                                    !p.equals(destiny) && !p.equals(objects.get(PlanetType.SPACESHIP))
+                                            ).collect(Collectors.toList()))));
+    }
+
+    private boolean spaceshipImpactOtherPlanets(Particle spaceship, List<Particle> otherPlanets){
+        return otherPlanets.stream().anyMatch(p -> spaceship.calculateDistanceTo(p) <= 0);
     }
 
     private boolean hasArrived(Particle spaceship, Particle destiny){
-        boolean hasArrived = spaceship.calculateDistanceTo(destiny) < SpaceConstants.ARRIVAL_UMBRAL;
-        if(hasArrived)
-            System.out.println("SHIP HAS ARRIVED DEPARTING AT " + this.secondsToDeparture);
-        return hasArrived;
+        return spaceship.calculateDistanceTo(destiny) < SpaceConstants.ARRIVAL_UMBRAL;
     }
 
     public void nextIteration() {

@@ -10,7 +10,7 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
     # iters = range(1, len(curves[0]) + 1)
     colors = sns.color_palette("hls", len(curves)) 
     for i in range(len(curves)):
-        label = legends[i] if legends is not None else None
+        label = legends[i] if legends is not None else ''
         plt.plot(inputs[i], curves[i], label=label, color=colors[i])
 
     plt.legend()
