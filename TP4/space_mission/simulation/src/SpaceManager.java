@@ -31,6 +31,7 @@ public class SpaceManager {
 
         // TESTING FOR BEST DEPARTURE DATE
         double hitDestinyDepartureSeconds = 2.01654E7;
+        //2.01663E7
 /*        simulationParameters.add(new SpaceParameters(300., 900.,
                 hitDestinyDepartureSeconds, 8., PlanetType.EARTH, PlanetType.VENUS));*/
 
