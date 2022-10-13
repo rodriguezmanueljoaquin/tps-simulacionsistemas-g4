@@ -99,4 +99,22 @@ def plot_velocity_evolution(simulation_result):
     print("Velocidad relativa de la nave al planeta destino cuando llega a un radio determinado de la superficie del destino",
              simulation_result.destiny_planet, ": vx=", velocity_relative_x, ": vy=", velocity_relative_y ," km/s")
 
-  
+def plot_trip_distance_evolution(simulation_result):
+    distances = []
+    times = []
+    index_of_departure = int(simulation_result.seconds_to_departure / \
+        (simulation_result.particles_by_frame[1].time - simulation_result.particles_by_frame[0].time))
+
+    # por si todavia no habia salido
+    while(len(simulation_result.particles_by_frame[index_of_departure].particles) < 3):
+        index_of_departure += 1
+
+    spaceship_data = None
+    for frame in simulation_result.particles_by_frame[index_of_departure:]:
+        spaceship_data = frame.particles[PlanetIndexInDynamic.SPACESHIP.value]
+        destiny_data = frame.particles[planet_index_dict[simulation_result.destiny_planet].value]
+        distances.append((math.sqrt(
+            (spaceship_data.x  - destiny_data.x)**2 + (spaceship_data.y - destiny_data.y)**2)) - spaceship_data.radius - destiny_data.radius)
+        times.append(frame.time - simulation_result.seconds_to_departure)
+
+    plot_curves_with_legend([times], [distances], None, "Tiempo (s)", "Distancia (km)")

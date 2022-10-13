@@ -222,7 +222,7 @@ public class SpaceSimulation {
         }
         double currentOutputTime = 0;
 
-        for (;continueIteration(Math.max(currentOutputTime - this.secondsToDeparture, 0)); currentOutputTime += this.outputDeltaT) {
+        for (;currentOutputTime <= SpaceConstants.MAX_TRIP_TIME + this.secondsToDeparture && continueIteration(Math.max(currentOutputTime - this.secondsToDeparture, 0)); currentOutputTime += this.outputDeltaT) {
             writer.write(this.currentSimulationTime + "\n");
             writer.write(PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
             writer.write(PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX() + ";" + objects.get(PlanetType.VENUS).getY() + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity() + "\n");
