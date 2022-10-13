@@ -31,16 +31,17 @@ public class SpaceManager {
 
         // TESTING FOR BEST DEPARTURE DATE
         double hitDestinyDepartureSeconds = 2.01654E7;
-        simulationParameters.add(new SpaceParameters(300., 900.,
-                hitDestinyDepartureSeconds, 8., PlanetType.EARTH, PlanetType.VENUS));
+/*        simulationParameters.add(new SpaceParameters(300., 900.,
+                hitDestinyDepartureSeconds, 8., PlanetType.EARTH, PlanetType.VENUS));*/
 
         // TESTING FOR DIFFERENT DEPARTURE DATES
         double secondsInOneDay = 60*60*24;
         double bestDepartureDay = 233;
         double bestDepartureTimeInBestDayInSeconds = 32215.;
-//        for(double daySeconds = bestDepartureDay*secondsInOneDay; daySeconds < secondsInOneDay*lastDay; daySeconds += secondsInOneDay/96)
-//            simulationParameters.add(new SpaceParameters(300., 900., daySeconds, SpaceConstants.VELOCITY_LAUNCH,
-//                    PlanetType.EARTH, PlanetType.VENUS));
+        //dt=15 minutes
+        for(double daySeconds = bestDepartureDay*secondsInOneDay; daySeconds < secondsInOneDay*lastDay; daySeconds += secondsInOneDay/96)
+            simulationParameters.add(new SpaceParameters(300., 900., daySeconds, SpaceConstants.VELOCITY_LAUNCH,
+                    PlanetType.EARTH, PlanetType.VENUS));
 
         // TESTING FOR DIFFERENT INITIAL VELOCITIES
 //        for(double v0 = SpaceConstants.VELOCITY_LAUNCH - initialVelocityUmbral;

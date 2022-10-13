@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class HorizonResultsReader {
-    private static final String POSITIONSANDVELOCITIESSEGMENT_ID = "$$SOE";
+    private static final String POSITIONS_VELOCITY_ID = "$$SOE";
 
     private static Pair<Double, Double> getDoublesAfterNLinesOnSegment(String path, String segmentIdentifier, Integer skips){
         try {
@@ -33,11 +33,11 @@ public class HorizonResultsReader {
     }
 
     public static Pair<Double, Double> getPosition(String path) {
-        return getDoublesAfterNLinesOnSegment(path, POSITIONSANDVELOCITIESSEGMENT_ID, 2);
+        return getDoublesAfterNLinesOnSegment(path, POSITIONS_VELOCITY_ID, 2);
     }
 
     public static Pair<Double, Double> getVelocity(String path) {
-        return getDoublesAfterNLinesOnSegment(path, POSITIONSANDVELOCITIESSEGMENT_ID, 3);
+        return getDoublesAfterNLinesOnSegment(path, POSITIONS_VELOCITY_ID, 3);
     }
 
 }

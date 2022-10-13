@@ -14,6 +14,6 @@ public class SpaceConstants {
     public static final double VELOCITY_LAUNCH = 8; // absolute value
     public static final double DISTANCE_SPACE_STATION_TO_ORIGIN = 1500;
     public static final double VELOCITY_SPACIAL_STATION = -7.12;
-    public static final double ARRIVAL_UMBRAL =  0;
+    public static final double ARRIVAL_UMBRAL =  10000;
     public static LocalDateTime START_SIMULATION_DATE = LocalDateTime.parse("2022-09-23T00:00:00");
 }
