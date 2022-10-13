@@ -49,7 +49,20 @@ def plot_minimum_distance_by_start_simulation_date(simulation_results):
     values.sort(key=lambda x: x[0])
     inputs = [x[0]/(60*60*24) for x in values]
     curves = [x[1] for x in values]
-    plot_curves_with_legend([inputs], [curves], None, "Days to departure", f"Minimum distance between spaceship and {simulation_result.destiny_planet}")
+    # TODO: DEBERIA DECIR LAS FECHAS EXACTAS Y EN EL LABEL ACORDARSE DE LAS UNIDADES
+    plot_curves_with_legend([inputs], [curves], None, "Dias hasta despegue (días)", f"Distancia mínima entre la nave y {simulation_result.destiny_planet} (km)")
 
 def plot_minimum_time_by_initial_velocity_module(simulation_results):
-    pass
+    values = []
+
+    for simulation_result in simulation_results:
+        values.append([
+            simulation_result.initial_velocity_module,
+            simulation_result.particles_by_frame[-1].time - simulation_result.seconds_to_departure
+        ])
+
+    values.sort(key=lambda x: x[0])
+    inputs = [x[0] for x in values]
+    curves = [x[1] for x in values]
+    plot_curves_with_legend([inputs], [curves], None, "Modulo de la velocidad inicial (km/s)", f"Tiempo de viaje (s)")
+

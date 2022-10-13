@@ -2,7 +2,7 @@ import argparse
 import math
 import exportOvito
 from files import read_input_files
-from graphs import plot_minimum_distance_by_start_simulation_date
+from graphs import plot_minimum_distance_by_start_simulation_date, plot_minimum_time_by_initial_velocity_module
 
 
 def read_results(input_files_directory_path):
@@ -55,6 +55,6 @@ if __name__ == "__main__":
             elif variable == 'initial_velocity_module':
                 plot_minimum_time_by_initial_velocity_module(simulations_results)
 
-    
     else:
         print("Invalid command line arguments")
+        

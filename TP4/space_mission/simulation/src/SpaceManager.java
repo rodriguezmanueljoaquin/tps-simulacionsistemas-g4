@@ -18,27 +18,33 @@ public class SpaceManager {
 
         // TESTING FOR SPECIFIC DATE
         LocalDateTime departureDate = LocalDateTime.parse("2023-07-18T00:00:00");
-        double seconds = (int) ChronoUnit.SECONDS.between(SpaceConstants.START_SIMULATION_DATE, departureDate);
-//        simulationParameters.add(new SpaceParameters(300., 900., seconds));
+//        double seconds = (int) ChronoUnit.SECONDS.between(SpaceConstants.START_SIMULATION_DATE, departureDate);
+//        simulationParameters.add(new SpaceParameters(300., 900., 0.,
+//                SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.VENUS));
 
         //PARAMETERS
-        double simulationsQty = 300;
+        double simulationsQty = 100;
 
-        double lastDay = 1000;
+        double lastDay = 234;
 
-        double initialVelocityUmbral = 1.5;
-        double dateToDepartureInSeconds = 19872000.;
+        double initialVelocityUmbral = 0.25;
 
         // TESTING FOR DIFFERENT DEPARTURE DATES
-//        double secondsInOneDay = 60*60*24;
-//        for(double i = 0; i < secondsInOneDay*lastDay ; i += Math.floor(secondsInOneDay*lastDay/simulationsQty))
-//            simulationParameters.add(new SpaceParameters(300., 900., i, SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.VENUS));
+        double secondsInOneDay = 60*60*24;
+        double bestDepartureDay = 233;
+        double bestDepartureTimeInBestDayInSeconds = 32215.;
+//        for(double daySeconds = bestDepartureDay*secondsInOneDay; daySeconds < secondsInOneDay*lastDay; daySeconds += secondsInOneDay/96)
+//            simulationParameters.add(new SpaceParameters(300., 900., daySeconds, SpaceConstants.VELOCITY_LAUNCH,
+//                    PlanetType.EARTH, PlanetType.VENUS));
 
+//        simulationParameters.add(new SpaceParameters(300., 900.,
+//                233*60*60*24. + 32215., 8., PlanetType.EARTH, PlanetType.VENUS));
         // TESTING FOR DIFFERENT INITIAL VELOCITIES
         for(double v0 = SpaceConstants.VELOCITY_LAUNCH - initialVelocityUmbral;
-            v0 < SpaceConstants.VELOCITY_LAUNCH + initialVelocityUmbral ;
+            v0 < SpaceConstants.VELOCITY_LAUNCH + initialVelocityUmbral;
             v0 += initialVelocityUmbral*2/simulationsQty){
-            simulationParameters.add(new SpaceParameters(300., 900., dateToDepartureInSeconds, v0, PlanetType.EARTH, PlanetType.VENUS));
+            simulationParameters.add(new SpaceParameters(300., 900.,
+                    bestDepartureDay*secondsInOneDay + bestDepartureTimeInBestDayInSeconds, v0, PlanetType.EARTH, PlanetType.VENUS));
         }
 
         simulationParameters.forEach(parameters -> {
