@@ -30,10 +30,15 @@ def get_min_distance_between_two_planets(simulation_result, planet1:PlanetType, 
     index_of_departure = int(simulation_result.seconds_to_departure / \
         (simulation_result.particles_by_frame[1].time - simulation_result.particles_by_frame[0].time))
 
-    for frame in simulation_result.particles_by_frame[index_of_departure+1: ]:
+        # por si todavia no habia salido
+    while(len(simulation_result.particles_by_frame[index_of_departure].particles) < 3):
+        index_of_departure += 1
+
+    for frame in simulation_result.particles_by_frame[index_of_departure: ]:
         planet1_data = frame.particles[planet1.value]
         planet2_data = frame.particles[planet2.value]
-        distances.append(math.sqrt((planet1_data.x - planet2_data.x)**2 + (planet1_data.y - planet2_data.y)**2))
+        distances.append((math.sqrt(
+            (planet1_data.x  - planet2_data.x)**2 + (planet1_data.y - planet2_data.y)**2))-planet2_data.radius - planet1_data.radius)
 
     return min(distances)
 
@@ -76,19 +81,22 @@ def plot_velocity_evolution(simulation_result):
     while(len(simulation_result.particles_by_frame[index_of_departure].particles) < 3):
         index_of_departure += 1
 
+    spaceship_data = None
     for frame in simulation_result.particles_by_frame[index_of_departure:]:
         spaceship_data = frame.particles[PlanetType.SPACESHIP.value]
         velocities.append(math.sqrt(spaceship_data.velx**2 + spaceship_data.vely**2))
         times.append(frame.time - simulation_result.seconds_to_departure)
+
+    plot_curves_with_legend([times], [velocities], None, "Tiempo (s)", "Velocidad (km/s)")
 
     print("Velocidad cuando llega a un radio determinado de la superficie del planeta: ", velocities[-1], " km/s")
     print("Tiempo total de viaje: ", times[-1], " s")
 
     destiny_planet_on_last_frame = simulation_result.particles_by_frame[-1]\
         .particles[planetType_dict[simulation_result.destiny_planet].value]
-    destiny_planet_on_last_frame_velocity = \
-        math.sqrt(destiny_planet_on_last_frame.velx**2 + destiny_planet_on_last_frame.vely**2)
+    velocity_relative_x = spaceship_data.velx - destiny_planet_on_last_frame.velx
+    velocity_relative_y = spaceship_data.vely - destiny_planet_on_last_frame.vely
     print("Velocidad relativa de la nave al planeta destino cuando llega a un radio determinado de la superficie del destino",
-             simulation_result.destiny_planet, ": ", velocities[-1] - destiny_planet_on_last_frame_velocity, " km/s")
+             simulation_result.destiny_planet, ": vx=", velocity_relative_x, ": vy=", velocity_relative_y ," km/s")
 
-    plot_curves_with_legend([times], [velocities], None, "Tiempo (s)", "Velocidad (km/s)")
+  
