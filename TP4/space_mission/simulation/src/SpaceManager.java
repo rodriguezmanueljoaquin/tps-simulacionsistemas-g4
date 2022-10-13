@@ -16,12 +16,6 @@ public class SpaceManager {
         new File(RESULTS_PATH).mkdir();
         ArrayList<SpaceParameters> simulationParameters = new ArrayList<>();
 
-        // TESTING FOR SPECIFIC DATE
-        LocalDateTime departureDate = LocalDateTime.parse("2023-07-18T00:00:00");
-//        double seconds = (int) ChronoUnit.SECONDS.between(SpaceConstants.START_SIMULATION_DATE, departureDate);
-//        simulationParameters.add(new SpaceParameters(300., 900., 0.,
-//                SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.VENUS));
-
         //PARAMETERS
         double simulationsQty = 100;
 
