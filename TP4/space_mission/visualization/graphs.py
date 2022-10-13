@@ -4,7 +4,7 @@ import collections
 import matplotlib.pyplot as plt
 import math
 
-from Constants import PlanetIndexInDynamic,PlanetIndexInDynamic_dict
+from Constants import PlanetIndexInDynamic,planet_index_dict
 
 def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", log_scale = False):
     # iters = range(1, len(curves[0]) + 1)
@@ -48,7 +48,7 @@ def plot_minimum_distance_by_start_simulation_date(simulation_results):
     for simulation_result in simulation_results:
         values.append([
             simulation_result.seconds_to_departure,
-            get_min_distance_between_two_planets(simulation_result, PlanetIndexInDynamic_dict[simulation_result.destiny_planet], PlanetIndexInDynamic.SPACESHIP)
+            get_min_distance_between_two_planets(simulation_result, planet_index_dict[simulation_result.destiny_planet], PlanetIndexInDynamic.SPACESHIP)
         ])
 
     values.sort(key=lambda x: x[0])
@@ -93,7 +93,7 @@ def plot_velocity_evolution(simulation_result):
     print("Tiempo total de viaje: ", times[-1], " s")
 
     destiny_planet_on_last_frame = simulation_result.particles_by_frame[-1]\
-        .particles[PlanetIndexInDynamic_dict[simulation_result.destiny_planet].value]
+        .particles[planet_index_dict[simulation_result.destiny_planet].value]
     velocity_relative_x = spaceship_data.velx - destiny_planet_on_last_frame.velx
     velocity_relative_y = spaceship_data.vely - destiny_planet_on_last_frame.vely
     print("Velocidad relativa de la nave al planeta destino cuando llega a un radio determinado de la superficie del destino",
