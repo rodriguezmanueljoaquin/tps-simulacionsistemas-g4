@@ -4,7 +4,7 @@ import collections
 import matplotlib.pyplot as plt
 import math
 
-from Constants import PlanetType
+from Constants import PlanetType,planetType_dict
 
 def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", log_scale = False):
     # iters = range(1, len(curves[0]) + 1)
@@ -13,7 +13,8 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
         label = legends[i] if legends is not None else ''
         plt.plot(inputs[i], curves[i], label=label, color=colors[i])
 
-    plt.legend()
+    if legends is not None:
+        plt.legend()
     plt.xlabel(X_label)
     plt.ylabel(Y_label)
     if(log_scale):
@@ -40,10 +41,10 @@ def plot_minimum_distance_by_start_simulation_date(simulation_results):
     for simulation_result in simulation_results:
         values.append([
             simulation_result.seconds_to_departure,
-            get_min_distance_between_two_planets(simulation_result, PlanetType.VENUS, PlanetType.SPACESHIP)
+            get_min_distance_between_two_planets(simulation_result, planetType_dict[simulation_result.destiny_planet], PlanetType.SPACESHIP)
         ])
 
     values.sort(key=lambda x: x[0])
     inputs = [x[0]/(60*60*24) for x in values]
     curves = [x[1] for x in values]
-    plot_curves_with_legend([inputs], [curves], None, "Days to departure", "Minimum distance between spaceship and venus")
+    plot_curves_with_legend([inputs], [curves], None, "Days to departure", f"Minimum distance between spaceship and {simulation_result.destiny_planet}")

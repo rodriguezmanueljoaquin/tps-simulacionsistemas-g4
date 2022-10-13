@@ -9,11 +9,14 @@ public class SpaceSimulation {
     private double outputDeltaT;
     private double currentSimulationTime;
     private double secondsToDeparture;
+    private Particle originPlanet;
+    private Particle destinyPlanet;
+    private Particle spaceship;
 
     private static Particle sun;
     private Map<PlanetType ,Particle> objects = new HashMap<>();
 
-    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture) {
+    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture, PlanetType origin, PlanetType destiny) {
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;
@@ -41,6 +44,10 @@ public class SpaceSimulation {
 
             objects.put(planetType,p);
         }
+
+        //Inicializamos los planetas origen y destino
+        this.originPlanet = objects.get(origin);
+        this.destinyPlanet = objects.get(destiny);
 
         //Inicializamos las aceleraciones de los planetas
         initializeParticlesAccelerations();
@@ -81,47 +88,39 @@ public class SpaceSimulation {
     }
 
     private void launchSpaceship(){
-        Particle earth = objects.get(PlanetType.EARTH);
-//        double vAbsEarth = Math.sqrt(Math.pow(earth.getxVelocity(), 2) + Math.pow(earth.getyVelocity(), 2));
-//        double tx = earth.getxVelocity() / vAbsEarth;
-//        double ty = earth.getyVelocity() / vAbsEarth;
-//        double distanceSpaceshipToEarth = SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH + SpaceConstants.EARTH_RADIUS;
-//        Particle p = new Particle(earth.getX() - distanceSpaceshipToEarth*tx,
-//                earth.getY() - distanceSpaceshipToEarth*ty,
-//                earth.getxVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * tx
-//                , earth.getyVelocity() + (SpaceConstants.VELOCITY_LAUNCH + SpaceConstants.VELOCITY_SPACIAL_STATION) * ty, 1,
-//                2 * Math.pow(10, 5));
-        //Primero, calculamos la distancia entre la tierra y el sol
-        double distanceSunToEarth = sun.calculateDistanceToWithoutRadius(earth);
+
+        //Primero, calculamos la distancia entre el origen y el sol
+        double distanceSunToOrigin = sun.calculateDistanceToWithoutRadius(originPlanet);
         //Luego, calculamos los versores correspondientes al vector normal
-        double rx = (earth.getX() - sun.getX()) / distanceSunToEarth;
-        double ry = (earth.getY() - sun.getY()) / distanceSunToEarth;
+        double rx = (originPlanet.getX() - sun.getX()) / distanceSunToOrigin;
+        double ry = (originPlanet.getY() - sun.getY()) / distanceSunToOrigin;
 
         // calculamos versores correspondientes al vector tangencial a la orbita de la tierra
         double tx = -ry;
         double ty = rx;
 
-        double distanceSpaceshipToEarth = SpaceConstants.DISTANCE_SPACE_STATION_TO_EARTH + SpaceConstants.EARTH_RADIUS;
-        double spaceshipX = earth.getX() - distanceSpaceshipToEarth * rx;
-        double spaceshipY = earth.getY() - distanceSpaceshipToEarth * ry;
+        double distanceSpaceshipToOrigin = SpaceConstants.DISTANCE_SPACE_STATION_TO_ORIGIN + originPlanet.getRadius();
+        double spaceshipX = originPlanet.getX() - distanceSpaceshipToOrigin * rx;
+        double spaceshipY = originPlanet.getY() - distanceSpaceshipToOrigin * ry;
 
         double tangencialVelocity = SpaceConstants.VELOCITY_SPACIAL_STATION + SpaceConstants.VELOCITY_LAUNCH
-                + earth.getxVelocity() * tx + earth.getyVelocity() * ty;
+                + originPlanet.getxVelocity() * tx + originPlanet.getyVelocity() * ty;
         double spaceshipVX = tangencialVelocity * tx;
         double spaceshipVY = tangencialVelocity * ty;
 
-        Particle p = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, 0.01, 2 * Math.pow(10, 5));
-        objects.put(PlanetType.SPACESHIP, p);
+        spaceship = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, 0.01, 2 * Math.pow(10, 5));
+        objects.put(PlanetType.SPACESHIP, spaceship);
+
     }
 
-    private boolean continueIteration(Particle destiny, Double timeSinceDeparture){
-        return !objects.containsKey(PlanetType.SPACESHIP) ||
-                (!hasArrived(objects.get(PlanetType.SPACESHIP), destiny) &&
+    private boolean continueIteration(Double timeSinceDeparture){
+        return spaceship==null ||
+                (!hasArrived() &&
                         Math.abs(SpaceConstants.MAX_TRIP_TIME - timeSinceDeparture) >= SpaceConstants.EPSILON &&
-                            !spaceshipImpactOtherPlanets(objects.get(PlanetType.SPACESHIP),
+                            !spaceshipImpactOtherPlanets(spaceship,
                                     getPlanetsWithSun(objects.values().stream()
                                             .filter(p ->
-                                                    !p.equals(destiny) && !p.equals(objects.get(PlanetType.SPACESHIP))
+                                                    !p.equals(destinyPlanet) && !p.equals(spaceship)
                                             ).collect(Collectors.toList()))));
     }
 
@@ -129,18 +128,18 @@ public class SpaceSimulation {
         return otherPlanets.stream().anyMatch(p -> spaceship.calculateDistanceTo(p) <= 0);
     }
 
-    private boolean hasArrived(Particle spaceship, Particle destiny){
-        return spaceship.calculateDistanceTo(destiny) < SpaceConstants.ARRIVAL_UMBRAL;
+    private boolean hasArrived(){
+        return spaceship.calculateDistanceTo(destinyPlanet) < SpaceConstants.ARRIVAL_UMBRAL;
     }
 
     public void nextIteration() {
 
         double iterationTime = this.currentSimulationTime;
         while(Math.abs(iterationTime - (this.currentSimulationTime + this.outputDeltaT))>=SpaceConstants.EPSILON
-                && continueIteration(objects.get(PlanetType.VENUS), Math.max(iterationTime - this.secondsToDeparture, 0))){
+                && continueIteration(Math.max(iterationTime - this.secondsToDeparture, 0))){
 
             //Primero, chequeamos si es el tiempo de despegue. En dicho caso, creamos la nave
-            if(!objects.containsKey(PlanetType.SPACESHIP) && Math.abs(iterationTime-this.secondsToDeparture) < SpaceConstants.EPSILON){
+            if(spaceship==null && Math.abs(iterationTime-this.secondsToDeparture) < SpaceConstants.EPSILON){
                 launchSpaceship();
             }
 
@@ -190,7 +189,7 @@ public class SpaceSimulation {
         currentSimulationTime = iterationTime;
     }
 
-    public static void createStaticFile(String outputName, String algorithmName, String outputPath, double simulationDeltaT, double departureTime) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputName, String algorithmName, String outputPath, double simulationDeltaT, double departureTime, PlanetType origin, PlanetType destiny) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
@@ -200,6 +199,8 @@ public class SpaceSimulation {
         writer.write(PlanetType.EARTH.ordinal() + " " + SpaceConstants.EARTH_RADIUS +  "\n");
         writer.write(PlanetType.VENUS.ordinal() + " " + SpaceConstants.VENUS_RADIUS + "\n");
         writer.write(PlanetType.SPACESHIP.ordinal() + " " + 1 +  "\n"); //TODO RADIO SPACESHIP?
+        writer.write("origin" + " " + origin.getPlanetName() + "\n");
+        writer.write("destiny" + " " + destiny.getPlanetName() + "\n");
         writer.close();
 
         System.out.println("\tStatic file successfully created");
@@ -212,8 +213,8 @@ public class SpaceSimulation {
         for (double i = 0; i <= SpaceConstants.MAX_TRIP_TIME + this.secondsToDeparture; i += this.outputDeltaT) {
             writer.write(this.currentSimulationTime +"\n"+ PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX()  + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
             writer.write( PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX()  + ";" + objects.get(PlanetType.VENUS).getY()  + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity()  +  "\n");
-            if(objects.containsKey(PlanetType.SPACESHIP)){
-                writer.write(PlanetType.SPACESHIP.ordinal() + " " + objects.get(PlanetType.SPACESHIP).getX()  + ";" + objects.get(PlanetType.SPACESHIP).getY()  + ";" + objects.get(PlanetType.SPACESHIP).getxVelocity() + ";" + objects.get(PlanetType.SPACESHIP).getyVelocity() +  "\n");
+            if(spaceship!=null){
+                writer.write(PlanetType.SPACESHIP.ordinal() + " " + spaceship.getX()  + ";" + spaceship.getY()  + ";" + spaceship.getxVelocity() + ";" + spaceship.getyVelocity() +  "\n");
             }
             else{
                 writer.write("\n");

@@ -4,7 +4,7 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius):
+    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.simulation_deltaT = simulation_deltaT
@@ -17,9 +17,11 @@ class SimulationResult:
         self.earth_radius = earth_radius
         self.venus_radius = venus_radius
         self.spaceship_radius = spaceship_radius
+        self.origin_planet = origin_planet
+        self.destiny_planet = destiny_planet
 
     def __str__(self):
-        return "{method_name="+str(self.method_name)+";simulation_deltaT="+str(self.simulation_deltaT)+";sun_position="+str(self.sun_position)+";sun_radius="+str(self.sun_radius)+";earth_radius="+str(self.earth_radius)+";venus_radius="+str(self.venus_radius)+";spaceship_radius="+str(self.spaceship_radius)+"}"
+        return "{method_name="+str(self.method_name)+";simulation_deltaT="+str(self.simulation_deltaT)+";sun_position="+str(self.sun_position)+";sun_radius="+str(self.sun_radius)+";earth_radius="+str(self.earth_radius)+";venus_radius="+str(self.venus_radius)+";spaceship_radius="+str(self.spaceship_radius)+";origin_planet="+str(self.origin_planet)+";destiny_planet="+str(self.destiny_planet)+"}"
 
     def __repr__(self):
         return self.__str__()
@@ -103,12 +105,16 @@ def __read_static_input_file(static_input_file_path):
     venus_radius = float(line.split()[1].strip())
     line = file.readline()
     spaceship_radius = float(line.split()[1].strip())     
-    line = file.readline()    
+    line = file.readline()
+    origin_planet =  line.split()[1].lower().strip()
+    line = file.readline()
+    destiny_planet =  line.split()[1].lower().strip()
+    line = file.readline()      
 
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius)
+    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True

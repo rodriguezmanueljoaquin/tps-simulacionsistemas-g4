@@ -11,7 +11,7 @@ def read_results(input_files_directory_path):
     return simulations_results_dict
 
 if __name__ == "__main__":
-    input_files_directory_path ="../results"
+    input_files_directory_path ="../results/earth_to_venus"
     action = 'graph'
     argsValid = True
     try:
