@@ -1,8 +1,7 @@
 import argparse
-import math
 import exportOvito
 from files import read_input_files
-from graphs import plot_minimum_distance_by_start_simulation_date, plot_minimum_time_by_initial_velocity_module
+from graphs import plot_minimum_distance_by_start_simulation_date, plot_minimum_time_by_initial_velocity_module, plot_velocity_evolution
 
 
 def read_results(input_files_directory_path):
@@ -29,7 +28,7 @@ if __name__ == "__main__":
                 argsValid = False
         if(args.variable is not None):
             variable = args.variable.lower().strip()
-            if(variable != 'seconds_to_departure' and variable != 'initial_velocity_module'):
+            if(variable != 'seconds_to_departure' and variable != 'initial_velocity_module' and variable != 'velocity_evolution'):
                 argsValid = False
     except Exception as e:
         print("Error in command line arguments")
@@ -54,6 +53,8 @@ if __name__ == "__main__":
                 plot_minimum_distance_by_start_simulation_date(simulations_results)
             elif variable == 'initial_velocity_module':
                 plot_minimum_time_by_initial_velocity_module(simulations_results)
+            elif variable == 'velocity_evolution':
+                plot_velocity_evolution(simulations_results[0])
 
     else:
         print("Invalid command line arguments")

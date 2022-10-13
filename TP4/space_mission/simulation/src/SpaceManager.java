@@ -29,6 +29,10 @@ public class SpaceManager {
 
         double initialVelocityUmbral = 0.25;
 
+        // TESTING FOR BEST DEPARTURE DATE
+        simulationParameters.add(new SpaceParameters(300., 900.,
+                233*60*60*24. + 32215., 8., PlanetType.EARTH, PlanetType.VENUS));
+
         // TESTING FOR DIFFERENT DEPARTURE DATES
         double secondsInOneDay = 60*60*24;
         double bestDepartureDay = 233;
@@ -37,15 +41,13 @@ public class SpaceManager {
 //            simulationParameters.add(new SpaceParameters(300., 900., daySeconds, SpaceConstants.VELOCITY_LAUNCH,
 //                    PlanetType.EARTH, PlanetType.VENUS));
 
-//        simulationParameters.add(new SpaceParameters(300., 900.,
-//                233*60*60*24. + 32215., 8., PlanetType.EARTH, PlanetType.VENUS));
         // TESTING FOR DIFFERENT INITIAL VELOCITIES
-        for(double v0 = SpaceConstants.VELOCITY_LAUNCH - initialVelocityUmbral;
-            v0 < SpaceConstants.VELOCITY_LAUNCH + initialVelocityUmbral;
-            v0 += initialVelocityUmbral*2/simulationsQty){
-            simulationParameters.add(new SpaceParameters(300., 900.,
-                    bestDepartureDay*secondsInOneDay + bestDepartureTimeInBestDayInSeconds, v0, PlanetType.EARTH, PlanetType.VENUS));
-        }
+//        for(double v0 = SpaceConstants.VELOCITY_LAUNCH - initialVelocityUmbral;
+//            v0 < SpaceConstants.VELOCITY_LAUNCH + initialVelocityUmbral;
+//            v0 += initialVelocityUmbral*2/simulationsQty){
+//            simulationParameters.add(new SpaceParameters(300., 900.,
+//                    bestDepartureDay*secondsInOneDay + bestDepartureTimeInBestDayInSeconds, v0, PlanetType.EARTH, PlanetType.VENUS));
+//        }
 
         simulationParameters.forEach(parameters -> {
             try {

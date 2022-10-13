@@ -66,3 +66,29 @@ def plot_minimum_time_by_initial_velocity_module(simulation_results):
     curves = [x[1] for x in values]
     plot_curves_with_legend([inputs], [curves], None, "Modulo de la velocidad inicial (km/s)", f"Tiempo de viaje (s)")
 
+def plot_velocity_evolution(simulation_result):
+    velocities = []
+    times = []
+    index_of_departure = int(simulation_result.seconds_to_departure / \
+        (simulation_result.particles_by_frame[1].time - simulation_result.particles_by_frame[0].time))
+
+    # por si todavia no habia salido
+    while(len(simulation_result.particles_by_frame[index_of_departure].particles) < 3):
+        index_of_departure += 1
+
+    for frame in simulation_result.particles_by_frame[index_of_departure:]:
+        spaceship_data = frame.particles[PlanetType.SPACESHIP.value]
+        velocities.append(math.sqrt(spaceship_data.velx**2 + spaceship_data.vely**2))
+        times.append(frame.time - simulation_result.seconds_to_departure)
+
+    print("Velocidad cuando llega a un radio determinado de la superficie del planeta: ", velocities[-1], " km/s")
+    print("Tiempo total de viaje: ", times[-1], " s")
+
+    destiny_planet_on_last_frame = simulation_result.particles_by_frame[-1]\
+        .particles[planetType_dict[simulation_result.destiny_planet].value]
+    destiny_planet_on_last_frame_velocity = \
+        math.sqrt(destiny_planet_on_last_frame.velx**2 + destiny_planet_on_last_frame.vely**2)
+    print("Velocidad relativa de la nave al planeta destino cuando llega a un radio determinado de la superficie del destino",
+             simulation_result.destiny_planet, ": ", velocities[-1] - destiny_planet_on_last_frame_velocity, " km/s")
+
+    plot_curves_with_legend([times], [velocities], None, "Tiempo (s)", "Velocidad (km/s)")
