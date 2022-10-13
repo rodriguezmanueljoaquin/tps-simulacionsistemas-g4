@@ -13,17 +13,23 @@ def read_results(input_files_directory_path):
 if __name__ == "__main__":
     input_files_directory_path ="../results/earth_to_venus"
     action = 'graph'
+    variable = 'seconds_to_departure'
     argsValid = True
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('-d','--InputFilesDirectory',dest='inputFilesDirectory')
         parser.add_argument('-a','--Action',dest='action')
+        parser.add_argument('-v','--Variable',dest='variable')
         args = parser.parse_args()
         if(args.inputFilesDirectory is not None):
             input_files_directory_path = args.inputFilesDirectory
         if(args.action is not None):
             action = args.action.lower().strip()
             if(action != 'graph' and action != 'animate'):
+                argsValid = False
+        if(args.variable is not None):
+            variable = args.variable.lower().strip()
+            if(variable != 'seconds_to_departure' and variable != 'initial_velocity_module'):
                 argsValid = False
     except Exception as e:
         print("Error in command line arguments")
@@ -43,14 +49,12 @@ if __name__ == "__main__":
                     exportOvito.exportOvito(simulation_result)
 
         else:
-        # GRAFICACION:
-            plot_minimum_distance_by_start_simulation_date(simulations_results)
+        # GRAFICOS:
+            if variable == 'seconds_to_departure':
+                plot_minimum_distance_by_start_simulation_date(simulations_results)
+            elif variable == 'initial_velocity_module':
+                plot_minimum_time_by_initial_velocity_module(simulations_results)
 
-        # if(graph=='position'):
-        #     # plot_particle_evolution_by_simulation(list(simulations_results_dict.values()))
-        #     plot_particle_evolution_by_simulation(simulations_results_dict)
-        # else:
-        #     plot_error_graph(simulations_results_dict) 
     
     else:
         print("Invalid command line arguments")

@@ -4,13 +4,14 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet):
+    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, initial_velocity_module, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.simulation_deltaT = simulation_deltaT
         self.start_simulation_date = start_simulation_date
         self.start_simulation_time = start_simulation_time
         self.seconds_to_departure = seconds_to_departure
+        self.initial_velocity_module = initial_velocity_module
         self.sun_id = sun_id
         self.sun_position = (sun_x,sun_y)
         self.sun_radius = sun_radius
@@ -94,6 +95,8 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     seconds_to_departure = float(line.strip())
     line = file.readline()
+    initial_velocity_module = float(line.strip())
+    line = file.readline()
     sun_id = int(line.split()[0])
     sun_data = line.split()[1].split(";")
     sun_x = float(sun_data[0])
@@ -114,7 +117,7 @@ def __read_static_input_file(static_input_file_path):
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet)
+    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, initial_velocity_module, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True

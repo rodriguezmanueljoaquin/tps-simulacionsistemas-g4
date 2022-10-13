@@ -14,16 +14,32 @@ public class SpaceManager {
         String RESULTS_PATH = "space_mission/results/";
 
         new File(RESULTS_PATH).mkdir();
-
-        // TESTING
-        LocalDateTime departureDate = LocalDateTime.parse("2023-07-18T00:00:00");
-        int seconds = (int) ChronoUnit.SECONDS.between(SpaceConstants.START_SIMULATION_DATE, departureDate);
-
-
         ArrayList<SpaceParameters> simulationParameters = new ArrayList<>();
-        for(double i = 0; i < 60*60*24*1000 ; i += 60*60*24*10)
-            simulationParameters.add(new SpaceParameters(300., 900., i, PlanetType.EARTH, PlanetType.VENUS));
-//        simulationParameters.add(new SpaceParameters(300., 900., (double) 60*60*24*257));
+
+        // TESTING FOR SPECIFIC DATE
+        LocalDateTime departureDate = LocalDateTime.parse("2023-07-18T00:00:00");
+        double seconds = (int) ChronoUnit.SECONDS.between(SpaceConstants.START_SIMULATION_DATE, departureDate);
+//        simulationParameters.add(new SpaceParameters(300., 900., seconds));
+
+        //PARAMETERS
+        double simulationsQty = 300;
+
+        double lastDay = 1000;
+
+        double initialVelocityUmbral = 1.5;
+        double dateToDepartureInSeconds = 19872000.;
+
+        // TESTING FOR DIFFERENT DEPARTURE DATES
+//        double secondsInOneDay = 60*60*24;
+//        for(double i = 0; i < secondsInOneDay*lastDay ; i += Math.floor(secondsInOneDay*lastDay/simulationsQty))
+//            simulationParameters.add(new SpaceParameters(300., 900., i, SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.VENUS));
+
+        // TESTING FOR DIFFERENT INITIAL VELOCITIES
+        for(double v0 = SpaceConstants.VELOCITY_LAUNCH - initialVelocityUmbral;
+            v0 < SpaceConstants.VELOCITY_LAUNCH + initialVelocityUmbral ;
+            v0 += initialVelocityUmbral*2/simulationsQty){
+            simulationParameters.add(new SpaceParameters(300., 900., dateToDepartureInSeconds, v0, PlanetType.EARTH, PlanetType.VENUS));
+        }
 
         simulationParameters.forEach(parameters -> {
             try {
@@ -32,11 +48,12 @@ public class SpaceManager {
                 if(!Files.exists(Paths.get(resultsFolderPath))){
                     new File(resultsFolderPath).mkdir();
                 }
-                String path = String.format(Locale.ENGLISH, "out_%.0f_%.0f", parameters.secondsToDeparture, parameters.simulationDeltaT);
-                SpaceSimulation simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.secondsToDeparture, parameters.origin, parameters.destiny);
+                String path = String.format(Locale.ENGLISH, "out_%.0f_%.0f_%.3f", parameters.secondsToDeparture, parameters.simulationDeltaT, parameters.initialVelocityModule, parameters.secondsToDeparture, parameters.simulationDeltaT);
+                SpaceSimulation simulation = new SpaceSimulation(parameters.simulationDeltaT,parameters.outputDeltaT,parameters.secondsToDeparture, parameters.initialVelocityModule, parameters.origin, parameters.destiny);
                 new File(resultsFolderPath + path).mkdir();
                 SpaceSimulation.createStaticFile(path, IntegrationAlgorithmImp.Type.BEEMAN.toString(),
-                        resultsFolderPath, parameters.simulationDeltaT, parameters.secondsToDeparture,parameters.origin,parameters.destiny);
+                        resultsFolderPath, parameters.simulationDeltaT, parameters.secondsToDeparture,
+                        parameters.initialVelocityModule, parameters.origin, parameters.destiny);
 
                 String dynamicsPath = path + "/dynamics";
                 new File(resultsFolderPath + dynamicsPath).mkdir();
@@ -54,13 +71,15 @@ public class SpaceManager {
         public double secondsToDeparture;
         public PlanetType origin;
         public PlanetType destiny;
+        public double initialVelocityModule;
 
-        public SpaceParameters(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture, PlanetType origin, PlanetType destiny) {
+        public SpaceParameters(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture, Double initialVelocityModule, PlanetType origin, PlanetType destiny) {
             this.simulationDeltaT = simulationDeltaT;
             this.outputDeltaT = outputDeltaT;
             this.secondsToDeparture = secondsToDeparture;
             this.origin = origin;
             this.destiny = destiny;
+            this.initialVelocityModule = initialVelocityModule;
         }
     }
 }

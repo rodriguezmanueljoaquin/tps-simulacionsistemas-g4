@@ -9,6 +9,7 @@ public class SpaceSimulation {
     private double outputDeltaT;
     private double currentSimulationTime;
     private double secondsToDeparture;
+    private double initialVelocityModule;
     private Particle originPlanet;
     private Particle destinyPlanet;
     private Particle spaceship;
@@ -16,11 +17,12 @@ public class SpaceSimulation {
     private static Particle sun;
     private Map<PlanetType ,Particle> objects = new HashMap<>();
 
-    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture, PlanetType origin, PlanetType destiny) {
+    public SpaceSimulation(Double simulationDeltaT, Double outputDeltaT, Double secondsToDeparture, double initialVelocityModule, PlanetType origin, PlanetType destiny) {
         this.simulationDeltaT = simulationDeltaT;
         this.outputDeltaT = outputDeltaT;
         this.currentSimulationTime = 0.;
         this.secondsToDeparture = secondsToDeparture;
+        this.initialVelocityModule = initialVelocityModule;
 
         this.sun = new Particle(
                 0,
@@ -103,14 +105,13 @@ public class SpaceSimulation {
         double spaceshipX = originPlanet.getX() - distanceSpaceshipToOrigin * rx;
         double spaceshipY = originPlanet.getY() - distanceSpaceshipToOrigin * ry;
 
-        double tangencialVelocity = SpaceConstants.VELOCITY_SPACIAL_STATION + SpaceConstants.VELOCITY_LAUNCH
+        double tangentialVelocity = SpaceConstants.VELOCITY_SPACIAL_STATION + -1* this.initialVelocityModule
                 + originPlanet.getxVelocity() * tx + originPlanet.getyVelocity() * ty;
-        double spaceshipVX = tangencialVelocity * tx;
-        double spaceshipVY = tangencialVelocity * ty;
+        double spaceshipVX = tangentialVelocity * tx;
+        double spaceshipVY = tangentialVelocity * ty;
 
-        spaceship = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, 0.01, 2 * Math.pow(10, 5));
-        objects.put(PlanetType.SPACESHIP, spaceship);
-
+        Particle p = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, SpaceConstants.SPACESHIP_RADIUS, 2 * Math.pow(10, 5));
+        objects.put(PlanetType.SPACESHIP, p);
     }
 
     private boolean continueIteration(Double timeSinceDeparture){
@@ -189,16 +190,16 @@ public class SpaceSimulation {
         currentSimulationTime = iterationTime;
     }
 
-    public static void createStaticFile(String outputName, String algorithmName, String outputPath, double simulationDeltaT, double departureTime, PlanetType origin, PlanetType destiny) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputName, String algorithmName, String outputPath, double simulationDeltaT, double departureTime, double initialVelocityModule, PlanetType origin, PlanetType destiny) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + outputName + "/static.txt", "UTF-8");
-        writer.write(String.format(Locale.ENGLISH, "%s\n%f\n%s\n%f\n", algorithmName, simulationDeltaT,
-                SpaceConstants.START_SIMULATION_DATE.toString(), departureTime));
+        writer.write(String.format(Locale.ENGLISH, "%s\n%f\n%s\n%f\n%f\n", algorithmName, simulationDeltaT,
+                SpaceConstants.START_SIMULATION_DATE.toString(), departureTime, initialVelocityModule));
         writer.write(PlanetType.SUN.ordinal() + " "  + sun.getX()  + ";" + sun.getY() + ";" + sun.getRadius() +  "\n");
         writer.write(PlanetType.EARTH.ordinal() + " " + SpaceConstants.EARTH_RADIUS +  "\n");
         writer.write(PlanetType.VENUS.ordinal() + " " + SpaceConstants.VENUS_RADIUS + "\n");
-        writer.write(PlanetType.SPACESHIP.ordinal() + " " + 1 +  "\n"); //TODO RADIO SPACESHIP?
+        writer.write(PlanetType.SPACESHIP.ordinal() + " " + SpaceConstants.SPACESHIP_RADIUS +  "\n");
         writer.write("origin" + " " + origin.getPlanetName() + "\n");
         writer.write("destiny" + " " + destiny.getPlanetName() + "\n");
         writer.close();

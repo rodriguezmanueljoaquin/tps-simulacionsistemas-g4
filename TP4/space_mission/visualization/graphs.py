@@ -10,8 +10,10 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
     # iters = range(1, len(curves[0]) + 1)
     colors = sns.color_palette("hls", len(curves)) 
     for i in range(len(curves)):
-        label = legends[i] if legends is not None else ''
-        plt.plot(inputs[i], curves[i], label=label, color=colors[i])
+        if legends is not None:
+            plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i])
+        else:
+            plt.plot(inputs[i], curves[i], color=colors[i])
 
     if legends is not None:
         plt.legend()
@@ -48,3 +50,6 @@ def plot_minimum_distance_by_start_simulation_date(simulation_results):
     inputs = [x[0]/(60*60*24) for x in values]
     curves = [x[1] for x in values]
     plot_curves_with_legend([inputs], [curves], None, "Days to departure", f"Minimum distance between spaceship and {simulation_result.destiny_planet}")
+
+def plot_minimum_time_by_initial_velocity_module(simulation_results):
+    pass
