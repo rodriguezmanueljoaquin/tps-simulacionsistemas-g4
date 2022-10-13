@@ -2,7 +2,9 @@ import seaborn as sns
 import pandas as pd
 import collections
 import matplotlib.pyplot as plt
+import matplotlib.dates as md
 import math
+import datetime
 
 from Constants import PlanetIndexInDynamic,planet_index_dict
 
@@ -22,6 +24,10 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
     if(log_scale):
         plt.yscale("log")
         plt.xscale("log")
+    ax=plt.gca()
+    # xfmt = md.DateFormatter('%H:%M:%S')
+    xfmt = md.DateFormatter('%d/%m/%Y')
+    ax.xaxis.set_major_formatter(xfmt)
     plt.show()
 
 def get_min_distance_between_two_planets(simulation_result, planet1:PlanetIndexInDynamic, planet2:PlanetIndexInDynamic):
@@ -42,9 +48,20 @@ def get_min_distance_between_two_planets(simulation_result, planet1:PlanetIndexI
 
     return min(distances)
 
+
+def __get_departure_date(start_simulation_date,days_from_simulation_start_date):
+    simulation_start_date = datetime.datetime.strptime(start_simulation_date,"%Y-%m-%d")
+    # print(simulation_start_date)
+    # return (simulation_start_date + datetime.timedelta(days=days_from_simulation_start_date)).strftime("%d/%m/%Y, %H:%M")
+    return (simulation_start_date + datetime.timedelta(days=days_from_simulation_start_date))
+
+
+
 def plot_minimum_distance_by_start_simulation_date(simulation_results):
     values = []
 
+    start_simulation_date = simulation_results[0].start_simulation_date
+    
     for simulation_result in simulation_results:
         values.append([
             simulation_result.seconds_to_departure,
@@ -52,7 +69,7 @@ def plot_minimum_distance_by_start_simulation_date(simulation_results):
         ])
 
     values.sort(key=lambda x: x[0])
-    inputs = [x[0]/(60*60*24) for x in values]
+    inputs = [__get_departure_date(start_simulation_date,x[0]/(60*60*24)) for x in values]
     curves = [x[1] for x in values]
     # TODO: DEBERIA DECIR LAS FECHAS EXACTAS Y EN EL LABEL ACORDARSE DE LAS UNIDADES
     plot_curves_with_legend([inputs], [curves], None, "Dias hasta despegue (días)", f"Distancia mínima entre la nave y {simulation_result.destiny_planet} (km)")
