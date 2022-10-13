@@ -145,7 +145,7 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
             #Nave
             line = file.readline()
             if(line!='\n'):
-                spaceship = __get_space_particle(line, simulation_result.spaceship_radius*3000)
+                spaceship = __get_space_particle(line, simulation_result.spaceship_radius)
                 particles_frame.particles.append(spaceship)
 
             simulation_result.particles_by_frame.append(particles_frame)

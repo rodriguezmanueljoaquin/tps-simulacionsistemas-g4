@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import os
+from Constants import PlanetIndexInDynamic
 import math
 ovitoFolderName = "ovito_input"
 
@@ -25,6 +26,11 @@ def exportParticles(particles_by_frame,simulation_deltaT,seconds_to_departure, s
         file.write("{}\ncomment\n".format(n + 1))
         file.write("{} {} {} {} {} {}\n".format(sun_id,sun_x, sun_y, 0, 0, sun_radius/30))
         for particle in particle_frame.particles:
-            file.write("{} {} {} {} {} {}\n".format(particle.id, particle.x, particle.y, particle.velx, particle.vely, particle.radius))
+            radius = particle.radius
+            if particle.id == PlanetIndexInDynamic.SPACESHIP.value +1:
+                radius *= 100000
+
+            file.write("{} {} {} {} {} {}\n".format(particle.id, particle.x, particle.y, particle.velx, particle.vely, radius))
+    
     file.close()
 

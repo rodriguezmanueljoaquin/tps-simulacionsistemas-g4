@@ -43,6 +43,8 @@ if __name__ == "__main__":
         ##Luego, realizamos la accion correspondiente
         if(action=='animate'):
         # ANIMACION:
+            exportOvito.exportOvito(simulations_results[0])
+
             for simulation_result in simulations_results:
                 if simulation_result.seconds_to_departure == 60*60*24*10*23:
                     exportOvito.exportOvito(simulation_result)
@@ -55,7 +57,7 @@ if __name__ == "__main__":
                 plot_minimum_time_by_initial_velocity_module(simulations_results)
             elif variable == 'velocity_evolution':
                 for simulation_result in simulations_results:
-                    if simulation_result.seconds_to_departure == 233*60*60*24 + 32215:
+                    if simulation_result.seconds_to_departure == 2.01654E7:
                         plot_velocity_evolution(simulation_result)
 
     else:

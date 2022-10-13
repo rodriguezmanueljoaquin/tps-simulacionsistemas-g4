@@ -133,7 +133,8 @@ public class SpaceSimulation {
 
     private boolean hasArrived() {
         boolean answer = spaceship.calculateDistanceTo(destinyPlanet) <= SpaceConstants.ARRIVAL_UMBRAL;
-        if (answer) System.out.println("EMBRACE FOR ARRIVAL!");
+        if (answer)
+            System.out.println("EMBRACE FOR ARRIVAL! "+ secondsToDeparture);
         return answer;
     }
 
@@ -219,10 +220,11 @@ public class SpaceSimulation {
         if (this.secondsToDeparture == 0) {
             launchSpaceship();
         }
-        double i = 0;
+        double currentOutputTime = 0;
 
-        for (; i <= SpaceConstants.MAX_TRIP_TIME + this.secondsToDeparture && continueIteration(Math.max(i - this.secondsToDeparture, 0)); i += this.outputDeltaT) {
-            writer.write(this.currentSimulationTime + "\n" + PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
+        for (; currentOutputTime <= SpaceConstants.MAX_TRIP_TIME + this.secondsToDeparture && continueIteration(Math.max(currentOutputTime - this.secondsToDeparture, 0)); currentOutputTime += this.outputDeltaT) {
+            writer.write(this.currentSimulationTime + "\n");
+            writer.write(PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
             writer.write(PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX() + ";" + objects.get(PlanetType.VENUS).getY() + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity() + "\n");
             if (spaceship != null) {
                 writer.write(PlanetType.SPACESHIP.ordinal() + " " + spaceship.getX() + ";" + spaceship.getY() + ";" + spaceship.getxVelocity() + ";" + spaceship.getyVelocity() + "\n");
@@ -231,7 +233,8 @@ public class SpaceSimulation {
             }
             nextIteration();
         }
-        writer.write(this.currentSimulationTime + "\n" + PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
+        writer.write(this.currentSimulationTime + "\n");
+        writer.write(PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
         writer.write(PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX() + ";" + objects.get(PlanetType.VENUS).getY() + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity() + "\n");
         writer.write(PlanetType.SPACESHIP.ordinal() + " " + spaceship.getX() + ";" + spaceship.getY() + ";" + spaceship.getxVelocity() + ";" + spaceship.getyVelocity() + "\n");
         writer.close();
