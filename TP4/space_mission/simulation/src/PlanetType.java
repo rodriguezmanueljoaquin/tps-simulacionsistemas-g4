@@ -2,6 +2,7 @@ public enum PlanetType {
     SUN("sun"),
     EARTH("earth"),
     VENUS("venus"),
+    MARS("mars"),
     SPACESHIP("spaceship");
 
     private String planetName;

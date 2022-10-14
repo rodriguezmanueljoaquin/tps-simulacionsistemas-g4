@@ -39,7 +39,7 @@ def get_min_distance_between_two_planets(simulation_result, planet1:PlanetIndexI
         (simulation_result.particles_by_frame[1].time - simulation_result.particles_by_frame[0].time))
 
         # por si todavia no habia salido
-    while(len(simulation_result.particles_by_frame[index_of_departure].particles) < 3):
+    while(len(simulation_result.particles_by_frame[index_of_departure].particles) < len(planet_index_dict)-1): #sun is not in the frame particles
         index_of_departure += 1
 
     for frame in simulation_result.particles_by_frame[index_of_departure: ]:

@@ -39,9 +39,9 @@ public class SpaceManager {
 //                    SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.VENUS));
 
         // TESTING FOR DIFFERENT RETURNING DATES
-        for(double dayInSeconds = 0; dayInSeconds < lastDay*secondsInOneDay; dayInSeconds += secondsInOneDay*4)
+        for(double dayInSeconds = secondsInOneDay*700; dayInSeconds < lastDay*secondsInOneDay; dayInSeconds += secondsInOneDay*4)
             simulationParameters.add(new SpaceParameters(300., 900., dayInSeconds,
-                    SpaceConstants.VELOCITY_LAUNCH, PlanetType.VENUS, PlanetType.EARTH));
+                    SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.MARS));
 
 //        double daysOfTrip = 65;
 //        for(double dayInSeconds = (bestDepartureDay+ daysOfTrip +365 +180)*secondsInOneDay;

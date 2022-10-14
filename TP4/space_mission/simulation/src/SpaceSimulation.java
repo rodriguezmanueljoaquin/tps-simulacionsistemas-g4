@@ -32,17 +32,28 @@ public class SpaceSimulation {
                 SpaceConstants.SUN_RADIUS,
                 SpaceConstants.SUN_MASS);
 
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i < PlanetType.values().length -1; i++) { // menos spaceship
             PlanetType planetType = PlanetType.values()[i];
             Pair<Double, Double> position = HorizonResultsReader.getPosition("space_mission/datasets/horizons_results_" + planetType.getPlanetName() + ".txt");
             Pair<Double, Double> velocity = HorizonResultsReader.getVelocity("space_mission/datasets/horizons_results_" + planetType.getPlanetName() + ".txt");
+            double radius, mass;
+            if(planetType.getPlanetName().equals("earth")){
+                radius = SpaceConstants.EARTH_RADIUS;
+                mass = SpaceConstants.EARTH_MASS;
+            }else if(planetType.getPlanetName().equals("venus")){
+                radius = SpaceConstants.VENUS_RADIUS;
+                mass = SpaceConstants.VENUS_MASS;
+            }else{
+                radius = SpaceConstants.MARS_RADIUS;
+                mass = SpaceConstants.MARS_RADIUS;
+            }
             Particle p = new Particle(
                     position.getLeft(),
                     position.getRight(),
                     velocity.getLeft(),
                     velocity.getRight(),
-                    planetType.getPlanetName().equals("earth") ? SpaceConstants.EARTH_RADIUS : SpaceConstants.VENUS_RADIUS,
-                    planetType.getPlanetName().equals("earth") ? SpaceConstants.EARTH_MASS : SpaceConstants.VENUS_MASS);
+                    radius,
+                    mass);
 
             objects.put(planetType, p);
         }
@@ -105,7 +116,7 @@ public class SpaceSimulation {
         double spaceshipX = originPlanet.getX() - distanceSpaceshipToOrigin * rx;
         double spaceshipY = originPlanet.getY() - distanceSpaceshipToOrigin * ry;
 
-        double tangentialVelocity = SpaceConstants.VELOCITY_SPACIAL_STATION + -1 * this.initialVelocityModule
+        double tangentialVelocity = SpaceConstants.VELOCITY_SPACIAL_STATION - 1 * this.initialVelocityModule
                 + originPlanet.getxVelocity() * tx + originPlanet.getyVelocity() * ty;
         double spaceshipVX = tangentialVelocity * tx;
         double spaceshipVY = tangentialVelocity * ty;
@@ -233,6 +244,7 @@ public class SpaceSimulation {
         writer.write(PlanetType.SUN.ordinal() + " " + sun.getX() + ";" + sun.getY() + ";" + sun.getRadius() + "\n");
         writer.write(PlanetType.EARTH.ordinal() + " " + SpaceConstants.EARTH_RADIUS + "\n");
         writer.write(PlanetType.VENUS.ordinal() + " " + SpaceConstants.VENUS_RADIUS + "\n");
+        writer.write(PlanetType.MARS.ordinal() + " " + SpaceConstants.MARS_RADIUS + "\n");
         writer.write(PlanetType.SPACESHIP.ordinal() + " " + SpaceConstants.SPACESHIP_RADIUS + "\n");
         writer.write("origin" + " " + origin.getPlanetName() + "\n");
         writer.write("destiny" + " " + destiny.getPlanetName() + "\n");
@@ -255,6 +267,7 @@ public class SpaceSimulation {
             writer.write(this.currentSimulationTime + "\n");
             writer.write(PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
             writer.write(PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX() + ";" + objects.get(PlanetType.VENUS).getY() + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity() + "\n");
+            writer.write(PlanetType.MARS.ordinal() + " " + objects.get(PlanetType.MARS).getX() + ";" + objects.get(PlanetType.MARS).getY() + ";" + objects.get(PlanetType.MARS).getxVelocity() + ";" + objects.get(PlanetType.MARS).getyVelocity() + "\n");
             if (spaceship != null) {
                 writer.write(PlanetType.SPACESHIP.ordinal() + " " + spaceship.getX() + ";" + spaceship.getY() + ";" + spaceship.getxVelocity() + ";" + spaceship.getyVelocity() + "\n");
             } else {
@@ -265,6 +278,7 @@ public class SpaceSimulation {
         writer.write(this.currentSimulationTime + "\n");
         writer.write(PlanetType.EARTH.ordinal() + " " + objects.get(PlanetType.EARTH).getX() + ";" + objects.get(PlanetType.EARTH).getY() + ";" + objects.get(PlanetType.EARTH).getxVelocity() + ";" + objects.get(PlanetType.EARTH).getyVelocity() + "\n");
         writer.write(PlanetType.VENUS.ordinal() + " " + objects.get(PlanetType.VENUS).getX() + ";" + objects.get(PlanetType.VENUS).getY() + ";" + objects.get(PlanetType.VENUS).getxVelocity() + ";" + objects.get(PlanetType.VENUS).getyVelocity() + "\n");
+        writer.write(PlanetType.MARS.ordinal() + " " + objects.get(PlanetType.MARS).getX() + ";" + objects.get(PlanetType.MARS).getY() + ";" + objects.get(PlanetType.MARS).getxVelocity() + ";" + objects.get(PlanetType.MARS).getyVelocity() + "\n");
         writer.write(PlanetType.SPACESHIP.ordinal() + " " + spaceship.getX() + ";" + spaceship.getY() + ";" + spaceship.getxVelocity() + ";" + spaceship.getyVelocity() + "\n");
         writer.close();
 

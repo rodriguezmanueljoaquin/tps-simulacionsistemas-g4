@@ -4,7 +4,7 @@ import copy
 
 
 class SimulationResult:
-    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, initial_velocity_module, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet):
+    def __init__(self, method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, initial_velocity_module, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, mars_radius, spaceship_radius, origin_planet, destiny_planet):
         self.particles_by_frame = list()
         self.method_name = method_name
         self.simulation_deltaT = simulation_deltaT
@@ -17,6 +17,7 @@ class SimulationResult:
         self.sun_radius = sun_radius
         self.earth_radius = earth_radius
         self.venus_radius = venus_radius
+        self.mars_radius = mars_radius
         self.spaceship_radius = spaceship_radius
         self.origin_planet = origin_planet
         self.destiny_planet = destiny_planet
@@ -107,6 +108,8 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     venus_radius = float(line.split()[1].strip())
     line = file.readline()
+    mars_radius = float(line.split()[1].strip())
+    line = file.readline()
     spaceship_radius = float(line.split()[1].strip())     
     line = file.readline()
     origin_planet =  line.split()[1].lower().strip()
@@ -117,7 +120,7 @@ def __read_static_input_file(static_input_file_path):
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, initial_velocity_module, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, spaceship_radius, origin_planet, destiny_planet)
+    return SimulationResult(method_name, simulation_deltaT, start_simulation_date, start_simulation_time, seconds_to_departure, initial_velocity_module, sun_id, sun_x, sun_y, sun_radius, earth_radius, venus_radius, mars_radius, spaceship_radius, origin_planet, destiny_planet)
 
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True
@@ -142,6 +145,10 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
             line = file.readline()
             venus = __get_space_particle(line, simulation_result.venus_radius)
             particles_frame.particles.append(venus)
+            #mARTE
+            line = file.readline()
+            mars = __get_space_particle(line, simulation_result.mars_radius)
+            particles_frame.particles.append(mars)
             #Nave
             line = file.readline()
             if(line!='\n'):
