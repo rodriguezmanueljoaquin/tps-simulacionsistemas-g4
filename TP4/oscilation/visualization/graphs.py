@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 import math
 from oscillator_helper import get_cuadratic_error,get_analytic
 
-DELTA_T_POSITION_GRAPH = math.pow(10,-4) 
+DELTA_T_POSITION_GRAPH = math.pow(10,-6) 
 
 def plot_curves_with_legend(inputs,curves, legends, X_label = "X", Y_label = "Y", log_scale = False):
-    # iters = range(1, len(curves[0]) + 1)
     colors = sns.color_palette("hls", len(legends))
     for i in range(len(curves)):
         plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i])
@@ -48,15 +47,15 @@ def plot_particle_evolution_by_simulation(simulation_results_dict):
 
         inputs.append(time_evolution)
         curves.append(position_evolution)
-        legends.append(simulation_result.method_name + " deltaT= " + str(simulation_result.simulation_deltaT) + " error= "+ str(get_cuadratic_error(simulation_result)))
+        legends.append(simulation_result.method_name + " error= "+ str(get_cuadratic_error(simulation_result)))
 
     #Finalmente, agregamos la data de la solucion analitica
     inputs.append(inputs[-1])
     curves.append([get_analytic(time,simulation_result.A,simulation_result.K,simulation_result.gamma,simulation_result.mass) for time in inputs[-1]])
     # print(curves[-1])
-    legends.append("Analytic")
+    legends.append("Analítica")
 
-    plot_curves_with_legend(inputs,curves, legends, "Time(s)", "Position(m)")
+    plot_curves_with_legend(inputs,curves, legends, "Tiempo [s]", "Posición [m]")
 
 def plot_error_graph(simulation_results_dict):
     #Primero, creamos el nuevo diccionario a utilizar ( {algoritmo: {deltaT : error}})
@@ -65,6 +64,7 @@ def plot_error_graph(simulation_results_dict):
         deltaT = key[0]
         method_name = key[1]
         simulation_result = value[0]
+        print(simulation_result)
         #Si el algoritmo no esta en el diccionario, creemos su diccionario correspondiente con el deltaT utilizado y su error
         if method_name not in error_dictionary:
             error_dictionary[method_name] = {deltaT : get_cuadratic_error(simulation_result)}
@@ -75,18 +75,17 @@ def plot_error_graph(simulation_results_dict):
     inputs = []
     curves = []
     legends = []
+    print(error_dictionary)
     for method in error_dictionary:
         #Obtenemos el diccionario {deltaT: error} para cada algoritmo, ordenado por los deltaT
         deltaT_error_dictionary = collections.OrderedDict(sorted(error_dictionary[method].items()))
+        print(deltaT_error_dictionary)
         #Agregamos los deltaT, errores y leyendas correspondientes
         inputs.append(list(deltaT_error_dictionary.keys()))
         curves.append(list(deltaT_error_dictionary.values()))
         legends.append(method)
     #Finalmente, graficamos los errores correspondientes
-    # print(inputs)
-    # print(curves)
-    # print(legends)
-    plot_curves_with_legend(inputs,curves, legends, "deltaT (s)", "Cuadratic error (m**2)",log_scale=True)
+    plot_curves_with_legend(inputs,curves, legends, "deltaT [s]", "Error cuadrático medio [m**2]",log_scale=True)
 
         
 

@@ -110,8 +110,36 @@ public class SpaceSimulation {
         double spaceshipVX = tangentialVelocity * tx;
         double spaceshipVY = tangentialVelocity * ty;
 
-        spaceship = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, SpaceConstants.SPACESHIP_RADIUS, 2 * Math.pow(10, 5));
+        spaceship = new Particle(spaceshipX, spaceshipY, spaceshipVX, spaceshipVY, SpaceConstants.SPACESHIP_RADIUS, SpaceConstants.SPACESHIP_MASS);
+
         objects.put(PlanetType.SPACESHIP, spaceship);
+
+        //Calculamos la aceleracion de la nave
+        List<Particle> planetsWithSun = getPlanetsWithSun(new ArrayList<>(objects.values()));
+        List<Particle> otherParticles = planetsWithSun.stream().filter(p -> !p.equals(spaceship)).collect(Collectors.toList());
+        spaceship.setXAcceleration(SpaceMissionHelper.totalForceX(spaceship, otherParticles) / spaceship.getMass());
+        spaceship.setYAcceleration(SpaceMissionHelper.totalForceY(spaceship, otherParticles) / spaceship.getMass());
+
+        //Calculamos la aceleracion previa de la nave
+        Map<PlanetType, Particle> previousObjects = new HashMap<>();
+        //Por cada particula, calculamos su aceleracion (en x y en y), y sus posiciones y velocidades previas con Euler
+        for (PlanetType planetType : objects.keySet()) {
+            Particle currentParticle = objects.get(planetType);
+            List<Particle> otherPlanets = planetsWithSun.stream().filter(p -> !p.equals(currentParticle)).collect(Collectors.toList());
+            currentParticle.setXAcceleration(SpaceMissionHelper.totalForceX(currentParticle, otherPlanets) / currentParticle.getMass());
+            currentParticle.setYAcceleration(SpaceMissionHelper.totalForceY(currentParticle, otherPlanets) / currentParticle.getMass());
+            double prevXPosition = SpaceMissionHelper.getEulerPosition(currentParticle.getX(), currentParticle.getxVelocity(), currentParticle.getXAcceleration(), -simulationDeltaT, false);
+            double prevYPosition = SpaceMissionHelper.getEulerPosition(currentParticle.getY(), currentParticle.getyVelocity(), currentParticle.getYAcceleration(), -simulationDeltaT, false);
+            double prevXVelocity = SpaceMissionHelper.getEulerVelocity(currentParticle.getxVelocity(), currentParticle.getXAcceleration(), -simulationDeltaT);
+            double prevYVelocity = SpaceMissionHelper.getEulerVelocity(currentParticle.getyVelocity(), currentParticle.getYAcceleration(), -simulationDeltaT);
+            previousObjects.put(planetType, new Particle(prevXPosition, prevYPosition, prevXVelocity, prevYVelocity, currentParticle.getRadius(), currentParticle.getMass()));
+        }
+
+        planetsWithSun = getPlanetsWithSun(new ArrayList<>(previousObjects.values()));
+        Particle previousSpaceship = previousObjects.get(PlanetType.SPACESHIP);
+        List<Particle> otherPreviousParticles = planetsWithSun.stream().filter(p -> !p.equals(previousSpaceship)).collect(Collectors.toList());
+        spaceship.setXPrevAcceleration(SpaceMissionHelper.totalForceX(previousSpaceship, otherPreviousParticles) / previousSpaceship.getMass());
+        spaceship.setYPrevAcceleration(SpaceMissionHelper.totalForceY(previousSpaceship, otherPreviousParticles) / previousSpaceship.getMass());
     }
 
     private boolean continueIteration(Double timeSinceDeparture) {

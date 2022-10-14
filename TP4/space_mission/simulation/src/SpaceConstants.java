@@ -7,9 +7,10 @@ public class SpaceConstants {
     public static final double SUN_MASS = 1988500*Math.pow(10,24);
     public static final double EARTH_MASS = 5.97219*Math.pow(10,24);
     public static final double VENUS_MASS = 48.685 * Math.pow(10,23);
+    public static final double SPACESHIP_MASS = 2 * Math.pow(10, 5);
     public static final double SUN_RADIUS = 695700;
     public static final double EARTH_RADIUS = 6371.01;
-        public static final double VENUS_RADIUS = 6051.84;
+    public static final double VENUS_RADIUS = 6051.84;
     public static final double SPACESHIP_RADIUS = 0.01;
     public static final double VELOCITY_LAUNCH = 8; // absolute value
     public static final double DISTANCE_SPACE_STATION_TO_ORIGIN = 1500;
