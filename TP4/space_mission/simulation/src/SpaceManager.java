@@ -24,29 +24,36 @@ public class SpaceManager {
         double initialVelocityUmbral = 0.25;
 
         // TESTING FOR BEST DEPARTURE DATE
-        double hitDestinyDepartureSeconds = 2.01654E7;
+        double hitDestinyDepartureSeconds = 1.96308E7;
         //2.01663E7
-/*        simulationParameters.add(new SpaceParameters(300., 900.,
-                hitDestinyDepartureSeconds, 8., PlanetType.EARTH, PlanetType.VENUS));*/
+//        simulationParameters.add(new SpaceParameters(300., 900.,
+//                hitDestinyDepartureSeconds, 8., PlanetType.EARTH, PlanetType.VENUS));
 
         // TESTING FOR DIFFERENT DEPARTURE DATES
         double secondsInOneDay = 60*60*24;
-        double bestDepartureDay = 0;
+        double bestDepartureDay = 228;
         double bestDepartureTimeInBestDayInSeconds = 32215.;
-        //dt=15 minutes
-        for(double daySeconds = bestDepartureDay*secondsInOneDay; daySeconds < secondsInOneDay*lastDay; daySeconds += secondsInOneDay*10)
-            simulationParameters.add(new SpaceParameters(300., 900., daySeconds, SpaceConstants.VELOCITY_LAUNCH,
-                    PlanetType.EARTH, PlanetType.VENUS));
-//        simulationParameters.add(new SpaceParameters(300., 900., 0., SpaceConstants.VELOCITY_LAUNCH,
-//                    PlanetType.EARTH, PlanetType.VENUS));
 
-//        // TESTING FOR DIFFERENT DEPARTURE DATES - TRIP VENUS TO EARTH
-//        double secondsToVenusArrival = 5383500.0;
-//        double daysToVenusArrival = secondsToVenusArrival * secondsInOneDay;
-//        lastDay = 1000;
-//        for(double daySeconds = daysToVenusArrival; daySeconds < daysToVenusArrival + secondsInOneDay*lastDay; daySeconds += secondsInOneDay*10)
+//        for(double dayInSeconds = 0; dayInSeconds < lastDay*secondsInOneDay; dayInSeconds += secondsInOneDay*4)
+//            simulationParameters.add(new SpaceParameters(300., 900., dayInSeconds,
+//                    SpaceConstants.VELOCITY_LAUNCH, PlanetType.EARTH, PlanetType.VENUS));
+
+        // TESTING FOR DIFFERENT RETURNING DATES
+        for(double dayInSeconds = 0; dayInSeconds < lastDay*secondsInOneDay; dayInSeconds += secondsInOneDay*4)
+            simulationParameters.add(new SpaceParameters(300., 900., dayInSeconds,
+                    SpaceConstants.VELOCITY_LAUNCH, PlanetType.VENUS, PlanetType.EARTH));
+
+//        double daysOfTrip = 65;
+//        for(double dayInSeconds = (bestDepartureDay+ daysOfTrip +365 +180)*secondsInOneDay;
+//            dayInSeconds < (bestDepartureDay + lastDay)*secondsInOneDay;
+//            dayInSeconds += secondsInOneDay*1)
+//            simulationParameters.add(new SpaceParameters(300., 900., dayInSeconds,
+//                    SpaceConstants.VELOCITY_LAUNCH, PlanetType.VENUS, PlanetType.EARTH));
+
+            //dt=15 minutes in 4 days which is the phase of the one before
+//        for(double daySeconds = (bestDepartureDay-2)*secondsInOneDay; daySeconds < secondsInOneDay*(bestDepartureDay+2); daySeconds += secondsInOneDay/48)
 //            simulationParameters.add(new SpaceParameters(300., 900., daySeconds, SpaceConstants.VELOCITY_LAUNCH,
-//                    PlanetType.VENUS, PlanetType.EARTH));
+//                    PlanetType.EARTH, PlanetType.VENUS));
 
         // TESTING FOR DIFFERENT INITIAL VELOCITIES
 //        for(double v0 = SpaceConstants.VELOCITY_LAUNCH - initialVelocityUmbral;

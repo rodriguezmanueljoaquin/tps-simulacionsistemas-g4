@@ -24,8 +24,10 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
     if(log_scale):
         plt.yscale("log")
         plt.xscale("log")
+
+    # WHEN SHOWING DATES:
     ax=plt.gca()
-    # xfmt = md.DateFormatter('%H:%M:%S')
+    # xfmt = md.DateFormatter("%d/%m/%YT%H")
     xfmt = md.DateFormatter('%d/%m/%Y')
     ax.xaxis.set_major_formatter(xfmt)
     plt.show()
@@ -71,8 +73,7 @@ def plot_minimum_distance_by_start_simulation_date(simulation_results):
     values.sort(key=lambda x: x[0])
     inputs = [__get_departure_date(start_simulation_date,x[0]/(60*60*24)) for x in values]
     curves = [x[1] for x in values]
-    # TODO: DEBERIA DECIR LAS FECHAS EXACTAS Y EN EL LABEL ACORDARSE DE LAS UNIDADES
-    plot_curves_with_legend([inputs], [curves], None, "Dias hasta despegue (días)", f"Distancia mínima entre la nave y {simulation_result.destiny_planet} (km)")
+    plot_curves_with_legend([inputs], [curves], None, "Día de despegue", f"Distancia mínima entre la nave y {simulation_result.destiny_planet} [km]")
 
 def plot_minimum_time_by_initial_velocity_module(simulation_results):
     values = []
@@ -86,7 +87,7 @@ def plot_minimum_time_by_initial_velocity_module(simulation_results):
     values.sort(key=lambda x: x[0])
     inputs = [x[0] for x in values]
     curves = [x[1] for x in values]
-    plot_curves_with_legend([inputs], [curves], None, "Modulo de la velocidad inicial (km/s)", f"Tiempo de viaje (s)")
+    plot_curves_with_legend([inputs], [curves], None, "Modulo de la velocidad inicial [km/s]", f"Tiempo de viaje [s]")
 
 def plot_velocity_evolution(simulation_result):
     velocities = []
@@ -104,7 +105,7 @@ def plot_velocity_evolution(simulation_result):
         velocities.append(math.sqrt(spaceship_data.velx**2 + spaceship_data.vely**2))
         times.append(frame.time - simulation_result.seconds_to_departure)
 
-    plot_curves_with_legend([times], [velocities], None, "Tiempo (s)", "Velocidad (km/s)")
+    plot_curves_with_legend([times], [velocities], None, "Tiempo [s]", "Velocidad [km/s]")
 
     print("Velocidad cuando llega a un radio determinado de la superficie del planeta: ", velocities[-1], " km/s")
     print("Tiempo total de viaje: ", times[-1], " s")
@@ -134,4 +135,4 @@ def plot_trip_distance_evolution(simulation_result):
             (spaceship_data.x  - destiny_data.x)**2 + (spaceship_data.y - destiny_data.y)**2)) - spaceship_data.radius - destiny_data.radius)
         times.append(frame.time - simulation_result.seconds_to_departure)
 
-    plot_curves_with_legend([times], [distances], None, "Tiempo (s)", "Distancia (km)")
+    plot_curves_with_legend([times], [distances], None, "Tiempo [s]", "Distancia [km]")

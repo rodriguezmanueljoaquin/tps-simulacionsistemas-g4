@@ -187,6 +187,7 @@ public class SpaceSimulation {
                 double nextYVelocity = SpaceMissionHelper.getBeemanPredictedVelocity(p.getyVelocity(), p.getYAcceleration(), p.getYPrevAcceleration(), simulationDeltaT);
                 nextObjects.put(planetType, new Particle(nextXPosition, nextYPosition, nextXVelocity, nextYVelocity, p.getRadius(), p.getMass()));
             }
+
             //Luego, actualizamos las posiciones y velocidades de todos los planetas
             for (PlanetType planetType : objects.keySet()) {
                 //Tomamos la particula correspondiente

@@ -57,9 +57,7 @@ if __name__ == "__main__":
             elif variable == 'initial_velocity_module':
                 plot_minimum_time_by_initial_velocity_module(simulations_results)
             elif variable == 'velocity_evolution':
-                for simulation_result in simulations_results:
-                    if simulation_result.seconds_to_departure == 2.01654E7:
-                        plot_velocity_evolution(simulation_result)
+                plot_velocity_evolution(simulations_results[0])
             elif variable == 'distance_evolution':
                 plot_trip_distance_evolution(simulations_results[0])
 
