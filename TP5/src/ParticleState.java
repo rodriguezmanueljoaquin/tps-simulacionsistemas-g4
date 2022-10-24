@@ -4,12 +4,11 @@ public enum ParticleState {
     ZOMBIE(2),
     ZOMBIE_INFECTING(3);
 
-    private  int value;
+    private int value;
 
     ParticleState(int value) {
         this.value = value;
     }
-
 
 
 }

@@ -1,7 +1,6 @@
-import java.util.Map;
 import java.util.Objects;
 
-public class Particle implements Comparable{
+public class Particle implements Comparable {
     private Double x;
     private Double y;
     private double yVelocity;
@@ -21,7 +20,7 @@ public class Particle implements Comparable{
         this.state = state;
         this.xVelocity = vdMax * Math.cos(angle);
         this.yVelocity = vdMax * Math.sin(angle);
-        this.radius = Constants.MAX_RADIUS;
+        this.radius = Constants.PARTICLE_MAX_RADIUS;
         this.vdMax = vdMax;
     }
 
@@ -37,7 +36,7 @@ public class Particle implements Comparable{
         return this.state;
     }
 
-    public void setState(ParticleState state){
+    public void setState(ParticleState state) {
         this.state = state;
     }
 
@@ -53,9 +52,13 @@ public class Particle implements Comparable{
         return this.id;
     }
 
-    public Double getXVelocity() { return this.xVelocity;}
+    public Double getXVelocity() {
+        return this.xVelocity;
+    }
 
-    public Double getYVelocity() { return this.yVelocity;}
+    public Double getYVelocity() {
+        return this.yVelocity;
+    }
 
     public void setXVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
@@ -77,49 +80,49 @@ public class Particle implements Comparable{
         return zombieContactTime;
     }
 
-    public void setZombieContactTime(Double time){
+    public void setZombieContactTime(Double time) {
         this.zombieContactTime = time;
     }
 
-    public double distanceToOrigin(){
+    public double distanceToOrigin() {
         return Math.hypot(this.getX(), this.getY());
     }
 
-    public void updatePosition( double dt){
-        this.x += this.xVelocity*dt;
-        this.y += this.yVelocity*dt;
+    public void updatePosition(double dt) {
+        this.x += this.xVelocity * dt;
+        this.y += this.yVelocity * dt;
     }
 
     public void radiusUpdate(double t, double dt, boolean contact) {
-       if(contact){
-           this.radius = Constants.MIN_RADIUS;
-       }else this.radius += Constants.MAX_RADIUS/(t/dt);
+        if (contact) {
+            this.radius = Constants.PARTICLE_MIN_RADIUS;
+        } else this.radius += Constants.PARTICLE_MAX_RADIUS / (t / dt);
     }
 
     //Para este metodo, el x y el y serian los de:
     //-Si hubo colision, la particula con la que colisiono
     //-Si no hubo colision y es un zombie, el humano objetivo
     //-Si no hubo colision y es un humano, el zombie más cercano
-    public void velocityUpdate(boolean contact, double otherX, double otherY){
+    public void velocityUpdate(boolean contact, double otherX, double otherY) {
         double rx;
         double ry;
-        if(contact){
+        if (contact) {
             //Si hubo contacto, la velocidad de escape es en direcciones opuestas, en la direccion del eje de contacto
-            rx = (this.x-otherX) / this.calculateDistanceToWithoutRadius(otherX,otherY);
-            ry = (this.y-otherY) / this.calculateDistanceToWithoutRadius(otherX,otherY);
+            rx = (this.x - otherX) / this.calculateDistanceToWithoutRadius(otherX, otherY);
+            ry = (this.y - otherY) / this.calculateDistanceToWithoutRadius(otherX, otherY);
             this.velocity = this.vdMax;
-        }else{
-            this.velocity = vdMax*(Math.pow((radius - Constants.MIN_RADIUS ) /(Constants.MAX_RADIUS - Constants.MIN_RADIUS),Constants.b));
+        } else {
+            this.velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) / (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
             rx = (this.x - otherX) / Math.abs(otherX - this.x); //target x
             ry = (this.y - otherY) / Math.abs(otherY - this.y); //target y
-            if(!this.state.equals(ParticleState.ZOMBIE)){
+            if (!this.state.equals(ParticleState.ZOMBIE)) {
                 // dirección opuesta a la que lleva al target
                 rx *= -1;
                 ry *= -1;
             }
         }
-        this.xVelocity = this.velocity*rx;
-        this.yVelocity = this.velocity*ry;
+        this.xVelocity = this.velocity * rx;
+        this.yVelocity = this.velocity * ry;
     }
 
     @Override
@@ -146,7 +149,7 @@ public class Particle implements Comparable{
 
     @Override
     public int compareTo(Object o) {
-        if(getClass() != o.getClass()){
+        if (getClass() != o.getClass()) {
             return -1;
         }
         Particle other = (Particle) o;
