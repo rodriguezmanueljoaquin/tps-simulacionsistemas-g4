@@ -38,6 +38,10 @@ public class Particle implements Comparable {
         this.state = state;
     }
 
+    public Integer getId() {
+        return this.id;
+    }
+
     public Double getX() {
         return this.x;
     }
@@ -46,8 +50,8 @@ public class Particle implements Comparable {
         return this.y;
     }
 
-    public Integer getId() {
-        return this.id;
+    public double getRadius() {
+        return radius;
     }
 
     public Double getXVelocity() {

@@ -157,8 +157,8 @@ public class Population {
             writer.println(this.currentTime);
             for (Particle p : this.population) {
                 boolean isZombie = p.getState() != ParticleState.HUMAN && p.getState() != ParticleState.HUMAN_INFECTED;
-                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%d",
-                        p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), isZombie ? 1 : 0));
+                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
+                        p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), isZombie ? 1 : 0));
             }
             nextIteration();
         }
