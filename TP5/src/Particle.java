@@ -1,17 +1,15 @@
 import java.util.Objects;
 
 public class Particle implements Comparable {
-    private Double x;
-    private Double y;
+    private Double x, y;
     private double yVelocity;
     private double xVelocity;
     private double radius;
+    private final double vdMax;
+    private double zombieContactTime;
     private ParticleState state;
     private static Integer count = 1;
     private final Integer id;
-    private Double zombieContactTime;
-    private Double vdMax;
-    private Double velocity;
 
     public Particle(Double x, Double y, double angle, ParticleState state, Double vdMax) {
         this.x = x;
@@ -103,16 +101,22 @@ public class Particle implements Comparable {
     //-Si hubo colision, la particula con la que colisiono
     //-Si no hubo colision y es un zombie, el humano objetivo
     //-Si no hubo colision y es un humano, el zombie más cercano
-    public void velocityUpdate(boolean contact, double otherX, double otherY) {
+
+    // Recibe velocity, pues en el caso de que un zombie este deambulando sin objetivo debe hacerlo con una velocidad especifica
+    public void velocityUpdate(boolean contact, double otherX, double otherY, Double velocity) {
         double rx;
         double ry;
         if (contact) {
             //Si hubo contacto, la velocidad de escape es en direcciones opuestas, en la direccion del eje de contacto
             rx = (this.x - otherX) / this.calculateDistanceToWithoutRadius(otherX, otherY);
             ry = (this.y - otherY) / this.calculateDistanceToWithoutRadius(otherX, otherY);
-            this.velocity = this.vdMax;
+            if(velocity == null)
+                velocity = this.vdMax;
         } else {
-            this.velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) / (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
+            if(velocity == null)
+                velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) / (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
+
+
             rx = (this.x - otherX) / Math.abs(otherX - this.x); //target x
             ry = (this.y - otherY) / Math.abs(otherY - this.y); //target y
             if (!this.state.equals(ParticleState.ZOMBIE)) {
@@ -121,8 +125,8 @@ public class Particle implements Comparable {
                 ry *= -1;
             }
         }
-        this.xVelocity = this.velocity * rx;
-        this.yVelocity = this.velocity * ry;
+        this.xVelocity = velocity * rx;
+        this.yVelocity = velocity * ry;
     }
 
     @Override

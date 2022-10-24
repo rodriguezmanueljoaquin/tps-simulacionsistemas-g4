@@ -6,12 +6,8 @@ import java.util.*;
 public class Population {
     private Set<Particle> population;
     private Random rand;
-    private Double currentTime;
-    private Integer initialHumansQty;
-    private Double circleRadius;
-    private Double zombieDesiredVelocity;
-
-    private Integer zombiesQty;
+    private Double currentTime, circleRadius, zombieDesiredVelocity;
+    private Integer initialHumansQty, zombiesQty;
 
     public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed) {
         this.initialHumansQty = initialHumansQty;
@@ -82,7 +78,7 @@ public class Population {
                             checkHumanInfected(p, other);
                             //Registramos que hubo una colision
                             collision = true;
-                            p.velocityUpdate(true, other.getX(), other.getY());
+                            p.velocityUpdate(true, other.getX(), other.getY(), null);
                         }
                     }
                 }
@@ -91,11 +87,12 @@ public class Population {
                 if (p.distanceToOrigin() <= this.circleRadius) {
                     collision = true;
                     // other estaria en el mismo eje de acuerdo al origen pero más lejos
-                    p.velocityUpdate(true, p.getX() * 2, p.getY() * 2);
+                    p.velocityUpdate(true, p.getX() * 2, p.getY() * 2, null);
                 }
 
                 if (!collision) {
                     double targetX = 0, targetY = 0;
+                    Double velocity = null;
                     if (p.getState() == ParticleState.ZOMBIE) {
                         // Busca al humano mas cercano a menos de 4m
                         Particle other = population.stream()
@@ -106,7 +103,7 @@ public class Population {
                             // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
                             targetX = this.rand.nextDouble() * this.circleRadius;
                             targetY = this.rand.nextDouble() * this.circleRadius;
-                            // TODO: SETEAR VELOCIDAD BAJA?
+                            velocity = Constants.ZOMBIE_SEARCH_SPEED;
                         } else {
                             targetX = other.getX();
                             targetY = other.getY();
@@ -120,7 +117,7 @@ public class Population {
                         targetY = other.getY();
                     }
 
-                    p.velocityUpdate(false, targetX, targetY);
+                    p.velocityUpdate(false, targetX, targetY, velocity);
                 }
             }
         }
