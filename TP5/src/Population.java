@@ -91,6 +91,7 @@ public class Population {
                 // Vemos si choco contra una pared
                 if(p.distanceToOrigin() <= this.circleRadius){
                     collision = true;
+                    // other estaria en el mismo eje de acuerdo al origen pero más lejos
                     p.velocityUpdate(true, p.getX() *2, p.getY() *2);
                 }
 
