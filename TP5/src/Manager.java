@@ -15,8 +15,8 @@ public class Manager {
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
         // variando cantidad de humanos;
 //        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-        Integer[] initialHumansQtyArray = new Integer[]{2};
-        double zombieDesiredVelocity = 0.3;
+        Integer[] initialHumansQtyArray = new Integer[]{100};
+        double zombieDesiredVelocity = 3;
         for (Integer integer : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity));
 
@@ -28,6 +28,7 @@ public class Manager {
        */
 
         Random rand = new Random(Constants.RANDOM_SEED);
+        System.out.println("Starting simulations");
         simulationParameters.forEach(parameters -> {
             try {
                 String resultsFolderPath = String.format(Locale.ENGLISH, RESULTS_PATH + "%d_%.2f", parameters.initialHumansQty, parameters.zombieDesiredVelocity);
@@ -35,7 +36,8 @@ public class Manager {
                 if (!Files.exists(Paths.get(resultsFolderPath))) {
                     new File(resultsFolderPath).mkdir();
                 }
-                for (int i = 0; i < Constants.SIMULATION_REPETITIONS; i++) {
+                for (int i = 0; i < Constants.SIMULATION_REPETITION_TIMES; i++) {
+                    System.out.println("Iteration " + i);
                     Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong());
                     Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity);
 

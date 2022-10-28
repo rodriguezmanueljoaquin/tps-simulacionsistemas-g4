@@ -1,7 +1,7 @@
 import java.util.Objects;
 
 public class Particle implements Comparable {
-    private Double x, y;
+    private Double x, y, wanderTargetX, wanderTargetY;
     private double yVelocity;
     private double xVelocity;
     private double radius;
@@ -62,6 +62,14 @@ public class Particle implements Comparable {
         return this.yVelocity;
     }
 
+    public Double getWanderTargetX() {
+        return wanderTargetX;
+    }
+
+    public Double getWanderTargetY() {
+        return wanderTargetY;
+    }
+
     public void setXVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
     }
@@ -76,6 +84,11 @@ public class Particle implements Comparable {
 
     public void setY(Double y) {
         this.y = y;
+    }
+
+    public void setWanderTarget(Double wanderTargetX, Double wanderTargetY) {
+        this.wanderTargetX = wanderTargetX;
+        this.wanderTargetY = wanderTargetY;
     }
 
     public Double getZombieContactTime() {
@@ -95,10 +108,11 @@ public class Particle implements Comparable {
         this.y += this.yVelocity * dt;
     }
 
-    public void radiusUpdate(double t, double dt, boolean contact) {
+    public void radiusUpdate(boolean contact) {
         if (contact) {
             this.radius = Constants.PARTICLE_MIN_RADIUS;
-        } else this.radius += Constants.PARTICLE_MAX_RADIUS / (t / dt);
+        } else if (this.radius < Constants.PARTICLE_MAX_RADIUS)
+            this.radius += Constants.PARTICLE_MAX_RADIUS / (Constants.EXPANSION_TIME / Constants.DELTA_T);
     }
 
     //Para este metodo, el x y el y serian los de:
@@ -114,16 +128,14 @@ public class Particle implements Comparable {
             //Si hubo contacto, la velocidad de escape es en direcciones opuestas, en la direccion del eje de contacto
             rx = (this.x - otherX) / this.calculateDistanceToWithoutRadius(otherX, otherY);
             ry = (this.y - otherY) / this.calculateDistanceToWithoutRadius(otherX, otherY);
-            if(velocity == null)
-                velocity = this.vdMax;
+            velocity = this.vdMax;
         } else {
-            if(velocity == null)
+            if (velocity == null)
                 velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) / (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
 
-
-            rx = (this.x - otherX) / Math.abs(otherX - this.x); //target x
-            ry = (this.y - otherY) / Math.abs(otherY - this.y); //target y
-            if (!this.state.equals(ParticleState.ZOMBIE)) {
+            rx = (otherX - this.x) / Math.abs(otherX - this.x); //target x
+            ry = (otherX - this.y) / Math.abs(otherY - this.y); //target y
+            if (!this.state.equals(ParticleState.ZOMBIE) && !this.state.equals(ParticleState.ZOMBIE_INFECTING)) {
                 // dirección opuesta a la que lleva al target
                 rx *= -1;
                 ry *= -1;
@@ -131,6 +143,15 @@ public class Particle implements Comparable {
         }
         this.xVelocity = velocity * rx;
         this.yVelocity = velocity * ry;
+    }
+
+    public boolean hasWanderTarget() {
+        return this.wanderTargetX != null && this.wanderTargetY != null;
+    }
+
+    public boolean reachedWanderTarget() {
+        return (Math.abs(this.x - this.wanderTargetX) < Constants.DISTANCE_EPSILON)
+                && (Math.abs(this.y - this.wanderTargetY) < Constants.DISTANCE_EPSILON);
     }
 
     @Override

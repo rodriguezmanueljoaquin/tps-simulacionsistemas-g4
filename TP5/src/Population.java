@@ -22,6 +22,14 @@ public class Population {
         setParticlesInitialPosition();
     }
 
+    private Pair<Double, Double> getRandomPositionInCircle() {
+        double angle = rand.nextDouble() * Math.PI * 2;
+        double newX = Math.cos(angle) * rand.nextDouble() * this.circleRadius;
+        double newY = Math.sin(angle) * rand.nextDouble() * this.circleRadius;
+
+        return new Pair<>(newX, newY);
+    }
+
     private void setParticlesInitialPosition() {
         //Seteamos el zombie
         Particle zombie = new Particle(0., 0., this.rand.nextDouble() * 2 * Math.PI, ParticleState.ZOMBIE, this.zombieDesiredVelocity);
@@ -33,15 +41,14 @@ public class Population {
         for (int i = 0; i < this.initialHumansQty; i++) {
             validPosition = false;
             while (!validPosition) {
-                newX = this.rand.nextDouble() * this.circleRadius;
-                newY = this.rand.nextDouble() * this.circleRadius;
-                newParticle = new Particle(newX, newY, this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY);
+                Pair<Double, Double> randPositions = getRandomPositionInCircle();
+                newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(), this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY);
                 validPosition = true;
                 // Revisamos que este a la distancia minima del zombie, y que no se solape con otra particula
                 if (newParticle.calculateDistanceTo(zombie) < Constants.INITIAL_MIN_DISTANCE_TO_ZOMBIE)
                     validPosition = false;
                 for (Particle other : this.population) {
-                    if (newParticle.calculateDistanceTo(other) < 0)
+                    if (newParticle.calculateDistanceTo(other) <= 0)
                         validPosition = false;
                 }
             }
@@ -52,6 +59,28 @@ public class Population {
 
     private boolean areAllZombies() {
         return this.zombiesQty == initialHumansQty + 1;
+    }
+
+    private Pair<Double, Double> checkParticleCollision(Particle p) {
+        for (Particle other : this.population) {
+            if (!other.equals(p)) {
+                if (p.calculateDistanceTo(other) <= 0) {
+                    //En caso de ser choque humano - zombie, establecemos la situacion de contacto
+                    checkHumanInfected(p, other);
+                    return new Pair<>(other.getX(), other.getY());
+                }
+            }
+        }
+        return null;
+    }
+
+    private Pair<Double, Double> checkWallCollision(Particle p) {
+        if (Math.abs(p.distanceToOrigin()) <= this.circleRadius) {
+            // actualizamos velocidad
+            return null;
+        }
+        // other estaria en el mismo eje de acuerdo al origen pero más lejos
+        return new Pair<>(p.getX() * 2, p.getY() * 2);
     }
 
     public void nextIteration() {
@@ -69,56 +98,56 @@ public class Population {
             if (p.getState() != ParticleState.HUMAN_INFECTED && p.getState() != ParticleState.ZOMBIE_INFECTING) {
                 //Primero, actualizamos sus posiciones
                 p.updatePosition(Constants.DELTA_T);
-                //Vemos si choco contra otra particula
-                boolean collision = false;
-                for (Particle other : this.population) {
-                    if (!other.equals(p)) {
-                        if (p.calculateDistanceTo(other) <= 0) {
-                            //En caso de ser choque humano - zombie, establecemos la situacion de contacto
-                            checkHumanInfected(p, other);
-                            //Registramos que hubo una colision
-                            collision = true;
-                            p.velocityUpdate(true, other.getX(), other.getY(), null);
-                        }
-                    }
+
+                //Vemos si choco contra otra particula o contra una pared
+                Pair<Double, Double> collisionTarget = checkParticleCollision(p);
+                if (collisionTarget == null) {
+                    collisionTarget = checkWallCollision(p);
                 }
 
-                // Vemos si choco contra una pared
-                if (p.distanceToOrigin() <= this.circleRadius) {
-                    collision = true;
-                    // other estaria en el mismo eje de acuerdo al origen pero más lejos
-                    p.velocityUpdate(true, p.getX() * 2, p.getY() * 2, null);
-                }
-
-                if (!collision) {
-                    double targetX = 0, targetY = 0;
-                    Double velocity = null;
+                double targetX = 0, targetY = 0;
+                Double velocity = null;
+                //En caso de que no haya habido contacto
+                if (collisionTarget == null) {
                     if (p.getState() == ParticleState.ZOMBIE) {
                         // Busca al humano mas cercano a menos de 4m
                         Particle other = population.stream()
                                 .filter(particle -> particle.getState().equals(ParticleState.HUMAN))
-                                .filter(particle -> particle.calculateDistanceTo(p) < Constants.ZOMBIE_SEARCH_RADIUS)
+                                .filter(particle -> particle.calculateDistanceTo(p) <= Constants.ZOMBIE_SEARCH_RADIUS)
                                 .min(Comparator.comparing(particle -> particle.calculateDistanceTo(p))).orElse(null);
+
+                        // Si no hay humano cercano, va hacia el target fijo que ya tenia en caso de que lo haya calculado
                         if (other == null) {
-                            // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
-                            targetX = this.rand.nextDouble() * this.circleRadius;
-                            targetY = this.rand.nextDouble() * this.circleRadius;
-                            velocity = Constants.ZOMBIE_SEARCH_SPEED;
+                            if (!p.hasWanderTarget() || p.reachedWanderTarget()) {
+                                // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
+                                velocity = Constants.ZOMBIE_SEARCH_SPEED;
+                                Pair<Double, Double> randPositions = getRandomPositionInCircle();
+                                p.setWanderTarget(randPositions.getLeft(), randPositions.getRight());
+                            }
+                            targetX = p.getWanderTargetX();
+                            targetY = p.getWanderTargetY();
                         } else {
                             targetX = other.getX();
                             targetY = other.getY();
+                            p.setWanderTarget(null, null);
                         }
+
                     } else {
                         // Busca el zombie más cercano y lo evita
                         Particle other = population.stream()
-                                .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE))
+                                .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE) || particle.getState().equals(ParticleState.ZOMBIE_INFECTING))
                                 .min(Comparator.comparing(particle -> particle.calculateDistanceTo(p))).orElse(p);
                         targetX = other.getX();
                         targetY = other.getY();
                     }
 
-                    p.velocityUpdate(false, targetX, targetY, velocity);
+                } else {
+                    targetX = collisionTarget.getLeft();
+                    targetY = collisionTarget.getRight();
                 }
+
+                p.velocityUpdate(collisionTarget != null, targetX, targetY, velocity);
+                p.radiusUpdate(collisionTarget != null);
             }
         }
 
