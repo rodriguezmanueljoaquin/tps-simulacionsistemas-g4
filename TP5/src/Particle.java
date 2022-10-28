@@ -63,11 +63,11 @@ public class Particle implements Comparable {
     }
 
     public Double getWanderTargetX() {
-        return wanderTargetX;
+        return this.wanderTargetX;
     }
 
     public Double getWanderTargetY() {
-        return wanderTargetY;
+        return this.wanderTargetY;
     }
 
     public void setXVelocity(double xVelocity) {
@@ -134,7 +134,7 @@ public class Particle implements Comparable {
                 velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) / (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
 
             rx = (otherX - this.x) / Math.abs(otherX - this.x); //target x
-            ry = (otherX - this.y) / Math.abs(otherY - this.y); //target y
+            ry = (otherY - this.y) / Math.abs(otherY - this.y); //target y
             if (!this.state.equals(ParticleState.ZOMBIE) && !this.state.equals(ParticleState.ZOMBIE_INFECTING)) {
                 // dirección opuesta a la que lleva al target
                 rx *= -1;
