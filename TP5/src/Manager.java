@@ -15,7 +15,7 @@ public class Manager {
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
         // variando cantidad de humanos;
 //        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-        Integer[] initialHumansQtyArray = new Integer[]{100};
+        Integer[] initialHumansQtyArray = new Integer[]{2};
         double zombieDesiredVelocity = 3;
         for (Integer integer : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity));

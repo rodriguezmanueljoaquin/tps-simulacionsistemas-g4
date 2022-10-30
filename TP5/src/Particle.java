@@ -150,8 +150,8 @@ public class Particle implements Comparable {
     }
 
     public boolean reachedWanderTarget() {
-        return (Math.abs(this.x - this.wanderTargetX) < Constants.DISTANCE_EPSILON)
-                && (Math.abs(this.y - this.wanderTargetY) < Constants.DISTANCE_EPSILON);
+        return (Math.abs(this.x - this.wanderTargetX) < Constants.WANDER_TARGET_DISTANCE_EPSILON)
+                && (Math.abs(this.y - this.wanderTargetY) < Constants.WANDER_TARGET_DISTANCE_EPSILON);
     }
 
     @Override
