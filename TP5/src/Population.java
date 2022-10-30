@@ -110,8 +110,15 @@ public class Population {
                         collisions.get(CollisionType.PARTICLE). add(new Pair<>(p, other));
                 }
             }
-            if(wallCollision == null && !particleCollision && !isInInfection(p.getState()))
+
+            // chequeamos si la particula que estamos analizando esta involucrada en un choque contra otra particula
+            for(List<Pair<Particle, Particle>> collisionsByTpe : collisions.values())
+                if (collisionsByTpe.stream().anyMatch(pair -> pair.getLeft().equals(p) || pair.getRight().equals(p)))
+                    particleCollision = true;
+
+            if(!isInInfection(p.getState()) && wallCollision == null && !particleCollision) {
                 freeParticles.add(p);
+            }
         }
     }
     
