@@ -70,12 +70,11 @@ public class Population {
         return new Particle(p.getX() * 2, p.getY() * 2,0,ParticleState.WALL, 0.);
     }
 
-    public boolean isInInfection(ParticleState state) {
-        return state != ParticleState.HUMAN_INFECTED && state != ParticleState.ZOMBIE_INFECTING;
+    private boolean isInInfection(ParticleState state) {
+        return state == ParticleState.HUMAN_INFECTED || state == ParticleState.ZOMBIE_INFECTING;
     }
 
-    public void nextIteration() {
-        // Reviso si alguna infección termino
+    private void checkInfections() {
         for (Particle p : this.population) {
             if (p.getState() == ParticleState.HUMAN_INFECTED || p.getState() == ParticleState.ZOMBIE_INFECTING) {
                 if (p.getZombieContactTime() + Constants.INFECTION_DURATION <= this.currentTime) {
@@ -84,23 +83,18 @@ public class Population {
                 }
             }
         }
+    }
 
-        // Actualizo posiciones
-        for (Particle p : this.population)
-            // Actualizo para aquellas que no estan en situación de contacto
-            if (isInInfection(p.getState()))
-                p.updatePosition(Constants.DELTA_T);
+    private boolean isHumanAgainstZombieCollision(Particle supposedHuman, Particle supposedZombie) {
+        return (supposedHuman.getState() == ParticleState.HUMAN &&
+                (supposedZombie.getState() == ParticleState.ZOMBIE || supposedZombie.getState() == ParticleState.ZOMBIE_INFECTING));
+    }
 
-        // Veo colisiones existentes
-        List<Particle> nonCollisionNotInfectionParticles = new ArrayList<>();
-        Map<CollisionType, List<Pair<Particle, Particle>>> collisions = new HashMap<>();
-        collisions.put(CollisionType.INFECTION, new ArrayList<>());
-        collisions.put(CollisionType.PARTICLE, new ArrayList<>());
-        collisions.put(CollisionType.WALL, new ArrayList<>());
+    private void findCollisions(List<Particle> freeParticles, Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
         for (int i = 0; i < this.population.size(); i++) {
             Particle p = this.population.get(i);
             Particle wallCollision = checkWallCollision(p);
-            if(wallCollision != null)
+            if(wallCollision != null && !isInInfection(p.getState()))
                 collisions.get(CollisionType.WALL).add(new Pair<>(p, wallCollision));
 
             boolean particleCollision = false;
@@ -108,38 +102,39 @@ public class Population {
                 Particle other = this.population.get(j);
                 if (p.calculateDistanceTo(other) <= 0) {
                     particleCollision = true;
-                    if (p.getState() == ParticleState.HUMAN &&
-                            (other.getState() == ParticleState.ZOMBIE || other.getState() == ParticleState.ZOMBIE_INFECTING)) {
+                    if (isHumanAgainstZombieCollision(p, other)) {
                         collisions.get(CollisionType.INFECTION).add(new Pair<>(p, other));
+                    } else if (isHumanAgainstZombieCollision(other, p)) {
+                        collisions.get(CollisionType.INFECTION).add(new Pair<>(other, p));
                     }else
                         collisions.get(CollisionType.PARTICLE). add(new Pair<>(p, other));
                 }
             }
-            if(wallCollision == null && !particleCollision && isInInfection(p.getState()))
-                nonCollisionNotInfectionParticles.add(p);
+            if(wallCollision == null && !particleCollision && !isInInfection(p.getState()))
+                freeParticles.add(p);
         }
-
-        // Revisar infecciones
+    }
+    
+    private void updateCollisionParticles(Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
+        // Infectar en colisiones humano - zombie
         for (Pair<Particle, Particle> particles : collisions.get(CollisionType.INFECTION)) {
-            infectHuman(particles.getLeft(), particles.getRight());
+            updateParticlesInInfection(particles.getLeft(), particles.getRight());
         }
 
-        // Revisar choques contra pared
+        // Choques contra pared
         for (Pair<Particle, Particle> particles : collisions.get(CollisionType.WALL)) {
             Particle wall = particles.getRight();
             Particle p = particles.getLeft();
-
-            // solo actualizo si no esta siendo infectada
-            if(isInInfection(p.getState())) {
-                particles.getLeft().velocityUpdate(true, wall.getX(), wall.getY(), null);
-                particles.getLeft().radiusUpdate(true);
-            }
+            p.velocityUpdate(true, wall.getX(), wall.getY(), null);
+            p.radiusUpdate(true);
         }
 
-        // Revisar choques entre particulas
+        // Choques entre particulas
         for (Pair<Particle, Particle> particles : collisions.get(CollisionType.PARTICLE)) {
             Particle p1 = particles.getLeft();
             Particle p2 = particles.getRight();
+
+            // Actualizar solo las que no estan en infección
             if(!isInInfection(p1.getState())) {
                 p1.velocityUpdate(true, p2.getX(), p2.getY(), null);
                 p1.radiusUpdate(true);
@@ -149,9 +144,10 @@ public class Population {
                 p2.radiusUpdate(true);
             }
         }
-
-        // Revisar particulas que no chocaron
-        for (Particle p : nonCollisionNotInfectionParticles) {
+    }
+    
+    private void updateFreeParticles(List<Particle> freeParticles) {
+        for (Particle p : freeParticles) {
             Double velocity = null, targetX, targetY;
 
             if (p.getState() == ParticleState.ZOMBIE) {
@@ -188,18 +184,42 @@ public class Population {
             p.radiusUpdate(false);
         }
 
+    }
+    
+    public void nextIteration() {
+        // Reviso si alguna infección termino
+        checkInfections();
+
+        // Actualizo posiciones
+        for (Particle p : this.population)
+            // Actualizo para aquellas que no estan en situación de contacto
+            if (!isInInfection(p.getState()))
+                p.updatePosition(Constants.DELTA_T);
+
+        // Veo colisiones existentes
+        List<Particle> freeParticles = new ArrayList<>(); // particulas que no estan en colisión ni en infección
+        Map<CollisionType, List<Pair<Particle, Particle>>> collisions = new HashMap<>();
+        collisions.put(CollisionType.INFECTION, new ArrayList<>());
+        collisions.put(CollisionType.PARTICLE, new ArrayList<>());
+        collisions.put(CollisionType.WALL, new ArrayList<>());
+        
+        findCollisions(freeParticles, collisions);
+        
+        updateCollisionParticles(collisions);
+        updateFreeParticles(freeParticles);
+
         this.currentTime += Constants.DELTA_T;
     }
 
-    private void infectHuman(Particle supposedHuman, Particle other) {
-        supposedHuman.setState(ParticleState.HUMAN_INFECTED);
-        supposedHuman.setZombieContactTime(this.currentTime);
-        supposedHuman.setXVelocity(0);
-        supposedHuman.setYVelocity(0);
-        other.setState(ParticleState.ZOMBIE_INFECTING);
-        other.setZombieContactTime(this.currentTime);
-        other.setXVelocity(0);
-        other.setYVelocity(0);
+    private void updateParticlesInInfection(Particle human, Particle zombie) {
+        human.setState(ParticleState.HUMAN_INFECTED);
+        human.setZombieContactTime(this.currentTime);
+        human.setXVelocity(0);
+        human.setYVelocity(0);
+        zombie.setState(ParticleState.ZOMBIE_INFECTING);
+        zombie.setZombieContactTime(this.currentTime);
+        zombie.setXVelocity(0);
+        zombie.setYVelocity(0);
     }
 
     public static void createStaticFile(String outputPath, Integer initialHumansQty, Double zombieDesiredVelocity) throws FileNotFoundException, UnsupportedEncodingException {

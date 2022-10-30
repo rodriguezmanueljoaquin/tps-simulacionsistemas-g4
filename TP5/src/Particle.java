@@ -165,7 +165,7 @@ public class Particle implements Comparable {
     @Override
     public String toString() {
         return "Particle{" +
-                ", x=" + this.x +
+                "x=" + this.x +
                 ", y=" + this.y +
                 ", id=" + this.id +
                 '}';
