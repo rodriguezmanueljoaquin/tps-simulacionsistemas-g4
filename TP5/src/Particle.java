@@ -108,11 +108,11 @@ public class Particle implements Comparable {
         this.y += this.yVelocity * dt;
     }
 
-    public void radiusUpdate(boolean contact) {
+    public void radiusUpdate(boolean contact, Double DELTA_T) {
         if (contact) {
             this.radius = Constants.PARTICLE_MIN_RADIUS;
         } else if (this.radius < Constants.PARTICLE_MAX_RADIUS)
-            this.radius += Constants.PARTICLE_MAX_RADIUS / (Constants.EXPANSION_TIME / Constants.DELTA_T);
+            this.radius += Constants.PARTICLE_MAX_RADIUS / (Constants.EXPANSION_TIME / DELTA_T);
     }
 
     //Para este metodo, el x y el y serian los de:

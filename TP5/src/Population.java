@@ -8,6 +8,7 @@ public class Population {
     private Random rand;
     private Double currentTime, circleRadius, zombieDesiredVelocity;
     private Integer initialHumansQty, zombiesQty;
+    private Double DELTA_T = Constants.PARTICLE_MIN_RADIUS /(2*Constants.HUMAN_DESIRED_VELOCITY);
 
     public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed) {
         this.initialHumansQty = initialHumansQty;
@@ -36,17 +37,15 @@ public class Population {
 
         //Seteamos a los humanos
         boolean validPosition;
-        double newX = 0, newY = 0;
         Particle newParticle = null;
         for (int i = 0; i < this.initialHumansQty; i++) {
             validPosition = false;
             while (!validPosition) {
                 Pair<Double, Double> randPositions = getRandomPositionInCircle();
-                newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(), this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY);
-                validPosition = true;
+                newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(),
+                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY);
                 // Revisamos que este a la distancia minima del zombie, y que no se solape con otra particula
-                if (newParticle.calculateDistanceTo(zombie) < Constants.INITIAL_MIN_DISTANCE_TO_ZOMBIE)
-                    validPosition = false;
+                validPosition = !(newParticle.calculateDistanceTo(zombie) < Constants.INITIAL_MIN_DISTANCE_TO_ZOMBIE);
                 for (Particle other : this.population) {
                     if (newParticle.calculateDistanceTo(other) <= 0)
                         validPosition = false;
@@ -133,7 +132,7 @@ public class Population {
             Particle wall = particles.getRight();
             Particle p = particles.getLeft();
             p.velocityUpdate(true, wall.getX(), wall.getY(), null);
-            p.radiusUpdate(true);
+            p.radiusUpdate(true, DELTA_T);
         }
 
         // Choques entre particulas
@@ -144,11 +143,11 @@ public class Population {
             // Actualizar solo las que no estan en infección
             if(!isInInfection(p1.getState())) {
                 p1.velocityUpdate(true, p2.getX(), p2.getY(), null);
-                p1.radiusUpdate(true);
+                p1.radiusUpdate(true, DELTA_T);
             }
             if(!isInInfection(p2.getState())) {
                 p2.velocityUpdate(true, p1.getX(), p1.getY(), null);
-                p2.radiusUpdate(true);
+                p2.radiusUpdate(true, DELTA_T);
             }
         }
     }
@@ -188,7 +187,7 @@ public class Population {
                 targetY = other.getY();
             }
             p.velocityUpdate(false, targetX, targetY, velocity);
-            p.radiusUpdate(false);
+            p.radiusUpdate(false, this.DELTA_T);
         }
 
     }
@@ -201,7 +200,7 @@ public class Population {
         for (Particle p : this.population)
             // Actualizo para aquellas que no estan en situación de contacto
             if (!isInInfection(p.getState()))
-                p.updatePosition(Constants.DELTA_T);
+                p.updatePosition(this.DELTA_T);
 
         // Veo colisiones existentes
         List<Particle> freeParticles = new ArrayList<>(); // particulas que no estan en colisión ni en infección
@@ -215,7 +214,7 @@ public class Population {
         updateCollisionParticles(collisions);
         updateFreeParticles(freeParticles);
 
-        this.currentTime += Constants.DELTA_T;
+        this.currentTime += this.DELTA_T;
     }
 
     private void updateParticlesInInfection(Particle human, Particle zombie) {
