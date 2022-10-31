@@ -15,10 +15,16 @@ public class Manager {
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
         // variando cantidad de humanos;
 //        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-        Integer[] initialHumansQtyArray = new Integer[]{2};
+        Integer[] initialHumansQtyArray = new Integer[]{20};
         double zombieDesiredVelocity = 3;
+        double zombieAP = 3500;
+        double zombieBP = 0.5;
+        double humanAP = 300;
+        double humanBP = 0.5;
+        double wallAP = 100;
+        double wallBP = 0.5;
         for (Integer integer : initialHumansQtyArray)
-            simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity));
+            simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity, zombieAP,zombieBP,humanAP,humanBP,wallAP,wallBP));
 
 
         //variando velocidad deseada del zombie
@@ -38,7 +44,7 @@ public class Manager {
                 }
                 for (int i = 0; i < Constants.SIMULATION_REPETITION_TIMES; i++) {
                     System.out.println("Iteration " + i);
-                    Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong());
+                    Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(),zombieAP,zombieBP,humanAP,humanBP,wallAP,wallBP);
                     Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity);
 
                     String dynamicsPath = resultsFolderPath + "/dynamics";
@@ -55,9 +61,28 @@ public class Manager {
         public Integer initialHumansQty;
         public Double zombieDesiredVelocity;
 
-        public SimulationParameters(Integer initialHumansQty, Double zombieDesiredVelocity) {
+        public Double zombieAP;
+
+        public Double zombieBP;
+
+        public Double humanAP;
+
+        public Double humanBP;
+
+        public Double wallAP;
+
+        public Double wallBP;
+
+        public SimulationParameters(Integer initialHumansQty, Double zombieDesiredVelocity,  Double zombieAP, Double zombieBP, Double humanAP, Double humanBP,Double wallAP, Double wallBP) {
             this.initialHumansQty = initialHumansQty;
             this.zombieDesiredVelocity = zombieDesiredVelocity;
+            this.zombieAP = zombieAP;
+            this.zombieBP = zombieBP;
+            this.humanAP = humanAP;
+            this.humanBP = humanBP;
+            this.wallAP = wallAP;
+            this.wallBP = wallBP;
+
         }
     }
 }

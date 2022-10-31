@@ -10,8 +10,10 @@ public class Particle implements Comparable {
     private ParticleState state;
     private static Integer count = 1;
     private final Integer id;
+    private final Double AP;
+    private final Double BP;
 
-    public Particle(Double x, Double y, double angle, ParticleState state, Double vdMax) {
+    public Particle(Double x, Double y, double angle, ParticleState state, Double vdMax, Double AP, Double BP) {
         this.x = x;
         this.y = y;
         this.id = count++;
@@ -20,6 +22,22 @@ public class Particle implements Comparable {
         this.yVelocity = vdMax * Math.sin(angle);
         this.radius = Constants.PARTICLE_MAX_RADIUS;
         this.vdMax = vdMax;
+        this.AP = AP;
+        this.BP = BP;
+    }
+
+
+    public Particle(Double x, Double y, double angle, double radius, ParticleState state, Double vdMax, Double AP, Double BP) {
+        this.x = x;
+        this.y = y;
+        this.id = count++;
+        this.state = state;
+        this.xVelocity = vdMax * Math.cos(angle);
+        this.yVelocity = vdMax * Math.sin(angle);
+        this.radius = radius;
+        this.vdMax = vdMax;
+        this.AP = AP;
+        this.BP = BP;
     }
 
     public Double calculateDistanceTo(Particle other) {
@@ -70,20 +88,20 @@ public class Particle implements Comparable {
         return this.wanderTargetY;
     }
 
+    public Double getAP() {
+        return this.AP;
+    }
+
+    public Double getBP() {
+        return this.BP;
+    }
+
     public void setXVelocity(double xVelocity) {
         this.xVelocity = xVelocity;
     }
 
     public void setYVelocity(double yVelocity) {
         this.yVelocity = yVelocity;
-    }
-
-    public void setX(Double x) {
-        this.x = x;
-    }
-
-    public void setY(Double y) {
-        this.y = y;
     }
 
     public void setWanderTarget(Double wanderTargetX, Double wanderTargetY) {
@@ -131,15 +149,11 @@ public class Particle implements Comparable {
             velocity = this.vdMax;
         } else {
             if (velocity == null)
-                velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) / (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
+                velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
+                        (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
 
             rx = (otherX - this.x) / Math.abs(otherX - this.x); //target x
             ry = (otherY - this.y) / Math.abs(otherY - this.y); //target y
-            if (!this.state.equals(ParticleState.ZOMBIE) && !this.state.equals(ParticleState.ZOMBIE_INFECTING)) {
-                // dirección opuesta a la que lleva al target
-                rx *= -1;
-                ry *= -1;
-            }
         }
         this.xVelocity = velocity * rx;
         this.yVelocity = velocity * ry;

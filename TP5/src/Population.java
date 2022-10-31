@@ -2,25 +2,57 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Population {
     private List<Particle> population;
+    private List<Particle> wallParticles;
     private Random rand;
     private Double currentTime, circleRadius, zombieDesiredVelocity;
     private Integer initialHumansQty, zombiesQty;
     private Double DELTA_T = Constants.PARTICLE_MIN_RADIUS /(2*Constants.HUMAN_DESIRED_VELOCITY);
 
-    public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed) {
+    public Double zombieAP;
+
+    public Double zombieBP;
+
+    public Double humanAP;
+
+    public Double humanBP;
+
+    public Double wallAP;
+
+    public Double wallBP;
+
+    public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed, Double zombieAP, Double zombieBP, Double humanAP, Double humanBP, Double wallAP, Double wallBP) {
         this.initialHumansQty = initialHumansQty;
         this.circleRadius = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
+        this.wallParticles = new ArrayList<>();
         this.zombiesQty = 1;
         this.zombieDesiredVelocity = zombieDesiredVelocity;
         this.rand = new Random(seed);
         this.currentTime = 0.;
+        this.zombieAP = zombieAP;
+        this.zombieBP = zombieBP;
+        this.humanAP = humanAP;
+        this.humanBP = humanBP;
+        this.wallAP = wallAP;
+        this.wallBP = wallBP;
 
         //Seteamos las posiciones iniciales de las particulas
         setParticlesInitialPosition();
+        setWallParticles();
+    }
+
+    private void setWallParticles() {
+        int PRECISION = 360;
+        for(int i = 0; i < PRECISION ; i++){
+            double angle = (double) i/PRECISION * Math.PI * 2;
+             wallParticles.add(new Particle(Math.cos(angle) * this.circleRadius, Math.sin(angle) * this.circleRadius,
+                    0, 0., ParticleState.WALL, 0., this.wallAP, this.wallBP));
+            System.out.println(wallParticles.size());
+        }
     }
 
     private Pair<Double, Double> getRandomPositionInCircle() {
@@ -33,7 +65,7 @@ public class Population {
 
     private void setParticlesInitialPosition() {
         //Seteamos el zombie
-        Particle zombie = new Particle(0., 0., this.rand.nextDouble() * 2 * Math.PI, ParticleState.ZOMBIE, this.zombieDesiredVelocity);
+        Particle zombie = new Particle(0., 0., this.rand.nextDouble() * 2 * Math.PI, ParticleState.ZOMBIE, this.zombieDesiredVelocity,zombieAP,zombieBP);
 
         //Seteamos a los humanos
         boolean validPosition;
@@ -43,7 +75,7 @@ public class Population {
             while (!validPosition) {
                 Pair<Double, Double> randPositions = getRandomPositionInCircle();
                 newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(),
-                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY);
+                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY,humanAP,humanBP);
                 // Revisamos que este a la distancia minima del zombie, y que no se solape con otra particula
                 validPosition = !(newParticle.calculateDistanceTo(zombie) < Constants.INITIAL_MIN_DISTANCE_TO_ZOMBIE);
                 for (Particle other : this.population) {
@@ -66,7 +98,7 @@ public class Population {
             return null;
         }
         // other estaria en el mismo eje de acuerdo al origen pero más lejos
-        return new Particle(p.getX() * 2, p.getY() * 2,0,ParticleState.WALL, 0.);
+        return new Particle(p.getX() * 2, p.getY() * 2,0,ParticleState.WALL, 0.,wallAP,wallBP);
     }
 
     private boolean isInInfection(ParticleState state) {
@@ -79,14 +111,15 @@ public class Population {
                 if (p.getZombieContactTime() + Constants.INFECTION_DURATION <= this.currentTime) {
                     System.out.println("Particle " + p.getId() + " ended infection");
                     p.setState(ParticleState.ZOMBIE);
+                    this.zombiesQty++;
                 }
             }
         }
     }
 
     private boolean isHumanAgainstZombieCollision(Particle supposedHuman, Particle supposedZombie) {
-        return (supposedHuman.getState() == ParticleState.HUMAN &&
-                (supposedZombie.getState() == ParticleState.ZOMBIE || supposedZombie.getState() == ParticleState.ZOMBIE_INFECTING));
+        return supposedHuman.getState() == ParticleState.HUMAN &&
+                (supposedZombie.getState() == ParticleState.ZOMBIE || supposedZombie.getState() == ParticleState.ZOMBIE_INFECTING);
     }
 
     private void findCollisions(List<Particle> freeParticles, Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
@@ -180,17 +213,45 @@ public class Population {
                 }
             } else {
                 // Busca el zombie más cercano y lo evita
-                Particle other = population.stream()
+              /*  Particle other = population.stream()
                         .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE) || particle.getState().equals(ParticleState.ZOMBIE_INFECTING))
-                        .min(Comparator.comparing(particle -> particle.calculateDistanceTo(p))).orElse(p);
-                targetX = other.getX();
-                targetY = other.getY();
+                        .min(Comparator.comparing(particle -> particle.calculateDistanceTo(p))).orElse(p);*/
+
+                //calculate heuristic
+                Pair<Double,Double> target = calculateTargetHeuristic(p);
+                targetX = target.getLeft();
+                targetY = target.getRight();
             }
             p.velocityUpdate(false, targetX, targetY, velocity);
             p.radiusUpdate(false, this.DELTA_T);
         }
 
     }
+
+    private Pair<Double,Double> calculateTargetHeuristic(Particle p){
+        List<Particle> particles = new ArrayList<>(population);
+        particles.addAll(wallParticles);
+        List<Particle> neighbours = particles.stream()
+                .filter(other -> p.calculateDistanceTo(other) < Constants.HUMAN_SEARCH_RADIUS && !p.equals(other))
+                .collect(Collectors.toList());
+
+        double nx = 0., ny = 0.;
+        for(Particle neighbour : neighbours) {
+            double neighbourWeight = neighbour.getAP() * Math.exp(-p.calculateDistanceTo(neighbour) * neighbour.getBP());
+
+            double xDiff = p.getX() - neighbour.getX() ;
+            double ex = (xDiff)/Math.abs(xDiff);
+            nx += ex * neighbourWeight;
+
+            double yDiff = p.getY() - neighbour.getY();
+            double ey = (yDiff)/Math.abs(yDiff);
+            ny += ey * neighbourWeight;
+        }
+
+        return new Pair<>(nx, ny);
+    }
+
+
     
     public void nextIteration() {
         // Reviso si alguna infección termino
@@ -223,6 +284,7 @@ public class Population {
         human.setXVelocity(0);
         human.setYVelocity(0);
         zombie.setState(ParticleState.ZOMBIE_INFECTING);
+        this.zombiesQty--;
         zombie.setZombieContactTime(this.currentTime);
         zombie.setXVelocity(0);
         zombie.setYVelocity(0);
@@ -238,21 +300,27 @@ public class Population {
         System.out.println("\tStatic file successfully created");
     }
 
+    private void writeOutput(PrintWriter writer) {
+        writer.println(this.currentTime);
+        for (Particle p : this.population) {
+            boolean isZombie = p.getState() != ParticleState.HUMAN && p.getState() != ParticleState.HUMAN_INFECTED;
+            writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
+                    p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), isZombie ? 1 : 0));
+        }
+    }
+
     public void createDynamicFile(String dynamicPath, String outputName) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating dynamic file. . .");
 
         PrintWriter writer = new PrintWriter(dynamicPath + "/" + outputName, "UTF-8");
         while (this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
-            writer.println(this.currentTime);
-            for (Particle p : this.population) {
-                boolean isZombie = p.getState() != ParticleState.HUMAN && p.getState() != ParticleState.HUMAN_INFECTED;
-                writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
-                        p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), isZombie ? 1 : 0));
-            }
+            writeOutput(writer);
             nextIteration();
         }
-        writer.close();
+        // last iteration
+        writeOutput(writer);
 
+        writer.close();
         System.out.println("\tDynamic file successfully created");
     }
 }
