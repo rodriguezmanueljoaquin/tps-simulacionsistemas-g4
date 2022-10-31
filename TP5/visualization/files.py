@@ -115,5 +115,5 @@ def __get_particle_data(line):
     vx = float(data[3])
     vy = float(data[4])
     radius = float(data[5])
-    is_zombie = int(data[6])
-    return Particle(id,x,y,vx,vy,radius,is_zombie)
+    state = int(data[6])
+    return Particle(id,x,y,vx,vy,radius,state)

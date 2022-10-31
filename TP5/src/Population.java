@@ -10,7 +10,7 @@ public class Population {
     private Random rand;
     private Double currentTime, circleRadius, zombieDesiredVelocity;
     private Integer initialHumansQty, zombiesQty;
-    private Double DELTA_T = Constants.PARTICLE_MIN_RADIUS /(2*Constants.HUMAN_DESIRED_VELOCITY);
+    private Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY);
 
     public Double zombieAP;
 
@@ -29,7 +29,7 @@ public class Population {
         this.circleRadius = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
         this.wallParticles = new ArrayList<>();
-        this.zombiesQty = 1;
+        this.zombiesQty = 0;
         this.zombieDesiredVelocity = zombieDesiredVelocity;
         this.rand = new Random(seed);
         this.currentTime = 0.;
@@ -47,11 +47,10 @@ public class Population {
 
     private void setWallParticles() {
         int PRECISION = 360;
-        for(int i = 0; i < PRECISION ; i++){
-            double angle = (double) i/PRECISION * Math.PI * 2;
-             wallParticles.add(new Particle(Math.cos(angle) * this.circleRadius, Math.sin(angle) * this.circleRadius,
+        for (int i = 0; i < PRECISION; i++) {
+            double angle = (double) i / PRECISION * Math.PI * 2;
+            wallParticles.add(new Particle(Math.cos(angle) * this.circleRadius, Math.sin(angle) * this.circleRadius,
                     0, 0., ParticleState.WALL, 0., this.wallAP, this.wallBP));
-            System.out.println(wallParticles.size());
         }
     }
 
@@ -65,7 +64,9 @@ public class Population {
 
     private void setParticlesInitialPosition() {
         //Seteamos el zombie
-        Particle zombie = new Particle(0., 0., this.rand.nextDouble() * 2 * Math.PI, ParticleState.ZOMBIE, this.zombieDesiredVelocity,zombieAP,zombieBP);
+        Particle zombie = new Particle(0., 0., this.rand.nextDouble() * 2 * Math.PI,
+                ParticleState.ZOMBIE, this.zombieDesiredVelocity, zombieAP, zombieBP);
+        this.zombiesQty++;
 
         //Seteamos a los humanos
         boolean validPosition;
@@ -75,7 +76,7 @@ public class Population {
             while (!validPosition) {
                 Pair<Double, Double> randPositions = getRandomPositionInCircle();
                 newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(),
-                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY,humanAP,humanBP);
+                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY, humanAP, humanBP);
                 // Revisamos que este a la distancia minima del zombie, y que no se solape con otra particula
                 validPosition = !(newParticle.calculateDistanceTo(zombie) < Constants.INITIAL_MIN_DISTANCE_TO_ZOMBIE);
                 for (Particle other : this.population) {
@@ -98,7 +99,7 @@ public class Population {
             return null;
         }
         // other estaria en el mismo eje de acuerdo al origen pero más lejos
-        return new Particle(p.getX() * 2, p.getY() * 2,0,ParticleState.WALL, 0.,wallAP,wallBP);
+        return new Particle(p.getX() * 2, p.getY() * 2, 0, ParticleState.WALL, 0., wallAP, wallBP);
     }
 
     private boolean isInInfection(ParticleState state) {
@@ -126,7 +127,7 @@ public class Population {
         for (int i = 0; i < this.population.size(); i++) {
             Particle p = this.population.get(i);
             Particle wallCollision = checkWallCollision(p);
-            if(wallCollision != null && !isInInfection(p.getState()))
+            if (wallCollision != null && !isInInfection(p.getState()))
                 collisions.get(CollisionType.WALL).add(new Pair<>(p, wallCollision));
 
             boolean particleCollision = false;
@@ -138,22 +139,22 @@ public class Population {
                         collisions.get(CollisionType.INFECTION).add(new Pair<>(p, other));
                     } else if (isHumanAgainstZombieCollision(other, p)) {
                         collisions.get(CollisionType.INFECTION).add(new Pair<>(other, p));
-                    }else
-                        collisions.get(CollisionType.PARTICLE). add(new Pair<>(p, other));
+                    } else
+                        collisions.get(CollisionType.PARTICLE).add(new Pair<>(p, other));
                 }
             }
 
             // chequeamos si la particula que estamos analizando esta involucrada en un choque contra otra particula
-            for(List<Pair<Particle, Particle>> collisionsByTpe : collisions.values())
+            for (List<Pair<Particle, Particle>> collisionsByTpe : collisions.values())
                 if (collisionsByTpe.stream().anyMatch(pair -> pair.getLeft().equals(p) || pair.getRight().equals(p)))
                     particleCollision = true;
 
-            if(!isInInfection(p.getState()) && wallCollision == null && !particleCollision) {
+            if (!isInInfection(p.getState()) && wallCollision == null && !particleCollision) {
                 freeParticles.add(p);
             }
         }
     }
-    
+
     private void updateCollisionParticles(Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
         // Infectar en colisiones humano - zombie
         for (Pair<Particle, Particle> particles : collisions.get(CollisionType.INFECTION)) {
@@ -174,17 +175,17 @@ public class Population {
             Particle p2 = particles.getRight();
 
             // Actualizar solo las que no estan en infección
-            if(!isInInfection(p1.getState())) {
+            if (!isInInfection(p1.getState())) {
                 p1.velocityUpdate(true, p2.getX(), p2.getY(), null);
                 p1.radiusUpdate(true, DELTA_T);
             }
-            if(!isInInfection(p2.getState())) {
+            if (!isInInfection(p2.getState())) {
                 p2.velocityUpdate(true, p1.getX(), p1.getY(), null);
                 p2.radiusUpdate(true, DELTA_T);
             }
         }
     }
-    
+
     private void updateFreeParticles(List<Particle> freeParticles) {
         for (Particle p : freeParticles) {
             Double velocity = null, targetX, targetY;
@@ -218,7 +219,7 @@ public class Population {
                         .min(Comparator.comparing(particle -> particle.calculateDistanceTo(p))).orElse(p);*/
 
                 //calculate heuristic
-                Pair<Double,Double> target = calculateTargetHeuristic(p);
+                Pair<Double, Double> target = calculateTargetHeuristic(p);
                 targetX = target.getLeft();
                 targetY = target.getRight();
             }
@@ -228,7 +229,7 @@ public class Population {
 
     }
 
-    private Pair<Double,Double> calculateTargetHeuristic(Particle p){
+    private Pair<Double, Double> calculateTargetHeuristic(Particle p) {
         List<Particle> particles = new ArrayList<>(population);
         particles.addAll(wallParticles);
         List<Particle> neighbours = particles.stream()
@@ -236,15 +237,15 @@ public class Population {
                 .collect(Collectors.toList());
 
         double nx = 0., ny = 0.;
-        for(Particle neighbour : neighbours) {
+        for (Particle neighbour : neighbours) {
             double neighbourWeight = neighbour.getAP() * Math.exp(-p.calculateDistanceTo(neighbour) * neighbour.getBP());
 
-            double xDiff = p.getX() - neighbour.getX() ;
-            double ex = (xDiff)/Math.abs(xDiff);
+            double xDiff = p.getX() - neighbour.getX();
+            double ex = (xDiff) / Math.abs(xDiff);
             nx += ex * neighbourWeight;
 
             double yDiff = p.getY() - neighbour.getY();
-            double ey = (yDiff)/Math.abs(yDiff);
+            double ey = (yDiff) / Math.abs(yDiff);
             ny += ey * neighbourWeight;
         }
 
@@ -252,7 +253,6 @@ public class Population {
     }
 
 
-    
     public void nextIteration() {
         // Reviso si alguna infección termino
         checkInfections();
@@ -269,9 +269,9 @@ public class Population {
         collisions.put(CollisionType.INFECTION, new ArrayList<>());
         collisions.put(CollisionType.PARTICLE, new ArrayList<>());
         collisions.put(CollisionType.WALL, new ArrayList<>());
-        
+
         findCollisions(freeParticles, collisions);
-        
+
         updateCollisionParticles(collisions);
         updateFreeParticles(freeParticles);
 
@@ -283,8 +283,10 @@ public class Population {
         human.setZombieContactTime(this.currentTime);
         human.setXVelocity(0);
         human.setYVelocity(0);
-        zombie.setState(ParticleState.ZOMBIE_INFECTING);
-        this.zombiesQty--;
+        if (zombie.getState() != ParticleState.ZOMBIE_INFECTING) {
+            zombie.setState(ParticleState.ZOMBIE_INFECTING);
+            this.zombiesQty--;
+        }
         zombie.setZombieContactTime(this.currentTime);
         zombie.setXVelocity(0);
         zombie.setYVelocity(0);
@@ -303,9 +305,9 @@ public class Population {
     private void writeOutput(PrintWriter writer) {
         writer.println(this.currentTime);
         for (Particle p : this.population) {
-            boolean isZombie = p.getState() != ParticleState.HUMAN && p.getState() != ParticleState.HUMAN_INFECTED;
+//            boolean isZombie = p.getState() != ParticleState.HUMAN && p.getState() != ParticleState.HUMAN_INFECTED;
             writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
-                    p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), isZombie ? 1 : 0));
+                    p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), p.getState().ordinal()));
         }
     }
 

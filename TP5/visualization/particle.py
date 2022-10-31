@@ -1,17 +1,23 @@
 from cmath import pi
 import random
 
+# enum
+class ParticleState:
+    HUMAN = 0
+    HUMAN_INFECTED = 1
+    ZOMBIE_INFECTED = 2
+    ZOMBIE = 3
+
 
 class Particle:    
-    
-    def __init__(self,id,x,y,velx,vely,radius,is_zombie):
+    def __init__(self,id,x,y,velx,vely,radius,state):
         self.id = id
         self.x = x
         self.y = y
         self.velx = velx
         self.vely = vely
         self.radius = radius
-        self.is_zombie = is_zombie
+        self.state = state
 
     def __eq__(self, other):
         return self.id == other.id

@@ -181,6 +181,7 @@ public class Particle implements Comparable {
         return "Particle{" +
                 "x=" + this.x +
                 ", y=" + this.y +
+                ", state=" + this.state.toString() +
                 ", id=" + this.id +
                 '}';
     }

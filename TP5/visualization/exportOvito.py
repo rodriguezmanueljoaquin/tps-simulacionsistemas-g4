@@ -36,7 +36,7 @@ def exportParticles(particles_by_frame, humans_initial_qty, zombie_desired_veloc
         n = len(particle_frame.particles)
         file.write("{}\ncomment\n".format(n))
         for particle in particle_frame.particles:
-            file.write("{} {} {} {} {} {} {}\n".format(particle.id, particle.x, particle.y, particle.velx, particle.vely, particle.radius, particle.is_zombie))
+            file.write("{} {} {} {} {} {} {}\n".format(particle.id, particle.x, particle.y, particle.velx, particle.vely, particle.radius, particle.state -2))
     
     file.close()
 

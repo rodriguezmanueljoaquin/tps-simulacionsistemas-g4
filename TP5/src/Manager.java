@@ -19,12 +19,12 @@ public class Manager {
         double zombieDesiredVelocity = 3;
         double zombieAP = 3500;
         double zombieBP = 0.5;
-        double humanAP = 300;
+        double humanAP = 500;
         double humanBP = 0.5;
         double wallAP = 100;
         double wallBP = 0.5;
         for (Integer integer : initialHumansQtyArray)
-            simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity, zombieAP,zombieBP,humanAP,humanBP,wallAP,wallBP));
+            simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity, zombieAP, zombieBP, humanAP, humanBP, wallAP, wallBP));
 
 
         //variando velocidad deseada del zombie
@@ -44,7 +44,7 @@ public class Manager {
                 }
                 for (int i = 0; i < Constants.SIMULATION_REPETITION_TIMES; i++) {
                     System.out.println("Iteration " + i);
-                    Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(),zombieAP,zombieBP,humanAP,humanBP,wallAP,wallBP);
+                    Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(), zombieAP, zombieBP, humanAP, humanBP, wallAP, wallBP);
                     Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity);
 
                     String dynamicsPath = resultsFolderPath + "/dynamics";
@@ -73,7 +73,7 @@ public class Manager {
 
         public Double wallBP;
 
-        public SimulationParameters(Integer initialHumansQty, Double zombieDesiredVelocity,  Double zombieAP, Double zombieBP, Double humanAP, Double humanBP,Double wallAP, Double wallBP) {
+        public SimulationParameters(Integer initialHumansQty, Double zombieDesiredVelocity, Double zombieAP, Double zombieBP, Double humanAP, Double humanBP, Double wallAP, Double wallBP) {
             this.initialHumansQty = initialHumansQty;
             this.zombieDesiredVelocity = zombieDesiredVelocity;
             this.zombieAP = zombieAP;
