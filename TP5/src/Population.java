@@ -11,20 +11,17 @@ public class Population {
     private Double currentTime, circleRadius, zombieDesiredVelocity;
     private Integer initialHumansQty, zombiesQty;
     private Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY);
+    private Pair<Double, Double> zombieAPRange;
+    private Pair<Double, Double> zombieBPRange;
+    private Pair<Double, Double> humanAPRange;
+    private Pair<Double, Double> humanBPRange;
+    private Pair<Double, Double> wallAPRange;
+    private Pair<Double, Double> wallBPRange;
 
-    public Double zombieAP;
-
-    public Double zombieBP;
-
-    public Double humanAP;
-
-    public Double humanBP;
-
-    public Double wallAP;
-
-    public Double wallBP;
-
-    public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed, Double zombieAP, Double zombieBP, Double humanAP, Double humanBP, Double wallAP, Double wallBP) {
+    public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed,
+                      Pair<Double, Double> zombieAPRange, Pair<Double, Double> zombieBPRange,
+                      Pair<Double, Double> humanAPRange, Pair<Double, Double> humanBPRange,
+                      Pair<Double, Double> wallAPRange, Pair<Double, Double> wallBPRange) {
         this.initialHumansQty = initialHumansQty;
         this.circleRadius = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
@@ -33,16 +30,20 @@ public class Population {
         this.zombieDesiredVelocity = zombieDesiredVelocity;
         this.rand = new Random(seed);
         this.currentTime = 0.;
-        this.zombieAP = zombieAP;
-        this.zombieBP = zombieBP;
-        this.humanAP = humanAP;
-        this.humanBP = humanBP;
-        this.wallAP = wallAP;
-        this.wallBP = wallBP;
+        this.zombieAPRange = zombieAPRange;
+        this.zombieBPRange = zombieBPRange;
+        this.humanAPRange = humanAPRange;
+        this.humanBPRange = humanBPRange;
+        this.wallAPRange = wallAPRange;
+        this.wallBPRange = wallBPRange;
 
         //Seteamos las posiciones iniciales de las particulas
         setParticlesInitialPosition();
         setWallParticles();
+    }
+
+    private double getRandomDoubleBetweenBounds(Pair<Double, Double> bounds) {
+        return this.rand.nextDouble()*(bounds.getRight()-bounds.getLeft()) + bounds.getRight();
     }
 
     private void setWallParticles() {
@@ -50,7 +51,8 @@ public class Population {
         for (int i = 0; i < PRECISION; i++) {
             double angle = (double) i / PRECISION * Math.PI * 2;
             wallParticles.add(new Particle(Math.cos(angle) * this.circleRadius, Math.sin(angle) * this.circleRadius,
-                    0, 0., ParticleState.WALL, 0., this.wallAP, this.wallBP));
+                    0, 0., ParticleState.WALL, 0.,
+                    this.getRandomDoubleBetweenBounds(wallAPRange), this.getRandomDoubleBetweenBounds(wallBPRange)));
         }
     }
 
@@ -65,7 +67,8 @@ public class Population {
     private void setParticlesInitialPosition() {
         //Seteamos el zombie
         Particle zombie = new Particle(0., 0., this.rand.nextDouble() * 2 * Math.PI,
-                ParticleState.ZOMBIE, this.zombieDesiredVelocity, zombieAP, zombieBP);
+                ParticleState.ZOMBIE, this.zombieDesiredVelocity,
+                this.getRandomDoubleBetweenBounds(zombieAPRange), this.getRandomDoubleBetweenBounds(zombieBPRange));
         this.zombiesQty++;
 
         //Seteamos a los humanos
@@ -76,7 +79,8 @@ public class Population {
             while (!validPosition) {
                 Pair<Double, Double> randPositions = getRandomPositionInCircle();
                 newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(),
-                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY, humanAP, humanBP);
+                        this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY,
+                        this.getRandomDoubleBetweenBounds(humanAPRange), this.getRandomDoubleBetweenBounds(humanBPRange));
                 // Revisamos que este a la distancia minima del zombie, y que no se solape con otra particula
                 validPosition = !(newParticle.calculateDistanceTo(zombie) < Constants.INITIAL_MIN_DISTANCE_TO_ZOMBIE);
                 for (Particle other : this.population) {
@@ -99,7 +103,7 @@ public class Population {
             return null;
         }
         // other estaria en el mismo eje de acuerdo al origen pero más lejos
-        return new Particle(p.getX() * 2, p.getY() * 2, 0, ParticleState.WALL, 0., wallAP, wallBP);
+        return new Particle(p.getX() * 2, p.getY() * 2, 0, ParticleState.WALL, 0.,0., 0.);
     }
 
     private boolean isInInfection(ParticleState state) {
