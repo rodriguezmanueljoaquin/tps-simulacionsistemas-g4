@@ -46,7 +46,7 @@ public class Population {
     }
 
     private void setWallParticles() {
-        int PRECISION = 360;
+        int PRECISION = 720;
         for (int i = 0; i < PRECISION; i++) {
             double angle = (double) i / PRECISION * Math.PI * 2;
             wallParticles.add(new Particle(Math.cos(angle) * this.circleRadius, Math.sin(angle) * this.circleRadius,
@@ -199,26 +199,20 @@ public class Population {
 
                 // Si no hay humano cercano, va hacia el target fijo que ya tenia en caso de que lo haya calculado
                 if (other == null) {
-                    if (!p.hasWanderTarget() || p.reachedWanderTarget()) {
+                    if (!p.hasWanderTarget() || p.changeWanderTarget(this.currentTime)) {
                         // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
                         velocity = Constants.ZOMBIE_SEARCH_SPEED;
                         Pair<Double, Double> randPositions = getRandomPositionInCircle();
-                        p.setWanderTarget(randPositions.getLeft(), randPositions.getRight());
+                        p.setWanderTarget(randPositions.getLeft(), randPositions.getRight(), this.currentTime);
                     }
                     targetX = p.getWanderTargetX();
                     targetY = p.getWanderTargetY();
                 } else {
                     targetX = other.getX();
                     targetY = other.getY();
-                    p.setWanderTarget(null, null);
+                    p.setWanderTarget(null, null, this.currentTime);
                 }
             } else {
-                // Busca el zombie más cercano y lo evita
-              /*  Particle other = population.stream()
-                        .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE) || particle.getState().equals(ParticleState.ZOMBIE_INFECTING))
-                        .min(Comparator.comparing(particle -> particle.calculateDistanceTo(p))).orElse(p);*/
-
-                //calculate heuristic
                 Pair<Double, Double> target = calculateTargetHeuristic(p);
                 targetX = target.getLeft();
                 targetY = target.getRight();

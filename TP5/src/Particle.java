@@ -7,6 +7,7 @@ public class Particle implements Comparable {
     private double radius;
     private final double vdMax;
     private double zombieContactTime;
+    private double startWanderingTime;
     private ParticleState state;
     private static Integer count = 1;
     private final Integer id;
@@ -26,7 +27,6 @@ public class Particle implements Comparable {
         this.BP = BP;
     }
 
-
     public Particle(Double x, Double y, double angle, double radius, ParticleState state, Double vdMax, Double AP, Double BP) {
         this.x = x;
         this.y = y;
@@ -44,8 +44,52 @@ public class Particle implements Comparable {
         return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - this.radius - other.radius);
     }
 
-    public double calculateDistanceToWithoutRadius(double otherX, double otherY) {
+    private double calculateDistanceToWithoutRadius(double otherX, double otherY) {
         return Math.hypot(this.getX() - otherX, this.getY() - otherY);
+    }
+    public void updatePosition(double dt) {
+        this.x += this.xVelocity * dt;
+        this.y += this.yVelocity * dt;
+    }
+
+    public void radiusUpdate(boolean contact, Double DELTA_T) {
+        if (contact) {
+            this.radius = Constants.PARTICLE_MIN_RADIUS;
+        } else if (this.radius < Constants.PARTICLE_MAX_RADIUS)
+            this.radius += Constants.PARTICLE_MAX_RADIUS / (Constants.EXPANSION_TIME / DELTA_T);
+    }
+
+    //Para este metodo, el x y el y serian los de:
+    //-Si hubo colision, la particula con la que colisiono
+    //-Si no hubo colision el target
+    // Recibe velocity, pues en el caso de que un zombie este deambulando sin objetivo debe hacerlo con una velocidad especifica
+    public void velocityUpdate(boolean contact, double otherX, double otherY, Double velocity) {
+        double rx;
+        double ry;
+        if (contact) {
+            //Si hubo contacto, la velocidad de escape es en direcciones opuestas, en la direccion del eje de contacto
+            rx = (this.x - otherX) / this.calculateDistanceToWithoutRadius(otherX, otherY);
+            ry = (this.y - otherY) / this.calculateDistanceToWithoutRadius(otherX, otherY);
+            velocity = this.vdMax;
+        } else {
+            if (velocity == null)
+                velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
+                        (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
+
+            rx = (otherX - this.x) / Math.abs(otherX - this.x);
+            ry = (otherY - this.y) / Math.abs(otherY - this.y);
+        }
+        this.xVelocity = velocity * rx;
+        this.yVelocity = velocity * ry;
+    }
+
+    public boolean hasWanderTarget() {
+        return this.wanderTargetX != null && this.wanderTargetY != null;
+    }
+
+    public boolean changeWanderTarget(Double currentTime) {
+        return calculateDistanceToWithoutRadius(wanderTargetX, wanderTargetY) < Constants.WANDER_TARGET_DISTANCE_EPSILON ||
+                currentTime > this.startWanderingTime + Constants.WANDER_TARGET_TIME;
     }
 
     public ParticleState getState() {
@@ -104,9 +148,10 @@ public class Particle implements Comparable {
         this.yVelocity = yVelocity;
     }
 
-    public void setWanderTarget(Double wanderTargetX, Double wanderTargetY) {
+    public void setWanderTarget(Double wanderTargetX, Double wanderTargetY, Double time) {
         this.wanderTargetX = wanderTargetX;
         this.wanderTargetY = wanderTargetY;
+        this.startWanderingTime = time;
     }
 
     public Double getZombieContactTime() {
@@ -119,53 +164,6 @@ public class Particle implements Comparable {
 
     public double distanceToOrigin() {
         return Math.hypot(this.getX(), this.getY());
-    }
-
-    public void updatePosition(double dt) {
-        this.x += this.xVelocity * dt;
-        this.y += this.yVelocity * dt;
-    }
-
-    public void radiusUpdate(boolean contact, Double DELTA_T) {
-        if (contact) {
-            this.radius = Constants.PARTICLE_MIN_RADIUS;
-        } else if (this.radius < Constants.PARTICLE_MAX_RADIUS)
-            this.radius += Constants.PARTICLE_MAX_RADIUS / (Constants.EXPANSION_TIME / DELTA_T);
-    }
-
-    //Para este metodo, el x y el y serian los de:
-    //-Si hubo colision, la particula con la que colisiono
-    //-Si no hubo colision y es un zombie, el humano objetivo
-    //-Si no hubo colision y es un humano, el zombie más cercano
-
-    // Recibe velocity, pues en el caso de que un zombie este deambulando sin objetivo debe hacerlo con una velocidad especifica
-    public void velocityUpdate(boolean contact, double otherX, double otherY, Double velocity) {
-        double rx;
-        double ry;
-        if (contact) {
-            //Si hubo contacto, la velocidad de escape es en direcciones opuestas, en la direccion del eje de contacto
-            rx = (this.x - otherX) / this.calculateDistanceToWithoutRadius(otherX, otherY);
-            ry = (this.y - otherY) / this.calculateDistanceToWithoutRadius(otherX, otherY);
-            velocity = this.vdMax;
-        } else {
-            if (velocity == null)
-                velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
-                        (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
-
-            rx = (otherX - this.x) / Math.abs(otherX - this.x); //target x
-            ry = (otherY - this.y) / Math.abs(otherY - this.y); //target y
-        }
-        this.xVelocity = velocity * rx;
-        this.yVelocity = velocity * ry;
-    }
-
-    public boolean hasWanderTarget() {
-        return this.wanderTargetX != null && this.wanderTargetY != null;
-    }
-
-    public boolean reachedWanderTarget() {
-        return (Math.abs(this.x - this.wanderTargetX) < Constants.WANDER_TARGET_DISTANCE_EPSILON)
-                && (Math.abs(this.y - this.wanderTargetY) < Constants.WANDER_TARGET_DISTANCE_EPSILON);
     }
 
     @Override
