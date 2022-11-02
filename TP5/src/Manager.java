@@ -33,10 +33,10 @@ public class Manager {
 
        */
 
-        Random rand = new Random(Constants.RANDOM_SEED);
         System.out.println("Starting simulations");
         simulationParameters.forEach(parameters -> {
             try {
+                Random rand = new Random(Constants.RANDOM_SEED);
                 String resultsFolderPath = String.format(Locale.ENGLISH, RESULTS_PATH + "%d_%.2f", parameters.initialHumansQty, parameters.zombieDesiredVelocity);
                 //Chequeamos si la carpeta con resultados existe, y en caso de que no, la creamos
                 if (!Files.exists(Paths.get(resultsFolderPath))) {
