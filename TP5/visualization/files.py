@@ -21,6 +21,9 @@ class SimulationResult:
     def __repr__(self):
         return self.__str__()
 
+    def set_total_contagion_time(self):
+        self.total_contagion_time = self.particles_by_frame[-1].time
+
 class ParticlesFrame:
     def __init__(self):
         self.particles = list()
@@ -59,6 +62,8 @@ def read_input_files(input_files__directory_path):
                             simulation_result_dynamic = copy.deepcopy(simulation_result_static)
                             print('\t\t\tReading dynamic file. . .')
                             __read_dynamic_input_file(dynamic_files_dir_path+"/"+dynamicFilePath,simulation_result_dynamic)
+                            ##Seteamos el tiempo de contagio total y lo agregamos a la lista
+                            simulation_result_dynamic.set_total_contagion_time()
                             simulation_results_list.append(simulation_result_dynamic)
                             print('\t\t\tDynamic file successfully read')
                     print('\t\tDynamic files directory successfully read. . .')
