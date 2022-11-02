@@ -10,7 +10,7 @@ public class Population {
     private Random rand;
     private Double currentTime, circleRadius, zombieDesiredVelocity;
     private Integer initialHumansQty, zombiesQty;
-    private Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY);
+    private static Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY);
     private Pair<Double, Double> zombieAPRange;
     private Pair<Double, Double> zombieBPRange;
     private Pair<Double, Double> humanAPRange;
@@ -294,7 +294,7 @@ public class Population {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + "/static.txt", "UTF-8");
-        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity));
+        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity,DELTA_T));
         writer.close();
 
         System.out.println("\tStatic file successfully created");

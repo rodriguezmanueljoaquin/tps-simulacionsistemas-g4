@@ -29,10 +29,11 @@ public class Manager {
 
 
         //variando velocidad deseada del zombie
-      /*  for (double i = 10 ; i <= 25 ; i+=5)
-            simulationParameters.add(new SimulationParameters(2500, 1., i));
+//        int initialHumansQty = 140;
+//        for (zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
+//            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
-       */
+
 
         System.out.println("Starting simulations");
         simulationParameters.forEach(parameters -> {

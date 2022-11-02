@@ -5,7 +5,7 @@ import random
 class ParticleState:
     HUMAN = 0
     HUMAN_INFECTED = 1
-    ZOMBIE_INFECTED = 2
+    ZOMBIE_INFECTING = 2
     ZOMBIE = 3
 
 

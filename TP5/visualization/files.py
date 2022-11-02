@@ -1,20 +1,23 @@
-from particle import Particle
+from particle import Particle,ParticleState
 import os
 import copy
+import numpy as np
 
 
 class SimulationResult:
-    def __init__(self, humans_initial_qty, circle_radius, zombie_desired_velocity):
+    def __init__(self, humans_initial_qty, circle_radius, zombie_desired_velocity,delta_t):
         self.particles_by_frame = list()
         self.humans_initial_qty = humans_initial_qty
         self.circle_radius = circle_radius
         self.zombie_desired_velocity = zombie_desired_velocity
+        self.delta_t = delta_t
 
     def __str__(self):
-        return "SimulationResult: [humans_initial_qty={}, circle_radius={}, zombie_desired_velocity={}, particles_by_frame={}]".format(
+        return "SimulationResult: [humans_initial_qty={}, circle_radius={}, zombie_desired_velocity={}, delta_t={}, particles_by_frame={}]".format(
             self.humans_initial_qty,
             self.circle_radius,
             self.zombie_desired_velocity,
+            self.delta_t,
             self.particles_by_frame
         )
 
@@ -24,10 +27,26 @@ class SimulationResult:
     def set_total_contagion_time(self):
         self.total_contagion_time = self.particles_by_frame[-1].time
 
+    def set_mean_contagion_speed(self):
+        ##Primero, creamos una lista con las velocidades de contagio de cada frame
+        contagion_speed_list = list(map(lambda particle_frame: particle_frame.contagion_speed,self.particles_by_frame))
+        ##Luego, a partir de ella calculamos la velocidad de contagio media
+        self.mean_contagion_speed = np.mean(contagion_speed_list)
+
 class ParticlesFrame:
     def __init__(self):
         self.particles = list()
         self.time = 0
+        self.contagion_speed = 0
+
+    def get_zombie_count(self):
+        ##Primero, generamos una lista con las particulas que son zombies
+        zombie_list = list(filter(lambda particle: (particle.state == ParticleState.ZOMBIE or particle.state == ParticleState.ZOMBIE_INFECTING),self.particles))
+        ##Luego, retornamos la cantidad de dicha lista
+        return len(zombie_list)
+
+    def set_contagion_speed(self,previous_zombie_count,deltaT):
+        self.contagion_speed = (self.get_zombie_count()-previous_zombie_count)/deltaT
 
 def read_input_files(input_files__directory_path):
 
@@ -62,8 +81,9 @@ def read_input_files(input_files__directory_path):
                             simulation_result_dynamic = copy.deepcopy(simulation_result_static)
                             print('\t\t\tReading dynamic file. . .')
                             __read_dynamic_input_file(dynamic_files_dir_path+"/"+dynamicFilePath,simulation_result_dynamic)
-                            ##Seteamos el tiempo de contagio total y lo agregamos a la lista
+                            ##Seteamos el tiempo de contagio total, la velocidad de contagio media y lo agregamos a la lista
                             simulation_result_dynamic.set_total_contagion_time()
+                            simulation_result_dynamic.set_mean_contagion_speed()
                             simulation_results_list.append(simulation_result_dynamic)
                             print('\t\t\tDynamic file successfully read')
                     print('\t\tDynamic files directory successfully read. . .')
@@ -85,15 +105,18 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     zombie_desired_velocity = float(line.strip())
     line = file.readline()
+    delta_t = float(line.strip())
+    line = file.readline()
 
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(humans_initial_qty, circle_radius, zombie_desired_velocity)
+    return SimulationResult(humans_initial_qty, circle_radius, zombie_desired_velocity,delta_t)
     
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True
     file = open(dynamic_input_file_path , 'r')
+    previous_particles_frame = None
     while read:
         line = file.readline()
         if not line:
@@ -107,7 +130,15 @@ def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
                 line = file.readline()
                 particles_frame.particles.append(__get_particle_data(line))
 
+            ##Seteamos la velocidad de contagio en funcion del particles_frame anterior (por default para cada particles_frame es 0)
+            if(previous_particles_frame is not None):
+                particles_frame.set_contagion_speed(previous_particles_frame.get_zombie_count(),simulation_result.delta_t)
+
+            ##Agregamos el frame a la lista
             simulation_result.particles_by_frame.append(particles_frame)
+
+            ##Seteamos el nuevo previous particles_frame
+            previous_particles_frame = particles_frame
 
     file.close()
     return simulation_result
