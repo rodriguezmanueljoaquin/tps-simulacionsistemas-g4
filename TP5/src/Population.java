@@ -39,21 +39,10 @@ public class Population {
 
         //Seteamos las posiciones iniciales de las particulas
         setParticlesInitialPosition();
-        setWallParticles();
     }
 
     private double getRandomDoubleBetweenBounds(Pair<Double, Double> bounds) {
-        return this.rand.nextDouble()*(bounds.getRight()-bounds.getLeft()) + bounds.getRight();
-    }
-
-    private void setWallParticles() {
-        int PRECISION = 720;
-        for (int i = 0; i < PRECISION; i++) {
-            double angle = (double) i / PRECISION * Math.PI * 2;
-            wallParticles.add(new Particle(Math.cos(angle) * this.circleRadius, Math.sin(angle) * this.circleRadius,
-                    0, 0., ParticleState.WALL, 0.,
-                    this.getRandomDoubleBetweenBounds(wallAPRange), this.getRandomDoubleBetweenBounds(wallBPRange)));
-        }
+        return this.rand.nextDouble() * (bounds.getRight() - bounds.getLeft()) + bounds.getRight();
     }
 
     private Pair<Double, Double> getRandomPositionInCircle() {
@@ -103,7 +92,7 @@ public class Population {
             return null;
         }
         // other estaria en el mismo eje de acuerdo al origen pero más lejos
-        return new Particle(p.getX() * 2, p.getY() * 2, 0, ParticleState.WALL, 0.,0., 0.);
+        return new Particle(p.getX() * 2, p.getY() * 2, 0, ParticleState.WALL, 0., 0., 0.);
     }
 
     private boolean isInInfection(ParticleState state) {
@@ -228,22 +217,43 @@ public class Population {
     }
 
     private Pair<Double, Double> calculateTargetHeuristic(Particle p) {
-        List<Particle> particles = new ArrayList<>(population);
-        particles.addAll(wallParticles);
-        List<Particle> neighbours = particles.stream()
+        double nx = 0., ny = 0.;
+
+        // contra pared
+        double distanceToOrigin = p.distanceToOrigin();
+        if (this.circleRadius - distanceToOrigin < Constants.HUMAN_SEARCH_RADIUS) {
+            // se encuentra cerca de la pared, debe alejarse
+            double closestWallX = (p.getX() / distanceToOrigin) * this.circleRadius;
+            double closestWallY = (p.getY() / distanceToOrigin) * this.circleRadius;
+            double distanceToWall = p.calculateDistanceToWithoutRadius(closestWallX, closestWallY);
+
+            double wallWeight = this.getRandomDoubleBetweenBounds(wallAPRange) *
+                    Math.exp(-distanceToWall * this.getRandomDoubleBetweenBounds(wallBPRange));
+
+            double xDiff = p.getX() - closestWallX;
+            double ex = (xDiff) / distanceToWall;
+            nx += ex * wallWeight;
+
+            double yDiff = p.getY() - closestWallY;
+            double ey = (yDiff) / distanceToWall;
+            ny += ey * wallWeight;
+        }
+
+        // contra vecinos
+        List<Particle> neighbours = population.stream()
                 .filter(other -> p.calculateDistanceTo(other) < Constants.HUMAN_SEARCH_RADIUS && !p.equals(other))
                 .collect(Collectors.toList());
 
-        double nx = 0., ny = 0.;
         for (Particle neighbour : neighbours) {
-            double neighbourWeight = neighbour.getAP() * Math.exp(-p.calculateDistanceTo(neighbour) * neighbour.getBP());
+            double distanceToNeighbour = p.calculateDistanceToWithoutRadius(neighbour.getX(), neighbour.getY());
 
+            double neighbourWeight = neighbour.getAP() * Math.exp(-distanceToNeighbour * neighbour.getBP());
             double xDiff = p.getX() - neighbour.getX();
-            double ex = (xDiff) / Math.abs(xDiff);
+            double ex = (xDiff) / distanceToNeighbour;
             nx += ex * neighbourWeight;
 
             double yDiff = p.getY() - neighbour.getY();
-            double ey = (yDiff) / Math.abs(yDiff);
+            double ey = (yDiff) / distanceToNeighbour;
             ny += ey * neighbourWeight;
         }
 

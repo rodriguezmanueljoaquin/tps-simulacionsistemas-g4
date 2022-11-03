@@ -41,12 +41,13 @@ public class Particle implements Comparable {
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.max(0, Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - this.radius - other.radius);
+        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - this.radius - other.radius;
     }
 
-    private double calculateDistanceToWithoutRadius(double otherX, double otherY) {
+    public double calculateDistanceToWithoutRadius(double otherX, double otherY) {
         return Math.hypot(this.getX() - otherX, this.getY() - otherY);
     }
+
     public void updatePosition(double dt) {
         this.x += this.xVelocity * dt;
         this.y += this.yVelocity * dt;
@@ -66,18 +67,16 @@ public class Particle implements Comparable {
     public void velocityUpdate(boolean contact, double otherX, double otherY, Double velocity) {
         double rx;
         double ry;
+        rx = (otherX - this.x) / this.calculateDistanceToWithoutRadius(otherX, otherY);
+        ry = (otherY - this.y) / this.calculateDistanceToWithoutRadius(otherX, otherY);
         if (contact) {
-            //Si hubo contacto, la velocidad de escape es en direcciones opuestas, en la direccion del eje de contacto
-            rx = (this.x - otherX) / this.calculateDistanceToWithoutRadius(otherX, otherY);
-            ry = (this.y - otherY) / this.calculateDistanceToWithoutRadius(otherX, otherY);
+            //Si hubo contacto, la velocidad de escape es en direcciones opuestas al other, en la direccion del eje de contacto
+            rx *= -1;
+            ry *= -1;
             velocity = this.vdMax;
-        } else {
-            if (velocity == null)
-                velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
+        } else if (velocity == null){
+            velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
                         (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
-
-            rx = (otherX - this.x) / Math.abs(otherX - this.x);
-            ry = (otherY - this.y) / Math.abs(otherY - this.y);
         }
         this.xVelocity = velocity * rx;
         this.yVelocity = velocity * ry;

@@ -14,15 +14,15 @@ public class Manager {
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
         // variando cantidad de humanos;
-//        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-        Integer[] initialHumansQtyArray = new Integer[]{200};
+        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
+//        Integer[] initialHumansQtyArray = new Integer[]{260};
         double zombieDesiredVelocity = 3;
-         Pair<Double, Double> zombieAPRange = new Pair<>(1800., 2200.);
-         Pair<Double, Double> zombieBPRange = new Pair<>(0.3,0.7);
-         Pair<Double, Double> humanAPRange = new Pair<>(400., 600.);
-         Pair<Double, Double> humanBPRange = new Pair<>(0.3, 0.7);
-         Pair<Double, Double> wallAPRange = new Pair<>(200. , 400.);
-         Pair<Double, Double> wallBPRange = new Pair<>(0.3, 0.7);
+        Pair<Double, Double> zombieAPRange = new Pair<>(1750., 2250.);
+        Pair<Double, Double> zombieBPRange = new Pair<>(0.25, .75);
+        Pair<Double, Double> humanAPRange = new Pair<>(400., 600.);
+        Pair<Double, Double> humanBPRange = new Pair<>(0.25, .75);
+        Pair<Double, Double> wallAPRange = new Pair<>(400., 600.);
+        Pair<Double, Double> wallBPRange = new Pair<>(0.25, .75);
         for (Integer integer : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity,
                     zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
@@ -45,7 +45,7 @@ public class Manager {
                     new File(resultsFolderPath).mkdir();
                 }
                 for (int i = 0; i < Constants.SIMULATION_REPETITION_TIMES; i++) {
-                    System.out.println("Iteration " + i);
+                    System.out.println("Iteration " + i + " for nH:" + parameters.initialHumansQty + " vz:" + parameters.zombieDesiredVelocity);
                     Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(),
                             parameters.zombieAPRange, parameters.zombieBPRange, parameters.humanAPRange, parameters.humanBPRange,
                             parameters.wallAPRange, parameters.wallBPRange);
