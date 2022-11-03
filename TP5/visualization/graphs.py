@@ -4,6 +4,7 @@ import numpy as np
 import collections
 import matplotlib.pyplot as plt
 import math
+from enum import Enum
 
 
 def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", errors = None, log_scale = False):
@@ -31,56 +32,49 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
 
 
 ##Funciones para observables escalares
+class ScalarObservableTypeData(Enum):
+    ZOMBIE_FRACTION = {
+        "set_execution_observable_value": lambda execution: execution.set_total_contagion_time(),
+        "get_execution_observable_value": lambda execution: execution.total_contagion_time,
+        "y_label": "Tiempo de contagio total (s)",
+    }
+    CONTAGION_SPEED = {
+        "set_execution_observable_value": lambda execution: execution.set_mean_contagion_speed(),
+        "get_execution_observable_value": lambda execution: execution.mean_contagion_speed,
+        "y_label": "Velocidad de contagio media (z/s)",
+    }
 
-###Tiempo de contagio total vs variable a analizar (Nh/Vz)
-def plot_zombie_fraction_scalar_observable(simulation_results,variable):
-    ##Primero, creamos un diccionario de la forma (variable a analizar;[tiempos de contagio total])
+def plot_scalar_observable(simulation_results, variable, observable):
+    if(observable == "zombie_fraction"):
+        scalar_data = ScalarObservableTypeData.ZOMBIE_FRACTION
+    else:
+        scalar_data = ScalarObservableTypeData.CONTAGION_SPEED
+
+    ##Primero, creamos un diccionario de la forma (variable a analizar;[observable])
     scalar_observable_dict = dict()
     ##Recorremos cada experimento, y por cada uno de ellos las distintas ejecuciones
-    for simulation_result_experiment in simulation_results:
-        for simulation_result_execution in simulation_result_experiment:
+    for experiment in simulation_results:
+        for execution in experiment:
+            scalar_data.value["set_execution_observable_value"](execution)
             ##Tomamos la variable a analizar como clave del diccionario
-            dict_key = simulation_result_execution.humans_initial_qty if variable=='humans_initial_qty' else simulation_result_execution.zombie_desired_velocity
-            ##Si no existe esa clave en el diccionario, la insertamos con una lista que contenga el tiempo de contagio total correspondiente
+            dict_key = execution.humans_initial_qty if variable=='humans_initial_qty' else execution.zombie_desired_velocity
+            
+            ##Si no existe esa clave en el diccionario, la insertamos con una lista que contenga la variable observada
             ##Sino, lo agregamos a la lista ya existente
             if(dict_key not in scalar_observable_dict):
-                scalar_observable_dict[dict_key] = [simulation_result_execution.total_contagion_time]
+                scalar_observable_dict[dict_key] = \
+                    [scalar_data.value["get_execution_observable_value"](execution)]
             else:
-                scalar_observable_dict[dict_key].append(simulation_result_execution.total_contagion_time)
+                scalar_observable_dict[dict_key]\
+                    .append(scalar_data.value["get_execution_observable_value"](execution))
+
     ##Luego, ordenamos el diccionario por clave
     scalar_observable_dict = dict(sorted(scalar_observable_dict.items()))
-    ##Luego, generamos la data para el observable
+    ##Luego, generamos la data para el observable escalar
     inputs = [list(scalar_observable_dict.keys())]
-    curves = [[np.mean(contagion_time_list) for contagion_time_list in list(scalar_observable_dict.values())]]
-    errors = [[np.std(contagion_time_list) for contagion_time_list in list(scalar_observable_dict.values())]]
-    y_label = "Tiempo de contagio total (s)"
-    x_label = "Cantidad de humanos" if variable=='humans_initial_qty' else "Velocidad deseada del zombie (m/s)"
-    ##Finalmente, realizamos el observable correspondiente
-    plot_curves_with_legend(inputs,curves,None,x_label,y_label,errors)
+    curves = [[np.mean(observable_list) for observable_list in list(scalar_observable_dict.values())]]
+    errors = [[np.std(observable_list) for observable_list in list(scalar_observable_dict.values())]]
 
-
-###Velocidad de contagio media vs variable a analizar (Nh/Vz)
-def plot_contagion_speed_scalar_observable(simulation_results,variable):
-    ##Primero, creamos un diccionario de la forma (variable a analizar;[velocidad de contagio media])
-    scalar_observable_dict = dict()
-    ##Recorremos cada experimento, y por cada uno de ellos las distintas ejecuciones
-    for simulation_result_experiment in simulation_results:
-        for simulation_result_execution in simulation_result_experiment:
-            ##Tomamos la variable a analizar como clave del diccionario
-            dict_key = simulation_result_execution.humans_initial_qty if variable=='humans_initial_qty' else simulation_result_execution.zombie_desired_velocity
-            ##Si no existe esa clave en el diccionario, la insertamos con una lista que contenga la velocidad de contagio media correspondiente
-            ##Sino, lo agregamos a la lista ya existente
-            if(dict_key not in scalar_observable_dict):
-                scalar_observable_dict[dict_key] = [simulation_result_execution.mean_contagion_speed]
-            else:
-                scalar_observable_dict[dict_key].append(simulation_result_execution.mean_contagion_speed)
-    ##Luego, ordenamos el diccionario por clave
-    scalar_observable_dict = dict(sorted(scalar_observable_dict.items()))
-    ##Luego, generamos la data para el observable
-    inputs = [list(scalar_observable_dict.keys())]
-    curves = [[np.mean(mean_contagion_speed_list) for mean_contagion_speed_list in list(scalar_observable_dict.values())]]
-    errors = [[np.std(mean_contagion_speed_list) for mean_contagion_speed_list in list(scalar_observable_dict.values())]]
-    y_label = "Velocidad de contagio media (z/s)"
+    y_label = scalar_data.value["y_label"]
     x_label = "Cantidad de humanos" if variable=='humans_initial_qty' else "Velocidad deseada del zombie (m/s)"
-    ##Finalmente, realizamos el observable correspondiente
     plot_curves_with_legend(inputs,curves,None,x_label,y_label,errors)

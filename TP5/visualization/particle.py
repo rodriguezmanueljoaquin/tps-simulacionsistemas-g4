@@ -1,13 +1,13 @@
 from cmath import pi
 import random
+from enum import Enum
 
 # enum
-class ParticleState:
+class ParticleState(Enum):
     HUMAN = 0
     HUMAN_INFECTED = 1
     ZOMBIE_INFECTING = 2
     ZOMBIE = 3
-
 
 class Particle:    
     def __init__(self,id,x,y,velx,vely,radius,state):

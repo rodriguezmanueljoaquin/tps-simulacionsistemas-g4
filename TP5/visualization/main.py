@@ -1,7 +1,7 @@
 import argparse
 import exportOvito
 from files import read_input_files
-from graphs import plot_zombie_fraction_scalar_observable,plot_contagion_speed_scalar_observable
+from graphs import plot_scalar_observable
 
 if __name__ == "__main__":
     #Valores default de los argumentos
@@ -60,10 +60,7 @@ if __name__ == "__main__":
         # GRAFICOS:
             #Primero, chequeamos el tipo de observable a realizar (escalar o temporal) y luego cual se quiere realizar (fraccion de zombies o velocidad de contagio)
             if(observable_type=='scalar'):
-                if(observable=='zombie_fraction'):
-                    plot_zombie_fraction_scalar_observable(simulations_results,observable_variable)
-                else:
-                    plot_contagion_speed_scalar_observable(simulations_results,observable_variable)
+                plot_scalar_observable(simulations_results,observable_variable,observable)
             else:
                 if(observable=='zombie_fraction'):
                     print("Observable temporal de fraccion de zombies vs tiempo en progreso") 
