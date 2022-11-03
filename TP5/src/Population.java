@@ -6,9 +6,8 @@ import java.util.stream.Collectors;
 
 public class Population {
     private List<Particle> population;
-    private List<Particle> wallParticles;
     private Random rand;
-    private Double currentTime, circleRadius, zombieDesiredVelocity;
+    private Double currentTime, deltaTOutput, circleRadius, zombieDesiredVelocity;
     private Integer initialHumansQty, zombiesQty;
     private static Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY);
     private Pair<Double, Double> zombieAPRange;
@@ -21,21 +20,22 @@ public class Population {
     public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed,
                       Pair<Double, Double> zombieAPRange, Pair<Double, Double> zombieBPRange,
                       Pair<Double, Double> humanAPRange, Pair<Double, Double> humanBPRange,
-                      Pair<Double, Double> wallAPRange, Pair<Double, Double> wallBPRange) {
+                      Pair<Double, Double> wallAPRange, Pair<Double, Double> wallBPRange,
+                      Integer deltaTOutputMultiplier) {
         this.initialHumansQty = initialHumansQty;
         this.circleRadius = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
-        this.wallParticles = new ArrayList<>();
+        this.currentTime = 0.;
         this.zombiesQty = 0;
         this.zombieDesiredVelocity = zombieDesiredVelocity;
         this.rand = new Random(seed);
-        this.currentTime = 0.;
         this.zombieAPRange = zombieAPRange;
         this.zombieBPRange = zombieBPRange;
         this.humanAPRange = humanAPRange;
         this.humanBPRange = humanBPRange;
         this.wallAPRange = wallAPRange;
         this.wallBPRange = wallBPRange;
+        this.deltaTOutput = Population.DELTA_T * deltaTOutputMultiplier;
 
         //Seteamos las posiciones iniciales de las particulas
         setParticlesInitialPosition();
@@ -99,15 +99,18 @@ public class Population {
         return state == ParticleState.HUMAN_INFECTED || state == ParticleState.ZOMBIE_INFECTING;
     }
 
-    private void checkInfections() {
+    private void checkInfectionsAndUpdatePositions() {
         for (Particle p : this.population) {
             if (p.getState() == ParticleState.HUMAN_INFECTED || p.getState() == ParticleState.ZOMBIE_INFECTING) {
                 if (p.getZombieContactTime() + Constants.INFECTION_DURATION <= this.currentTime) {
-                    System.out.println("Particle " + p.getId() + " ended infection");
+//                    System.out.println("Particle " + p.getId() + " ended infection");
                     p.setState(ParticleState.ZOMBIE);
                     this.zombiesQty++;
                 }
             }
+            // Actualizo para aquellas que no estan en situación de contacto
+            if (!isInInfection(p.getState()))
+                p.updatePosition(Population.DELTA_T);
         }
     }
 
@@ -146,6 +149,20 @@ public class Population {
                 freeParticles.add(p);
             }
         }
+    }
+
+    private void updateParticlesInInfection(Particle human, Particle zombie) {
+        human.setState(ParticleState.HUMAN_INFECTED);
+        human.setZombieContactTime(this.currentTime);
+        human.setXVelocity(0);
+        human.setYVelocity(0);
+        if (zombie.getState() != ParticleState.ZOMBIE_INFECTING) {
+            zombie.setState(ParticleState.ZOMBIE_INFECTING);
+            this.zombiesQty--;
+        }
+        zombie.setZombieContactTime(this.currentTime);
+        zombie.setXVelocity(0);
+        zombie.setYVelocity(0);
     }
 
     private void updateCollisionParticles(Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
@@ -211,7 +228,7 @@ public class Population {
                 targetY = target.getRight();
             }
             p.velocityUpdate(false, targetX, targetY, velocity);
-            p.radiusUpdate(false, this.DELTA_T);
+            p.radiusUpdate(false, Population.DELTA_T);
         }
 
     }
@@ -260,51 +277,33 @@ public class Population {
         return new Pair<>(nx, ny);
     }
 
-
     public void nextIteration() {
-        // Reviso si alguna infección termino
-        checkInfections();
+        double endIterationTime = this.currentTime + this.deltaTOutput;
+        while (this.currentTime <= endIterationTime && this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
+            // Reviso si alguna infección termino y actualizo posiciones
+            checkInfectionsAndUpdatePositions();
 
-        // Actualizo posiciones
-        for (Particle p : this.population)
-            // Actualizo para aquellas que no estan en situación de contacto
-            if (!isInInfection(p.getState()))
-                p.updatePosition(this.DELTA_T);
+            // Veo colisiones existentes
+            List<Particle> freeParticles = new ArrayList<>(); // particulas que no estan en colisión ni en infección
+            Map<CollisionType, List<Pair<Particle, Particle>>> collisions = new HashMap<>();
+            collisions.put(CollisionType.INFECTION, new ArrayList<>());
+            collisions.put(CollisionType.PARTICLE, new ArrayList<>());
+            collisions.put(CollisionType.WALL, new ArrayList<>());
 
-        // Veo colisiones existentes
-        List<Particle> freeParticles = new ArrayList<>(); // particulas que no estan en colisión ni en infección
-        Map<CollisionType, List<Pair<Particle, Particle>>> collisions = new HashMap<>();
-        collisions.put(CollisionType.INFECTION, new ArrayList<>());
-        collisions.put(CollisionType.PARTICLE, new ArrayList<>());
-        collisions.put(CollisionType.WALL, new ArrayList<>());
+            findCollisions(freeParticles, collisions);
 
-        findCollisions(freeParticles, collisions);
+            updateCollisionParticles(collisions);
+            updateFreeParticles(freeParticles);
 
-        updateCollisionParticles(collisions);
-        updateFreeParticles(freeParticles);
-
-        this.currentTime += this.DELTA_T;
-    }
-
-    private void updateParticlesInInfection(Particle human, Particle zombie) {
-        human.setState(ParticleState.HUMAN_INFECTED);
-        human.setZombieContactTime(this.currentTime);
-        human.setXVelocity(0);
-        human.setYVelocity(0);
-        if (zombie.getState() != ParticleState.ZOMBIE_INFECTING) {
-            zombie.setState(ParticleState.ZOMBIE_INFECTING);
-            this.zombiesQty--;
+            this.currentTime += Population.DELTA_T;
         }
-        zombie.setZombieContactTime(this.currentTime);
-        zombie.setXVelocity(0);
-        zombie.setYVelocity(0);
     }
 
-    public static void createStaticFile(String outputPath, Integer initialHumansQty, Double zombieDesiredVelocity) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputPath, Integer initialHumansQty, Double zombieDesiredVelocity, Integer deltaTOutputMultiplier) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + "/static.txt", "UTF-8");
-        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity,DELTA_T));
+        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity, Population.DELTA_T * deltaTOutputMultiplier));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
@@ -313,7 +312,6 @@ public class Population {
     private void writeOutput(PrintWriter writer) {
         writer.println(this.currentTime);
         for (Particle p : this.population) {
-//            boolean isZombie = p.getState() != ParticleState.HUMAN && p.getState() != ParticleState.HUMAN_INFECTED;
             writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
                     p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), p.getState().ordinal()));
         }

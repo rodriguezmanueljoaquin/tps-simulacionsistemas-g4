@@ -8,14 +8,15 @@ import java.util.Locale;
 import java.util.Random;
 
 public class Manager {
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void main(String[] args) {
         String RESULTS_PATH = "results/";
         new File("results").mkdir();
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
+        int deltaTOutputMultiplier = 4*20*10; // si vale 4, deltaTOutput = 0.05s, 4*20 hace que valga 1s
         // variando cantidad de humanos;
         Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-//        Integer[] initialHumansQtyArray = new Integer[]{260};
+//        Integer[] initialHumansQtyArray = new Integer[]{40};
         double zombieDesiredVelocity = 3;
         Pair<Double, Double> zombieAPRange = new Pair<>(1750., 2250.);
         Pair<Double, Double> zombieBPRange = new Pair<>(0.25, .75);
@@ -27,13 +28,10 @@ public class Manager {
             simulationParameters.add(new SimulationParameters(integer, zombieDesiredVelocity,
                     zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
-
         //variando velocidad deseada del zombie
 //        int initialHumansQty = 140;
 //        for (zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
 //            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
-
-
 
         System.out.println("Starting simulations");
         simulationParameters.forEach(parameters -> {
@@ -48,8 +46,8 @@ public class Manager {
                     System.out.println("Iteration " + i + " for nH:" + parameters.initialHumansQty + " vz:" + parameters.zombieDesiredVelocity);
                     Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(),
                             parameters.zombieAPRange, parameters.zombieBPRange, parameters.humanAPRange, parameters.humanBPRange,
-                            parameters.wallAPRange, parameters.wallBPRange);
-                    Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity);
+                            parameters.wallAPRange, parameters.wallBPRange, deltaTOutputMultiplier);
+                    Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity, deltaTOutputMultiplier);
 
                     String dynamicsPath = resultsFolderPath + "/dynamics";
                     new File(dynamicsPath).mkdir();
