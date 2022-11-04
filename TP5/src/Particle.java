@@ -74,9 +74,9 @@ public class Particle implements Comparable {
             rx *= -1;
             ry *= -1;
             velocity = this.vdMax;
-        } else if (velocity == null){
+        } else if (velocity == null) {
             velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
-                        (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
+                    (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
         }
         this.xVelocity = velocity * rx;
         this.yVelocity = velocity * ry;

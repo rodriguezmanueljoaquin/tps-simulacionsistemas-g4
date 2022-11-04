@@ -8,8 +8,9 @@ public class Population {
     private List<Particle> population;
     private Random rand;
     private Double currentTime, deltaTOutput, circleRadius, zombieDesiredVelocity;
-    private Integer initialHumansQty, zombiesQty;
-    private static Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY);
+    private final Integer initialHumansQty;
+    private Integer zombiesQty;
+    private static Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY); // ve = vdmax
     private Pair<Double, Double> zombieAPRange;
     private Pair<Double, Double> zombieBPRange;
     private Pair<Double, Double> humanAPRange;
@@ -23,6 +24,7 @@ public class Population {
                       Pair<Double, Double> wallAPRange, Pair<Double, Double> wallBPRange,
                       Integer deltaTOutputMultiplier) {
         this.initialHumansQty = initialHumansQty;
+        System.out.println(this.initialHumansQty);
         this.circleRadius = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
         this.currentTime = 0.;
@@ -329,6 +331,6 @@ public class Population {
         writeOutput(writer);
 
         writer.close();
-        System.out.println("\tDynamic file successfully created");
+        System.out.println("\tDynamic file successfully created, finished with " + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " zombies");
     }
 }
