@@ -1,11 +1,9 @@
 import seaborn as sns
 import pandas as pd
 import numpy as np
-import collections
 import matplotlib.pyplot as plt
 import math
 from enum import Enum
-
 
 def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", errors = None, log_scale = False):
     colors = sns.color_palette("hls", len(curves))
@@ -17,9 +15,9 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
                 plt.plot(inputs[i], curves[i], color=colors[i])
         else:
             if(legends is not None):
-                plt.errorbar(inputs[i], curves[i],yerr=errors,label=legends[i],color=colors[i])
+                plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i],color=colors[i])
             else:
-                plt.errorbar(inputs[i], curves[i],yerr=errors,color=colors[i])
+                plt.errorbar(inputs[i], curves[i],yerr=errors[i],color=colors[i])
 
     if legends is not None:
         plt.legend()
@@ -50,7 +48,7 @@ def plot_scalar_observable(simulation_results, variable, observable):
     else:
         scalar_data = ScalarObservableTypeData.CONTAGION_SPEED
 
-    ##Primero, creamos un diccionario de la forma (variable a analizar;[observable])
+    ##Primero, creamos un diccionario de la forma {variable a analizar;[observable]}
     scalar_observable_dict = dict()
     ##Recorremos cada experimento, y por cada uno de ellos las distintas ejecuciones
     for experiment in simulation_results:
@@ -78,3 +76,57 @@ def plot_scalar_observable(simulation_results, variable, observable):
     y_label = scalar_data.value["y_label"]
     x_label = "Cantidad de humanos" if variable=='humans_initial_qty' else "Velocidad deseada del zombie (m/s)"
     plot_curves_with_legend(inputs,curves,None,x_label,y_label,errors)
+
+
+##Funciones para observables temporales
+
+###Velocidad de contagio vs tiempo
+def plot_contagion_speed_temporal_observable(simulation_results,variable):
+    ##Primero, creamos un diccionario de la forma {variable a analizar;[(tiempo;[velocidades de contagio de cada ejecucion])]}
+    temporal_observable_dict = dict()
+    ##Recorremos cada experimento, y por cada uno de ellos las distintas ejecuciones
+    for experiment in simulation_results:
+        for execution in experiment:
+            ##Tomamos la variable a analizar como clave del diccionario principal
+            dict_key = execution.humans_initial_qty if variable=='humans_initial_qty' else execution.zombie_desired_velocity
+
+            ##Si no existe esa clave en el diccionario, la insertamos con su lista correspondiente
+            if(dict_key not in temporal_observable_dict):
+                temporal_observable_dict[dict_key] = list()
+            
+            ##Luego, recorremos los distintos frames de la ejecucion correspondiente
+            for particle_frame in execution.particles_by_frame:
+                ##Si no existe el tiempo del frame en la lista de tuplas correspondiente a la variable analizada, insertamos en la lista correspondiente una tupla con dicho tiempo
+                ##y una lista que contenga la velocidad de contagio del mismo
+                ##Sino, agregamos la velocidad de contagio a la lista existente de la tupla de dicho tiempo
+                if(particle_frame.time not in list(map(lambda tuple: tuple[0],temporal_observable_dict[dict_key]))):
+                    temporal_observable_dict[dict_key].append((particle_frame.time,[particle_frame.contagion_speed]))
+                else:
+                    current_time_tuple = list(filter(lambda tup: tup[0] == particle_frame.time,temporal_observable_dict[dict_key]))[0]
+                    current_time_tuple[1].append(particle_frame.contagion_speed)
+
+            ##Luego, ordenamos la lista de tuplas por tiempo
+            temporal_observable_dict[dict_key].sort(key=lambda x: x[0])
+    
+    ##Luego, ordenamos el diccionario por clave
+    temporal_observable_dict = dict(sorted(temporal_observable_dict.items()))
+
+    ##Luego, generamos la data para el observable temporal
+    ###inputs = Tiempos medidos en cada ejecucion
+    inputs = list(map(lambda time_tuples_list: list(map(lambda tuple: tuple[0],time_tuples_list)),list(temporal_observable_dict.values())))
+    ###curves = Los valores medios de la vel de contagio en cada tiempo, por cada valor de variable analizada
+    ####Primero, armamos una lista de vel de contagio por tiempo, por cada variable analizada (de la forma [ [ [...], [...], [...] ], [ [...], [...], [...] ], ... ])
+    contagion_speed_per_time_per_variable_list = list(map(lambda time_tuples_list: list(map(lambda tuple: tuple[1],time_tuples_list)),list(temporal_observable_dict.values())))
+    ####Luego, a partir de ella creamos una lista, que por cada variable analizada, tenga las vel de contagio promedio de cada tiempo (de la forma [ [ vPromt0, vPromt5 , ... ], [ vPromt0, vPromt5 , ... ], ... ])
+    ####Dicha lista sera "curves"
+    curves = list(map(lambda variable_list : list(map(lambda time_list: np.mean(time_list),variable_list)),contagion_speed_per_time_per_variable_list))
+    ###errors = Desvios estandar de las distintas velocidades de contagio por tiempo por variable analizada (se calcula igual que curves pero usando np.std() en vez de np.mean())
+    errors = list(map(lambda variable_list : list(map(lambda time_list: np.std(time_list),variable_list)),contagion_speed_per_time_per_variable_list))
+    ###legends = Los distintos valores de la variable analizada
+    legends = list(map(lambda dict_key: f"Cantidad de humanos = {dict_key}" if variable=='humans_initial_qty' else f"Velocidad deseada del zombie = {dict_key} m/s",temporal_observable_dict.keys()))
+    
+    y_label = "Velocidad de contagio (z/s)"
+    x_label = "Tiempo (s)"
+
+    ##Finalmente, realizamos el observable correspondiente
+    plot_curves_with_legend(inputs,curves,legends,x_label,y_label,errors)
