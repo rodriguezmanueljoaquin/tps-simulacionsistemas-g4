@@ -24,7 +24,6 @@ public class Population {
                       Pair<Double, Double> wallAPRange, Pair<Double, Double> wallBPRange,
                       Integer deltaTOutputMultiplier) {
         this.initialHumansQty = initialHumansQty;
-        System.out.println(this.initialHumansQty);
         this.circleRadius = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
         this.currentTime = 0.;
@@ -331,6 +330,6 @@ public class Population {
         writeOutput(writer);
 
         writer.close();
-        System.out.println("\tDynamic file successfully created, finished with " + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " zombies");
+        System.out.println("\tDynamic file successfully created, finished with " + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " zombies at " + this.currentTime);
     }
 }

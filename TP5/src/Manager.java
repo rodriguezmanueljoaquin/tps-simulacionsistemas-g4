@@ -16,7 +16,7 @@ public class Manager {
         Pair<Double, Double> zombieBPRange = new Pair<>(0.25, .75);
         Pair<Double, Double> humanAPRange = new Pair<>(750., 1000.);
         Pair<Double, Double> humanBPRange = new Pair<>(0.25, .75);
-        Pair<Double, Double> wallAPRange = new Pair<>(100., 1500.);
+        Pair<Double, Double> wallAPRange = new Pair<>(100., 800.);
         Pair<Double, Double> wallBPRange = new Pair<>(0.25, .75);
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
@@ -24,21 +24,21 @@ public class Manager {
 //        int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
-        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-//        Integer[] initialHumansQtyArray = new Integer[]{80};
+//        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
+        Integer[] initialHumansQtyArray = new Integer[]{140};
         double zombieDesiredVelocity = 3;
         for (Integer initialHumansQty : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
                     zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         //variando velocidad deseada del zombie
-//        int initialHumansQty = 200;
+//        int initialHumansQty = 140;
 //        for (double zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
 //            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
 //                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
-        // variando el coeficiente Aphumanos/Apzombies
-//        for (double AphOverApzCoefficient = 0; AphOverApzCoefficient < 2. ; AphOverApzCoefficient += 0.25){
+        // variando el coeficiente Aphumanos/Apzombies, hasta 1.2 por que no tiene sentido que le tenga mas miedo a los humanos que a los zombies
+//        for (double AphOverApzCoefficient = 0; AphOverApzCoefficient <= 1.2. ; AphOverApzCoefficient += 0.2){
 //            // ApWall y ApZombies se mantienen como antes pero se cambia el Aphumanos
 //            humanAPRange.setNewValues(zombieAPRange.getLeft() * AphOverApzCoefficient, zombieAPRange.getRight() * AphOverApzCoefficient);
 //            extraParameters = String.valueOf(AphOverApzCoefficient);
