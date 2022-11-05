@@ -1,7 +1,7 @@
 import argparse
 import exportOvito
 from files import read_input_files
-from graphs import plot_scalar_observable,plot_contagion_speed_temporal_observable,plot_zombie_fraction_temporal_observable
+from graphs import plot_scalar_observable,plot_temporal_observable
 
 if __name__ == "__main__":
     #Valores default de los argumentos
@@ -62,10 +62,7 @@ if __name__ == "__main__":
             if(observable_type=='scalar'):
                 plot_scalar_observable(simulations_results,observable_variable,observable)
             else:
-                if(observable=='zombie_fraction'):
-                    plot_zombie_fraction_temporal_observable(simulations_results,observable_variable) 
-                else:
-                    plot_contagion_speed_temporal_observable(simulations_results,observable_variable)
+                plot_temporal_observable(simulations_results,observable_variable,observable)
 
     else:
         print("Invalid command line arguments")
