@@ -45,6 +45,9 @@ class ParticlesFrame:
         ##Luego, retornamos la cantidad de dicha lista
         return len(zombie_list)
 
+    def get_zombie_fraction(self):
+        return self.get_zombie_count()/len(self.particles)
+
     def set_contagion_speed(self,previous_zombie_count,deltaT):
         self.contagion_speed = (self.get_zombie_count()-previous_zombie_count)/deltaT
 
