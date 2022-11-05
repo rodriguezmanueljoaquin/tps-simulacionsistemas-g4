@@ -5,7 +5,7 @@ public class Particle implements Comparable {
     private double yVelocity;
     private double xVelocity;
     private double radius;
-    private final double vdMax;
+    private double vdMax;
     private double zombieContactTime;
     private double startWanderingTime;
     private ParticleState state;
@@ -41,11 +41,11 @@ public class Particle implements Comparable {
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.hypot(this.getX() - other.getX(), this.getY() - other.getY()) - this.radius - other.radius;
+       return Math.sqrt(Math.pow(this.getX() - other.getX(), 2)) + Math.pow((this.getY() - other.getY()),2) - this.radius - other.radius;
     }
 
     public double calculateDistanceToWithoutRadius(double otherX, double otherY) {
-        return Math.hypot(this.getX() - otherX, this.getY() - otherY);
+        return Math.sqrt(Math.pow(this.getX() - otherX, 2)) + Math.pow((this.getY() - otherY),2);
     }
 
     public void updatePosition(double dt) {
@@ -64,20 +64,20 @@ public class Particle implements Comparable {
     //-Si hubo colision, la particula con la que colisiono
     //-Si no hubo colision el target
     // Recibe velocity, pues en el caso de que un zombie este deambulando sin objetivo debe hacerlo con una velocidad especifica
-    public void velocityUpdate(boolean contact, double otherX, double otherY, Double velocity) {
+    public void velocityUpdate(boolean contact, double otherX, double otherY) {
+        double velocity;
         double rx;
         double ry;
-        rx = (otherX - this.x) / this.calculateDistanceToWithoutRadius(otherX, otherY);
-        ry = (otherY - this.y) / this.calculateDistanceToWithoutRadius(otherX, otherY);
+        double distanceToWithoutRadius =  this.calculateDistanceToWithoutRadius(otherX, otherY);
+        rx = (otherX - this.x) / distanceToWithoutRadius;
+        ry = (otherY - this.y) / distanceToWithoutRadius;
         if (contact) {
             //Si hubo contacto, la velocidad de escape es en direcciones opuestas al other, en la direccion del eje de contacto
             rx *= -1;
             ry *= -1;
-            velocity = this.vdMax;
-        } else if (velocity == null) {
-            velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
-                    (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
         }
+        velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
+                (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
         this.xVelocity = velocity * rx;
         this.yVelocity = velocity * ry;
     }
@@ -139,12 +139,8 @@ public class Particle implements Comparable {
         return this.BP;
     }
 
-    public void setXVelocity(double xVelocity) {
-        this.xVelocity = xVelocity;
-    }
-
-    public void setYVelocity(double yVelocity) {
-        this.yVelocity = yVelocity;
+    public void setVdMax(double vdMax) {
+        this.vdMax = vdMax;
     }
 
     public void setWanderTarget(Double wanderTargetX, Double wanderTargetY, Double time) {

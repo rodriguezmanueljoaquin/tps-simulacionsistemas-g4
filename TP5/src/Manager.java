@@ -13,9 +13,9 @@ public class Manager {
         String extraParametersStr = "";
         new File("results").mkdir();
 
-        double zombieMeanAp = 2000;
-        double zombieStdAp = 50;
-        double humanMeanAp = 800;
+        double zombieMeanAp = 1500;
+        double zombieStdAp = 500;
+        double humanMeanAp = 350;
         double humanStdAp = 50;
         double wallMeanAp = humanMeanAp;
         double wallStdAp = 50;
@@ -33,9 +33,9 @@ public class Manager {
         int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
-//        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-        Integer[] initialHumansQtyArray = new Integer[]{140};
-        double zombieDesiredVelocity = 3;
+        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
+        //Integer[] initialHumansQtyArray = new Integer[]{140};
+        double zombieDesiredVelocity = 4;
         for (Integer initialHumansQty : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
                     zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));

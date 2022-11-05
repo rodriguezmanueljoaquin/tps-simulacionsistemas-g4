@@ -119,6 +119,7 @@ public class Population {
                 if (p.getZombieContactTime() + Constants.INFECTION_DURATION <= this.currentTime) {
 //                    System.out.println("Particle " + p.getId() + " ended infection");
                     p.setState(ParticleState.ZOMBIE);
+                    p.setVdMax(Constants.ZOMBIE_SEARCH_SPEED);
                     this.zombiesQty++;
                 }
             }
@@ -168,15 +169,13 @@ public class Population {
     private void updateParticlesInInfection(Particle human, Particle zombie) {
         human.setState(ParticleState.HUMAN_INFECTED);
         human.setZombieContactTime(this.currentTime);
-        human.setXVelocity(0);
-        human.setYVelocity(0);
+        human.setVdMax(0);
         if (zombie.getState() != ParticleState.ZOMBIE_INFECTING) {
             zombie.setState(ParticleState.ZOMBIE_INFECTING);
             this.zombiesQty--;
         }
         zombie.setZombieContactTime(this.currentTime);
-        zombie.setXVelocity(0);
-        zombie.setYVelocity(0);
+        zombie.setVdMax(0);
     }
 
     private void updateCollisionParticles(Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
@@ -189,8 +188,9 @@ public class Population {
         for (Pair<Particle, Particle> particles : collisions.get(CollisionType.WALL)) {
             Particle wall = particles.getRight();
             Particle p = particles.getLeft();
-            p.velocityUpdate(true, wall.getX(), wall.getY(), null);
             p.radiusUpdate(true, DELTA_T);
+            p.velocityUpdate(true, wall.getX(), wall.getY());
+
         }
 
         // Choques entre particulas
@@ -200,12 +200,13 @@ public class Population {
 
             // Actualizar solo las que no estan en infección
             if (!isInInfection(p1.getState())) {
-                p1.velocityUpdate(true, p2.getX(), p2.getY(), null);
                 p1.radiusUpdate(true, DELTA_T);
+                p1.velocityUpdate(true, p2.getX(), p2.getY());
+
             }
             if (!isInInfection(p2.getState())) {
-                p2.velocityUpdate(true, p1.getX(), p1.getY(), null);
                 p2.radiusUpdate(true, DELTA_T);
+                p2.velocityUpdate(true, p1.getX(), p1.getY());
             }
         }
     }
@@ -213,7 +214,7 @@ public class Population {
     private void updateFreeParticles(List<Particle> freeParticles) {
         for (Particle p : freeParticles) {
             p.radiusUpdate(false, Population.DELTA_T);
-            Double velocity = null, targetX, targetY;
+            Double targetX, targetY;
 
             if (p.getState() == ParticleState.ZOMBIE) {
                 // Busca al humano mas cercano a menos de 4m
@@ -226,7 +227,7 @@ public class Population {
                 if (other == null) {
                     if (!p.hasWanderTarget() || p.changeWanderTarget(this.currentTime)) {
                         // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
-                        velocity = Constants.ZOMBIE_SEARCH_SPEED;
+                        p.setVdMax(Constants.ZOMBIE_SEARCH_SPEED);
                         Pair<Double, Double> randPositions = getRandomPositionInCircle();
                         p.setWanderTarget(randPositions.getLeft(), randPositions.getRight(), this.currentTime);
                     }
@@ -235,6 +236,7 @@ public class Population {
                 } else {
                     targetX = other.getX();
                     targetY = other.getY();
+                    p.setVdMax(Constants.ZOMBIE_DESIRED_VELOCITY);
                     p.setWanderTarget(null, null, this.currentTime);
                 }
             } else {
@@ -243,16 +245,17 @@ public class Population {
                         .filter(particle -> particle.calculateDistanceTo(p) <= Constants.HUMAN_SEARCH_RADIUS)
                         .collect(Collectors.toList()).size() == 0) {
                     // si no hay zombies cerca no se mueve
-                    velocity = 0.;
+                    p.setVdMax(0);
                     targetX = targetY = 0.;
                 } else {
                     Pair<Double, Double> target = calculateTargetHeuristic(p);
                     targetX = target.getLeft();
                     targetY = target.getRight();
+                    p.setVdMax(Constants.HUMAN_DESIRED_VELOCITY);
                 }
 
             }
-            p.velocityUpdate(false, targetX, targetY, velocity);
+            p.velocityUpdate(false, targetX, targetY);
         }
 
     }
@@ -287,6 +290,7 @@ public class Population {
                 .filter(other -> p.calculateDistanceTo(other) < Constants.HUMAN_SEARCH_RADIUS && !p.equals(other))
                 .collect(Collectors.toList());
 
+
         for (Particle neighbour : neighbours) {
             double distanceToNeighbour = p.calculateDistanceToWithoutRadius(neighbour.getX(), neighbour.getY());
 
@@ -299,14 +303,17 @@ public class Population {
             double ey = (yDiff) / distanceToNeighbour;
             ny += ey * neighbourWeight;
         }
-        if(Math.atan2(nx,ny) > this.circleRadius) {
+        double abs = Math.sqrt(nx*nx + ny*ny);
+        nx/=abs;
+        ny/=abs;
+        if(Math.sqrt(Math.pow(p.getX()+nx,2) + Math.pow(p.getY()+ny,2)) > this.circleRadius) {
             // el target esta fuera del recinto, lo roto para que no se choque con la pared
             double n = -Math.PI/2;
             nx = (nx * Math.cos(n)) - (ny * Math.sin(n));
             ny = (nx * Math.sin(n)) + (ny * Math.cos(n));
         }
 
-        return new Pair<>(nx, ny);
+        return new Pair<>(nx+p.getX(), ny+p.getY());
     }
 
     public void nextIteration() {

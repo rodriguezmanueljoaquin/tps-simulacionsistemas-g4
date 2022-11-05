@@ -6,6 +6,7 @@ public class Constants {
     public static final double PARTICLE_MIN_RADIUS = 0.1;
     public static final double CIRCLE_RADIUS = 11;
     public static final double HUMAN_DESIRED_VELOCITY = 4;
+    public static final double ZOMBIE_DESIRED_VELOCITY = 4;
     public static final double INITIAL_MIN_DISTANCE_TO_ZOMBIE = 1.;
     public static final double ZOMBIE_SEARCH_SPEED = 0.3;
     public static final double ZOMBIE_SEARCH_RADIUS = 4.;
