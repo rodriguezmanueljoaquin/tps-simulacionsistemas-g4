@@ -34,12 +34,12 @@ class ScalarObservableTypeData(Enum):
     ZOMBIE_FRACTION = {
         "set_execution_observable_value": lambda execution: execution.set_total_contagion_time(),
         "get_execution_observable_value": lambda execution: execution.total_contagion_time,
-        "y_label": "Tiempo de contagio total (s)",
+        "y_label": "Tiempo de contagio total [s]",
     }
     CONTAGION_SPEED = {
         "set_execution_observable_value": lambda execution: execution.set_mean_contagion_speed(),
         "get_execution_observable_value": lambda execution: execution.mean_contagion_speed,
-        "y_label": "Velocidad de contagio media (z/s)",
+        "y_label": "Velocidad de contagio media [z/s]",
     }
 
 def plot_scalar_observable(simulation_results, variable, observable):
@@ -74,7 +74,7 @@ def plot_scalar_observable(simulation_results, variable, observable):
     errors = [[np.std(observable_list) for observable_list in list(scalar_observable_dict.values())]]
 
     y_label = scalar_data.value["y_label"]
-    x_label = "Cantidad de humanos" if variable=='humans_initial_qty' else "Velocidad deseada del zombie (m/s)"
+    x_label = "Cantidad de humanos" if variable=='humans_initial_qty' else "Velocidad deseada del zombie [m/s]"
     plot_curves_with_legend(inputs,curves,None,x_label,y_label,errors)
 
 
@@ -86,7 +86,7 @@ class TemporalObservableTypeData(Enum):
     }
     CONTAGION_SPEED = {
         "get_particles_frame_observable_value": lambda particles_frame: particles_frame.contagion_speed,
-        "y_label": "Velocidad de contagio (z/s)",
+        "y_label": "Velocidad de contagio [z/s]",
     }
 
 def plot_temporal_observable(simulation_results, variable, observable):
@@ -139,7 +139,7 @@ def plot_temporal_observable(simulation_results, variable, observable):
     legends = list(map(lambda dict_key: f"Cantidad de humanos = {dict_key}" if variable=='humans_initial_qty' else f"Velocidad deseada del zombie = {dict_key} m/s",temporal_observable_dict.keys()))
     
     y_label = temporal_data.value["y_label"]
-    x_label = "Tiempo (s)"
+    x_label = "Tiempo [s]"
 
     ##Finalmente, realizamos el observable correspondiente
     plot_curves_with_legend(inputs,curves,legends,x_label,y_label,errors)
