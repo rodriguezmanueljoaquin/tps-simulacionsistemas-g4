@@ -18,6 +18,8 @@ public class Population {
     private Pair<Double, Double> wallAPRange;
     private Pair<Double, Double> wallBPRange;
 
+    private List<Double> wallAps, wallBps;
+
     public Population(Integer initialHumansQty, Double zombieDesiredVelocity, long seed,
                       Pair<Double, Double> zombieAPRange, Pair<Double, Double> zombieBPRange,
                       Pair<Double, Double> humanAPRange, Pair<Double, Double> humanBPRange,
@@ -40,10 +42,20 @@ public class Population {
 
         //Seteamos las posiciones iniciales de las particulas
         setParticlesInitialPosition();
+        setWallsCoefficients();
     }
 
     private double getRandomDoubleBetweenBounds(Pair<Double, Double> bounds) {
         return this.rand.nextDouble() * (bounds.getRight() - bounds.getLeft()) + bounds.getRight();
+    }
+
+    private void setWallsCoefficients() {
+        this.wallAps = new ArrayList<>();
+        this.wallBps = new ArrayList<>();
+        for(int i = 0 ; i < 360 ;i++){
+            wallAps.add(getRandomDoubleBetweenBounds(wallAPRange));
+            wallBps.add(getRandomDoubleBetweenBounds(wallBPRange));
+        }
     }
 
     private Pair<Double, Double> getRandomPositionInCircle() {
@@ -244,9 +256,11 @@ public class Population {
             double closestWallX = (p.getX() / distanceToOrigin) * this.circleRadius;
             double closestWallY = (p.getY() / distanceToOrigin) * this.circleRadius;
             double distanceToWall = p.calculateDistanceToWithoutRadius(closestWallX, closestWallY);
+            // busco los coeficientes asociados al punto mas cercano en la pared
+            int wallCoefficientIndex = (int)(Math.toDegrees(Math.atan2(closestWallX, closestWallY))) +180;
 
-            double wallWeight = this.getRandomDoubleBetweenBounds(wallAPRange) *
-                    Math.exp(-distanceToWall * this.getRandomDoubleBetweenBounds(wallBPRange));
+            double wallWeight = wallAps.get(wallCoefficientIndex) *
+                    Math.exp(-distanceToWall * wallBps.get(wallCoefficientIndex));
 
             double xDiff = p.getX() - closestWallX;
             double ex = (xDiff) / distanceToWall;
@@ -325,6 +339,7 @@ public class Population {
         while (this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
             writeOutput(writer);
             nextIteration();
+            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
         }
         // last iteration
         writeOutput(writer);
