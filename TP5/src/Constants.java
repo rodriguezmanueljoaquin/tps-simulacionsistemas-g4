@@ -10,7 +10,7 @@ public class Constants {
     public static final double ZOMBIE_SEARCH_SPEED = 0.3;
     public static final double ZOMBIE_SEARCH_RADIUS = 4.;
     public static final double HUMAN_SEARCH_RADIUS = 4.;
-    public static final double MAX_TIME = 300.;
+    public static final double MAX_TIME = 200.;
     public static final double INFECTION_DURATION = 7.;
     public static final double WANDER_TARGET_DISTANCE_EPSILON = 0.1;
     public static final double WANDER_TARGET_TIME = 3;

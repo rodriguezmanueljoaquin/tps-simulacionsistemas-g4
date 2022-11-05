@@ -35,6 +35,7 @@ public class Population {
         this.zombieAPRange = zombieAPRange;
         this.zombieBPRange = zombieBPRange;
         this.humanAPRange = humanAPRange;
+        System.out.println(humanAPRange);
         this.humanBPRange = humanBPRange;
         this.wallAPRange = wallAPRange;
         this.wallBPRange = wallBPRange;
@@ -211,6 +212,7 @@ public class Population {
 
     private void updateFreeParticles(List<Particle> freeParticles) {
         for (Particle p : freeParticles) {
+            p.radiusUpdate(false, Population.DELTA_T);
             Double velocity = null, targetX, targetY;
 
             if (p.getState() == ParticleState.ZOMBIE) {
@@ -236,12 +238,21 @@ public class Population {
                     p.setWanderTarget(null, null, this.currentTime);
                 }
             } else {
-                Pair<Double, Double> target = calculateTargetHeuristic(p);
-                targetX = target.getLeft();
-                targetY = target.getRight();
+                if(population.stream()
+                        .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE))
+                        .filter(particle -> particle.calculateDistanceTo(p) <= Constants.HUMAN_SEARCH_RADIUS)
+                        .collect(Collectors.toList()).size() == 0) {
+                    // si no hay zombies cerca no se mueve
+                    velocity = 0.;
+                    targetX = targetY = 0.;
+                } else {
+                    Pair<Double, Double> target = calculateTargetHeuristic(p);
+                    targetX = target.getLeft();
+                    targetY = target.getRight();
+                }
+
             }
             p.velocityUpdate(false, targetX, targetY, velocity);
-            p.radiusUpdate(false, Population.DELTA_T);
         }
 
     }
@@ -288,6 +299,12 @@ public class Population {
             double ey = (yDiff) / distanceToNeighbour;
             ny += ey * neighbourWeight;
         }
+        if(Math.atan2(nx,ny) > this.circleRadius) {
+            // el target esta fuera del recinto, lo roto para que no se choque con la pared
+            double n = -Math.PI/2;
+            nx = (nx * Math.cos(n)) - (ny * Math.sin(n));
+            ny = (nx * Math.sin(n)) + (ny * Math.cos(n));
+        }
 
         return new Pair<>(nx, ny);
     }
@@ -314,11 +331,11 @@ public class Population {
         }
     }
 
-    public static void createStaticFile(String outputPath, Integer initialHumansQty, Double zombieDesiredVelocity, Integer deltaTOutputMultiplier) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void createStaticFile(String outputPath, Integer initialHumansQty, Double zombieDesiredVelocity, Integer deltaTOutputMultiplier, String humanApOverZombieApCoeff) throws FileNotFoundException, UnsupportedEncodingException {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + "/static.txt", "UTF-8");
-        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity, Population.DELTA_T * deltaTOutputMultiplier));
+        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n%s\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity, Population.DELTA_T * deltaTOutputMultiplier, humanApOverZombieApCoeff));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
@@ -339,7 +356,7 @@ public class Population {
         while (this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
             writeOutput(writer);
             nextIteration();
-            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
+//            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
         }
         // last iteration
         writeOutput(writer);

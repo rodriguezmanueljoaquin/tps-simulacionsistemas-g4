@@ -12,16 +12,25 @@ public class Manager {
         String RESULTS_PATH = "results/";
         String extraParametersStr = "";
         new File("results").mkdir();
-        Pair<Double, Double> zombieAPRange = new Pair<>(1000., 2000.);
-        Pair<Double, Double> zombieBPRange = new Pair<>(0.25, .75);
-        Pair<Double, Double> humanAPRange = new Pair<>(750., 1000.);
-        Pair<Double, Double> humanBPRange = new Pair<>(0.25, .75);
-        Pair<Double, Double> wallAPRange = new Pair<>(100., 800.);
-        Pair<Double, Double> wallBPRange = new Pair<>(0.25, .75);
+
+        double zombieMeanAp = 2000;
+        double zombieStdAp = 50;
+        double humanMeanAp = 800;
+        double humanStdAp = 50;
+        double wallMeanAp = humanMeanAp;
+        double wallStdAp = 50;
+        Pair<Double, Double> zombieAPRange = new Pair<>(zombieMeanAp-zombieStdAp , zombieMeanAp+zombieStdAp);
+        Pair<Double, Double> zombieBPRange = new Pair<>(0.45, 0.55);
+        Pair<Double, Double> humanAPRange = new Pair<>(humanMeanAp-humanStdAp, humanMeanAp+humanStdAp);
+        Pair<Double, Double> humanBPRange = new Pair<>(0.45, 0.55);
+        Pair<Double, Double> wallAPRange = new Pair<>(wallMeanAp-wallStdAp, wallMeanAp+wallStdAp);
+        Pair<Double, Double> wallBPRange = new Pair<>(0.45, 0.55);
+
+        extraParametersStr = String.format("%.2f", humanAPRange.getLeft()/zombieAPRange.getLeft());
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
-        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
-//        int deltaTOutputMultiplier = 4; // 0.05s
+//        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
+        int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
 //        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
@@ -38,12 +47,18 @@ public class Manager {
 //                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         // variando el coeficiente Aphumanos/Apzombies, hasta 1.2 por que no tiene sentido que le tenga mas miedo a los humanos que a los zombies
-//        for (double AphOverApzCoefficient = 0; AphOverApzCoefficient <= 1.2. ; AphOverApzCoefficient += 0.2){
+//        for (double AphOverApzCoefficient = 0; AphOverApzCoefficient <= 1.2; AphOverApzCoefficient += 0.4){
 //            // ApWall y ApZombies se mantienen como antes pero se cambia el Aphumanos
-//            humanAPRange.setNewValues(zombieAPRange.getLeft() * AphOverApzCoefficient, zombieAPRange.getRight() * AphOverApzCoefficient);
-//            extraParameters = String.valueOf(AphOverApzCoefficient);
-//            simulationParameters.add(new SimulationParameters(140, zombieDesiredVelocity, extraParametersStr,
-//                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
+//            extraParametersStr = String.format("%.2f", AphOverApzCoefficient);
+//            simulationParameters.add(new SimulationParameters(80, 3., extraParametersStr,
+//                    zombieAPRange, zombieBPRange, new Pair<>(zombieAPRange.getLeft() * AphOverApzCoefficient,
+//                    zombieAPRange.getRight() * AphOverApzCoefficient), humanBPRange, wallAPRange, wallBPRange));
+//            simulationParameters.add(new SimulationParameters(140, 3., extraParametersStr,
+//                    zombieAPRange, zombieBPRange, new Pair<>(zombieAPRange.getLeft() * AphOverApzCoefficient,
+//                    zombieAPRange.getRight() * AphOverApzCoefficient), humanBPRange, wallAPRange, wallBPRange));
+//            simulationParameters.add(new SimulationParameters(200, 3., extraParametersStr,
+//                    zombieAPRange, zombieBPRange, new Pair<>(zombieAPRange.getLeft() * AphOverApzCoefficient,
+//                    zombieAPRange.getRight() * AphOverApzCoefficient), humanBPRange, wallAPRange, wallBPRange));
 //        }
 
 
@@ -61,7 +76,7 @@ public class Manager {
                     Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(),
                             parameters.zombieAPRange, parameters.zombieBPRange, parameters.humanAPRange, parameters.humanBPRange,
                             parameters.wallAPRange, parameters.wallBPRange, deltaTOutputMultiplier);
-                    Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity, deltaTOutputMultiplier);
+                    Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity, deltaTOutputMultiplier, parameters.extraParametersStr);
 
                     String dynamicsPath = resultsFolderPath + "/dynamics";
                     new File(dynamicsPath).mkdir();

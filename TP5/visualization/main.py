@@ -1,7 +1,7 @@
 import argparse
 import exportOvito
 from files import read_input_files
-from graphs import plot_scalar_observable,plot_temporal_observable
+from graphs import plot_scalar_observable,plot_temporal_observable,plot_coefficient
 
 if __name__ == "__main__":
     #Valores default de los argumentos
@@ -23,7 +23,7 @@ if __name__ == "__main__":
         ##action
         if(args.action is not None):
             action = args.action.lower().strip()
-            if(action != 'graph' and action != 'animate'):
+            if(action != 'graph' and action != 'animate' and action != 'coeff_evol'):
                 argsValid = False
         ##input_files_directory
         if(args.input_files_directory is not None):
@@ -56,6 +56,8 @@ if __name__ == "__main__":
         if(action=='animate'):
         # ANIMACION:
             exportOvito.exportOvito(simulations_results[0][0])
+        elif(action=='coeff_evol'):
+            plot_coefficient(simulations_results)
         else:
         # GRAFICOS:
             #Primero, chequeamos el tipo de observable a realizar (escalar o temporal) y luego cual se quiere realizar (fraccion de zombies o velocidad de contagio)

@@ -77,6 +77,35 @@ def plot_scalar_observable(simulation_results, variable, observable):
     x_label = "Cantidad de humanos" if variable=='humans_initial_qty' else "Velocidad deseada del zombie [m/s]"
     plot_curves_with_legend(inputs,curves,None,x_label,y_label,errors)
 
+## Estudio de coeficientes zombie fraction
+def plot_coefficient(simulation_results):
+    ##Primero, creamos un diccionario de la forma {variable a analizar;[observable]}
+    scalar_observable_dict = dict()
+    ##Recorremos cada experimento, y por cada uno de ellos las distintas ejecuciones
+    for experiment in simulation_results:
+        for execution in experiment:
+            dict_key = execution.hap_over_zap_coeff
+            zf = execution.particles_by_frame[6].get_zombie_fraction()
+            print(zf)
+            
+            if(dict_key not in scalar_observable_dict):
+                scalar_observable_dict[dict_key] = \
+                    [zf]
+            else:
+                scalar_observable_dict[dict_key]\
+                    .append(zf)
+
+
+    ##Luego, ordenamos el diccionario por clave
+    scalar_observable_dict = dict(sorted(scalar_observable_dict.items()))
+    ##Luego, generamos la data para el observable escalar
+    inputs = [list(scalar_observable_dict.keys())]
+    curves = [[np.mean([observable_list]) for observable_list in list(scalar_observable_dict.values())]]
+    errors = [[np.std([observable_list]) for observable_list in list(scalar_observable_dict.values())]]
+
+    y_label = "Fracción de zombies"
+    x_label = "Hap/Zap"
+    plot_curves_with_legend(inputs,curves,None,x_label,y_label,errors)
 
 ##Funciones para observables temporales
 class TemporalObservableTypeData(Enum):
