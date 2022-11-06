@@ -60,8 +60,9 @@ public class Population {
 
     private Pair<Double, Double> getRandomPositionInCircle() {
         double angle = rand.nextDouble() * Math.PI * 2;
-        double newX = Math.cos(angle) * rand.nextDouble() * this.circleRadius;
-        double newY = Math.sin(angle) * rand.nextDouble() * this.circleRadius;
+        double randPosition = rand.nextDouble();
+        double newX = Math.cos(angle) * randPosition * this.circleRadius * 0.95;
+        double newY = Math.sin(angle) * randPosition * this.circleRadius * 0.95;
 
         return new Pair<>(newX, newY);
     }
@@ -309,7 +310,7 @@ public class Population {
         for (Particle neighbour : neighbours) {
             double distanceToNeighbour = p.calculateDistanceToWithoutRadius(neighbour.getX(), neighbour.getY());
 
-            double neighbourWeight = neighbour.getAP() * Math.exp(-distanceToNeighbour * neighbour.getBP());
+            double neighbourWeight = neighbour.getAP() * Math.exp(-distanceToNeighbour / neighbour.getBP());
             double xDiff = p.getX() - neighbour.getX();
             double ex = (xDiff) / distanceToNeighbour;
             nx += ex * neighbourWeight;
