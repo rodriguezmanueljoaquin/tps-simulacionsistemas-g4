@@ -12,6 +12,7 @@ public class Manager {
         String RESULTS_PATH = "results/";
         String extraParametersStr = "";
         new File("results").mkdir();
+        Boolean isSquareCell = false;
 
         double zombieMeanAp = 1400;
         double zombieStdAp = 500;
@@ -29,16 +30,16 @@ public class Manager {
         extraParametersStr = String.format("%.2f", humanAPRange.getLeft() / zombieAPRange.getLeft());
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
-        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
-//        int deltaTOutputMultiplier = 4; // 0.05s
+//        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
+        int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
-        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
-//        Integer[] initialHumansQtyArray = new Integer[]{320};
-//        double zombieDesiredVelocity = 3;
-//        for (Integer initialHumansQty : initialHumansQtyArray)
-//            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
-//                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
+//        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
+        Integer[] initialHumansQtyArray = new Integer[]{50};
+        double zombieDesiredVelocity = 3;
+        for (Integer initialHumansQty : initialHumansQtyArray)
+            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
+                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         //variando velocidad deseada del zombie
 //        int initialHumansQty = 140;
@@ -75,7 +76,7 @@ public class Manager {
                     System.out.println("Iteration " + i + " for nH:" + parameters.initialHumansQty + " vz:" + parameters.zombieDesiredVelocity + " extra parameters:" + parameters.extraParametersStr);
                     Population simulation = new Population(parameters.initialHumansQty, parameters.zombieDesiredVelocity, rand.nextLong(),
                             parameters.zombieAPRange, parameters.zombieBPRange, parameters.humanAPRange, parameters.humanBPRange,
-                            parameters.wallAPRange, parameters.wallBPRange, deltaTOutputMultiplier);
+                            parameters.wallAPRange, parameters.wallBPRange, deltaTOutputMultiplier, isSquareCell);
                     Population.createStaticFile(resultsFolderPath, parameters.initialHumansQty, parameters.zombieDesiredVelocity, deltaTOutputMultiplier, parameters.extraParametersStr);
 
                     String dynamicsPath = resultsFolderPath + "/dynamics";

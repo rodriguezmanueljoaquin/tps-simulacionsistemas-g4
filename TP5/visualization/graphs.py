@@ -168,7 +168,7 @@ def plot_temporal_observable(simulation_results, variable, observable):
     ###errors = Desvios estandar de los distintos valores de la variable observada por tiempo por variable analizada (se calcula igual que curves pero usando np.std() en vez de np.mean())
     errors = list(map(lambda variable_list : list(map(lambda time_list: np.std(time_list),variable_list)),observed_variable_per_time_per_variable_list))
     ###legends = Los distintos valores de la variable analizada
-    legends = list(map(lambda dict_key: f'$N_h = {dict_key}$' if variable=='humans_initial_qty' else f'$V_{"dz"} = {dict_key} m/s$',temporal_observable_dict.keys()))
+    legends = list(map(lambda dict_key: f'$N_h = {dict_key}$' if variable=='humans_initial_qty' else f'$V_{dz} = {dict_key} m/s$',temporal_observable_dict.keys()))
     
     y_label = temporal_data.value["y_label"]
     x_label = "Tiempo [s]"

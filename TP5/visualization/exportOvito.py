@@ -8,16 +8,31 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import os
 ovitoFolderName = "ovito_input"
 
-def exportOvito(simulation_result):
+def exportOvito(simulation_result, observable_variable):
     #Si no existe la carpeta de archivos de Ovito, la creamos
     if(not os.path.exists(ovitoFolderName)):
         os.makedirs(ovitoFolderName)
     print('Generating ovito files. . .')
-    print('Generating circle ovito file. . .')
-    exportCircle(simulation_result.circle_radius)
+    print('Generating cell ovito file. . .')
+    if(observable_variable == "circle"):
+        exportCircle(simulation_result.circle_radius)
+    else: exportSquare(simulation_result.circle_radius)
     print('Generating particles ovito file. . .')
     exportParticles(simulation_result.particles_by_frame, simulation_result.humans_initial_qty, simulation_result.zombie_desired_velocity)
     print('Ovito file successfully generated')
+
+def exportSquare(circle_radius):
+    file = open("{}/square.xyz".format(ovitoFolderName), "w")
+
+    n = 250
+    file.write("{}\ncomment\n".format(n*4))
+    for i in range(0, n):
+        z = n/2
+        file.write("{} {} {}\n".format(i, (i-z)/(z) * circle_radius, -circle_radius))
+        file.write("{} {} {}\n".format(i + n, ((i-z)/z) * circle_radius, circle_radius))
+        file.write("{} {} {}\n".format(i + 2*n, circle_radius, ((i-z)/z) * circle_radius))
+        file.write("{} {} {}\n".format(i + 3*n, -circle_radius, ((i-z)/z) * circle_radius))
+    file.close()
 
 def exportCircle(circle_radius):
     file = open("{}/circle.xyz".format(ovitoFolderName), "w")

@@ -7,7 +7,8 @@ import java.util.stream.Collectors;
 public class Population {
     private List<Particle> population;
     private Random rand;
-    private Double currentTime, deltaTOutput, circleRadius, zombieDesiredVelocity;
+    private Double currentTime, deltaTOutput, cellHalfLength, zombieDesiredVelocity;
+    private Boolean isSquareCell;
     private final Integer initialHumansQty;
     private Integer zombiesQty;
     private static Double DELTA_T = Constants.PARTICLE_MIN_RADIUS / (2 * Constants.HUMAN_DESIRED_VELOCITY); // ve = vdmax
@@ -24,9 +25,9 @@ public class Population {
                       Pair<Double, Double> zombieAPRange, Pair<Double, Double> zombieBPRange,
                       Pair<Double, Double> humanAPRange, Pair<Double, Double> humanBPRange,
                       Pair<Double, Double> wallAPRange, Pair<Double, Double> wallBPRange,
-                      Integer deltaTOutputMultiplier) {
+                      Integer deltaTOutputMultiplier, boolean isSquareCell) {
         this.initialHumansQty = initialHumansQty;
-        this.circleRadius = Constants.CIRCLE_RADIUS;
+        this.cellHalfLength = Constants.CIRCLE_RADIUS;
         this.population = new ArrayList<>();
         this.currentTime = 0.;
         this.zombiesQty = 0;
@@ -38,7 +39,9 @@ public class Population {
         this.humanBPRange = humanBPRange;
         this.wallAPRange = wallAPRange;
         this.wallBPRange = wallBPRange;
+
         this.deltaTOutput = Population.DELTA_T * deltaTOutputMultiplier;
+        this.isSquareCell = isSquareCell;
 
         //Seteamos las posiciones iniciales de las particulas
         setParticlesInitialPosition();
@@ -58,11 +61,18 @@ public class Population {
         }
     }
 
-    private Pair<Double, Double> getRandomPositionInCircle() {
-        double angle = rand.nextDouble() * Math.PI * 2;
-        double randPosition = rand.nextDouble();
-        double newX = Math.cos(angle) * randPosition * this.circleRadius * 0.95;
-        double newY = Math.sin(angle) * randPosition * this.circleRadius * 0.95;
+    private Pair<Double, Double> getRandomPositionInCell() {
+        double newX, newY;
+        double cellHalfLengthReduced = this.cellHalfLength * 0.95; // para que no aparezca en el borde
+        if(this.isSquareCell) {
+            newX = (rand.nextDouble() * cellHalfLengthReduced *2) - cellHalfLengthReduced;
+            newY = (rand.nextDouble() * cellHalfLengthReduced *2) - cellHalfLengthReduced;
+        } else {
+            double angle = rand.nextDouble() * Math.PI * 2;
+            double randPosition = rand.nextDouble();
+            newX = Math.cos(angle) * randPosition * cellHalfLengthReduced;
+            newY = Math.sin(angle) * randPosition * cellHalfLengthReduced;
+        }
 
         return new Pair<>(newX, newY);
     }
@@ -80,7 +90,7 @@ public class Population {
         for (int i = 0; i < this.initialHumansQty; i++) {
             validPosition = false;
             while (!validPosition) {
-                Pair<Double, Double> randPositions = getRandomPositionInCircle();
+                Pair<Double, Double> randPositions = getRandomPositionInCell();
                 newParticle = new Particle(randPositions.getLeft(), randPositions.getRight(),
                         this.rand.nextDouble() * 2 * Math.PI, ParticleState.HUMAN, Constants.HUMAN_DESIRED_VELOCITY,
                         this.getRandomDoubleBetweenBounds(humanAPRange), this.getRandomDoubleBetweenBounds(humanBPRange));
@@ -101,10 +111,16 @@ public class Population {
     }
 
     private Particle checkWallCollision(Particle p) {
-        if (Math.abs(p.distanceToOrigin()) <= this.circleRadius) {
-            // actualizamos velocidad
-            return null;
+        if(!this.isSquareCell) {
+            if (Math.abs(p.distanceToOrigin()) <= this.cellHalfLength) {
+                return null;
+            }
+        } else {
+            if (Math.abs(p.getX()) <= this.cellHalfLength && Math.abs(p.getY()) <= this.cellHalfLength) {
+                return null;
+            }
         }
+        // si llego aca es por que impacto contra pared
         // other estaria en el mismo eje de acuerdo al origen pero más lejos
         return new Particle(p.getX() * 2, p.getY() * 2, 0, ParticleState.WALL, 0., 0., 0.);
     }
@@ -243,7 +259,7 @@ public class Population {
                 if (other == null) {
                     if (!p.hasWanderTarget() || ((p.getXVelocity() * 1.0) == 0.0 && (p.getYVelocity() * 1.0) == 0.0) || p.changeWanderTarget(this.currentTime)) {
                         // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
-                        Pair<Double, Double> randPositions = getRandomPositionInCircle();
+                        Pair<Double, Double> randPositions = getRandomPositionInCell();
                         p.setWanderTarget(randPositions.getLeft(), randPositions.getRight(), this.currentTime);
                     }
                     targetX = p.getWanderTargetX();
@@ -276,21 +292,64 @@ public class Population {
 
     }
 
-    private Pair<Double, Double> calculateTargetHeuristic(Particle p) {
-        double nx = 0., ny = 0.;
+    private Pair<Double, Double> heuristicAgainstSquareWall(Particle p) {
+        double nx = 0., ny = 0., distance, absDistanceX, absDistanceY, distanceX = 0, distanceY = 0;
+        Integer coeffIndex;
+        absDistanceX = Math.abs(p.getX() + Constants.HUMAN_SEARCH_RADIUS);
+        absDistanceY = Math.abs(p.getY() + Constants.HUMAN_SEARCH_RADIUS);
 
-        // contra pared
+        if(absDistanceX >= this.cellHalfLength || absDistanceY >= this.cellHalfLength) {
+            // llega almenos una pared
+            if(Math.abs(p.getX()) > Math.abs(p.getY())) {
+                coeffIndex = (int) ((absDistanceX/11)*90);
+                // esta cerca de la pared superior o la inferior
+                if(p.getX() > 0) {
+                  //pared superior, toma una de las primeros 90 coeficientes, no hago nada
+                    distanceX = this.cellHalfLength - p.getX();
+                } else {
+                    //pared inferior, toma entre 180 y 270
+                    coeffIndex += 180;
+                    distanceX = -this.cellHalfLength - p.getX();
+                }
+            } else {
+                coeffIndex = (int) ((absDistanceY/11)*90);
+                if(p.getY() > 0) {
+                    // toma entre 90 y 180
+                    coeffIndex += 90;
+                    distanceY = this.cellHalfLength - p.getY();
+                } else {
+                    // toma entre 270 y 360
+                    coeffIndex += 270;
+                    distanceY = -this.cellHalfLength - p.getY();
+                }
+            }
+            distance = Math.sqrt(Math.pow(absDistanceX, 2) + Math.pow(absDistanceY, 2));
+            double wallWeight = wallAps.get(coeffIndex) *
+                    Math.exp(-distance / wallBps.get(coeffIndex));
+
+            // uno de los versores vale cero, que es el mas lejano a la pared
+            double ex = (distanceX) / distance;
+            nx += ex * wallWeight;
+            double ey = (distanceY) / distance;
+            ny += ey * wallWeight;
+        }
+
+        return new Pair<>(nx, ny);
+    }
+
+    private Pair<Double, Double> heuristicAgainstCircularWall(Particle p) {
+        double nx = 0., ny = 0.;
         double distanceToOrigin = p.distanceToOrigin();
-        if (this.circleRadius - distanceToOrigin < Constants.HUMAN_SEARCH_RADIUS) {
+        if (this.cellHalfLength - distanceToOrigin < Constants.HUMAN_SEARCH_RADIUS) {
             // se encuentra cerca de la pared, debe alejarse
-            double closestWallX = (p.getX() / distanceToOrigin) * this.circleRadius;
-            double closestWallY = (p.getY() / distanceToOrigin) * this.circleRadius;
+            double closestWallX = (p.getX() / distanceToOrigin) * this.cellHalfLength;
+            double closestWallY = (p.getY() / distanceToOrigin) * this.cellHalfLength;
             double distanceToWall = p.calculateDistanceToWithoutRadius(closestWallX, closestWallY);
             // busco los coeficientes asociados al punto mas cercano en la pared
             int wallCoefficientIndex = (int) (Math.toDegrees(Math.atan2(closestWallX, closestWallY))) + 180;
 
             double wallWeight = wallAps.get(wallCoefficientIndex) *
-                    Math.exp(-distanceToWall * wallBps.get(wallCoefficientIndex));
+                    Math.exp(-distanceToWall / wallBps.get(wallCoefficientIndex));
 
             double xDiff = p.getX() - closestWallX;
             double ex = (xDiff) / distanceToWall;
@@ -301,11 +360,26 @@ public class Population {
             ny += ey * wallWeight;
         }
 
+        return new Pair<>(nx, ny);
+    }
+
+    private Pair<Double, Double> calculateTargetHeuristic(Particle p) {
+        double nx = 0., ny = 0.;
+
+        Pair<Double, Double> n;
+        // contra pared
+        if(this.isSquareCell) {
+            n = heuristicAgainstSquareWall(p);
+        }else {
+            n = heuristicAgainstCircularWall(p);
+        }
+        nx += n.getLeft();
+        ny += n.getRight();
+
         // contra vecinos
         List<Particle> neighbours = population.stream()
                 .filter(other -> p.calculateDistanceTo(other) < Constants.HUMAN_SEARCH_RADIUS && !p.equals(other))
                 .collect(Collectors.toList());
-
 
         for (Particle neighbour : neighbours) {
             double distanceToNeighbour = p.calculateDistanceToWithoutRadius(neighbour.getX(), neighbour.getY());
@@ -322,11 +396,12 @@ public class Population {
         double abs = Math.sqrt(nx * nx + ny * ny);
         nx /= abs;
         ny /= abs;
-        if (Math.sqrt(Math.pow(p.getX() + nx, 2) + Math.pow(p.getY() + ny, 2)) > this.circleRadius) {
+
+        if (Math.sqrt(Math.pow(p.getX() + nx, 2) + Math.pow(p.getY() + ny, 2)) > this.cellHalfLength) {
             // el target esta fuera del recinto, lo roto para que no se choque con la pared
-            double n = -Math.PI / 2;
-            nx = (nx * Math.cos(n)) - (ny * Math.sin(n));
-            ny = (nx * Math.sin(n)) + (ny * Math.cos(n));
+            double angle = -Math.PI / 2;
+            nx = (nx * Math.cos(angle)) - (ny * Math.sin(angle));
+            ny = (nx * Math.sin(angle)) + (ny * Math.cos(angle));
         }
 
         return new Pair<>(nx + p.getX(), ny + p.getY());

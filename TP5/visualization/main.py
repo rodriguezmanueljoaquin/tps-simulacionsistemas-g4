@@ -31,12 +31,12 @@ if __name__ == "__main__":
         ##variable
         if(args.variable is not None):
             observable_variable = args.variable.lower().strip()
-            if((observable_variable!='humans_initial_qty' and observable_variable!='zombie_desired_velocity') or action=='animate'):
+            if((observable_variable!='humans_initial_qty' and observable_variable!='zombie_desired_velocity' and observable_variable !="square")):
                 argsValid=False
         ##observable_type
         if(args.observable_type is not None):
             observable_type = args.observable_type.lower().strip()
-            if((observable_type!='scalar' and observable_type!='temporal') or action=='animate'):
+            if((observable_type!='scalar' and observable_type!='temporal' ) or action=='animate'):
                 args_valid = False
         ##observable
         if(args.observable is not None):
@@ -48,14 +48,13 @@ if __name__ == "__main__":
         print("Error in command line arguments")
         print(e)
     if(args_valid):
-
         ##Leemos los archivos de input
         simulations_results = read_input_files(input_files_directory_path)
 
         ##Luego, realizamos la accion correspondiente
         if(action=='animate'):
         # ANIMACION:
-            exportOvito.exportOvito(simulations_results[0][0])
+            exportOvito.exportOvito(simulations_results[0][0], observable_variable)
         elif(action=='coeff_evol'):
             plot_coefficient(simulations_results)
         else:
