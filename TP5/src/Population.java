@@ -30,7 +30,7 @@ public class Population {
         this.population = new ArrayList<>();
         this.currentTime = 0.;
         this.zombiesQty = 0;
-        this.zombieDesiredVelocity = zombieDesiredVelocity;
+        Constants.ZOMBIE_DESIRED_VELOCITY = zombieDesiredVelocity;
         this.rand = new Random(seed);
         this.zombieAPRange = zombieAPRange;
         this.zombieBPRange = zombieBPRange;
@@ -53,7 +53,7 @@ public class Population {
     private void setWallsCoefficients() {
         this.wallAps = new ArrayList<>();
         this.wallBps = new ArrayList<>();
-        for(int i = 0 ; i < 360 ;i++){
+        for (int i = 0; i < 360; i++) {
             wallAps.add(getRandomDoubleBetweenBounds(wallAPRange));
             wallBps.add(getRandomDoubleBetweenBounds(wallBPRange));
         }
@@ -198,16 +198,25 @@ public class Population {
             Particle p1 = particles.getLeft();
             Particle p2 = particles.getRight();
 
-            // Actualizar solo las que no estan en infección
-            if (!isInInfection(p1.getState())) {
-                p1.radiusUpdate(true, DELTA_T);
+            if(p1.getState().equals(ParticleState.ZOMBIE) && p2.getState().equals(ParticleState.ZOMBIE) && p2.getXVelocity() == 0.0 && p1.getYVelocity() == 0.0  && p2.getXVelocity() == 0.0  && p2.getYVelocity() == 0.0) {
+                p1.radiusUpdate(false, DELTA_T);
                 p1.velocityUpdate(true, p2.getX(), p2.getY());
+            }else{
+                // Actualizar solo las que no estan en infección
+                if (!isInInfection(p1.getState())) {
+                    p1.radiusUpdate(true, DELTA_T);
+                    p1.velocityUpdate(true, p2.getX(), p2.getY());
+
+                }
+                if (!isInInfection(p2.getState())) {
+                    p2.radiusUpdate(true, DELTA_T);
+                    p2.velocityUpdate(true, p1.getX(), p1.getY());
+                }
 
             }
-            if (!isInInfection(p2.getState())) {
-                p2.radiusUpdate(true, DELTA_T);
-                p2.velocityUpdate(true, p1.getX(), p1.getY());
-            }
+
+
+
         }
     }
 
@@ -225,14 +234,16 @@ public class Population {
 
                 // Si no hay humano cercano, va hacia el target fijo que ya tenia en caso de que lo haya calculado
                 if (other == null) {
-                    if (!p.hasWanderTarget() || p.changeWanderTarget(this.currentTime)) {
+                    if (!p.hasWanderTarget() || ((p.getXVelocity() * 1.0) == 0.0 && (p.getYVelocity() * 1.0) == 0.0) || p.changeWanderTarget(this.currentTime)) {
                         // si no hay humano a menos de 4 metros, toma un objetivo random y va hacia allí con velocidad baja
-                        p.setVdMax(Constants.ZOMBIE_SEARCH_SPEED);
                         Pair<Double, Double> randPositions = getRandomPositionInCircle();
                         p.setWanderTarget(randPositions.getLeft(), randPositions.getRight(), this.currentTime);
                     }
+
+
                     targetX = p.getWanderTargetX();
                     targetY = p.getWanderTargetY();
+                    p.setVdMax(Constants.ZOMBIE_SEARCH_SPEED);
                 } else {
                     targetX = other.getX();
                     targetY = other.getY();
@@ -240,7 +251,7 @@ public class Population {
                     p.setWanderTarget(null, null, this.currentTime);
                 }
             } else {
-                if(population.stream()
+                if (population.stream()
                         .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE))
                         .filter(particle -> particle.calculateDistanceTo(p) <= Constants.HUMAN_SEARCH_RADIUS)
                         .collect(Collectors.toList()).size() == 0) {
@@ -271,7 +282,7 @@ public class Population {
             double closestWallY = (p.getY() / distanceToOrigin) * this.circleRadius;
             double distanceToWall = p.calculateDistanceToWithoutRadius(closestWallX, closestWallY);
             // busco los coeficientes asociados al punto mas cercano en la pared
-            int wallCoefficientIndex = (int)(Math.toDegrees(Math.atan2(closestWallX, closestWallY))) +180;
+            int wallCoefficientIndex = (int) (Math.toDegrees(Math.atan2(closestWallX, closestWallY))) + 180;
 
             double wallWeight = wallAps.get(wallCoefficientIndex) *
                     Math.exp(-distanceToWall * wallBps.get(wallCoefficientIndex));
@@ -303,17 +314,17 @@ public class Population {
             double ey = (yDiff) / distanceToNeighbour;
             ny += ey * neighbourWeight;
         }
-        double abs = Math.sqrt(nx*nx + ny*ny);
-        nx/=abs;
-        ny/=abs;
-        if(Math.sqrt(Math.pow(p.getX()+nx,2) + Math.pow(p.getY()+ny,2)) > this.circleRadius) {
+        double abs = Math.sqrt(nx * nx + ny * ny);
+        nx /= abs;
+        ny /= abs;
+        if (Math.sqrt(Math.pow(p.getX() + nx, 2) + Math.pow(p.getY() + ny, 2)) > this.circleRadius) {
             // el target esta fuera del recinto, lo roto para que no se choque con la pared
-            double n = -Math.PI/2;
+            double n = -Math.PI / 2;
             nx = (nx * Math.cos(n)) - (ny * Math.sin(n));
             ny = (nx * Math.sin(n)) + (ny * Math.cos(n));
         }
 
-        return new Pair<>(nx+p.getX(), ny+p.getY());
+        return new Pair<>(nx + p.getX(), ny + p.getY());
     }
 
     public void nextIteration() {
