@@ -35,10 +35,10 @@ public class Manager {
         // variando cantidad de humanos
         Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
 //        Integer[] initialHumansQtyArray = new Integer[]{320};
-        double zombieDesiredVelocity = 3;
-        for (Integer initialHumansQty : initialHumansQtyArray)
-            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
-                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
+//        double zombieDesiredVelocity = 3;
+//        for (Integer initialHumansQty : initialHumansQtyArray)
+//            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
+//                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         //variando velocidad deseada del zombie
 //        int initialHumansQty = 140;

@@ -2,7 +2,6 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 from enum import Enum
 
 def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", errors = None, log_scale = False, temporal_style = False):
@@ -11,16 +10,13 @@ def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_labe
     for i in range(len(curves)):
         if(errors is None):
             if(legends is not None):
-                if(temporal_style):
-                    plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i], marker='o', markersize=3)
-                else:
-                    plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i])
+                plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i])
             else:
                 plt.plot(inputs[i], curves[i], color=colors[i])
         else:
             if(legends is not None):
                 if(temporal_style):
-                    plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i], color=colors[i], fmt="", linestyle="", capsize=3)
+                    plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i], color=colors[i], marker='o', capsize=3, markersize=2, linewidth=0.7)
                 else: 
                     plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i], color=colors[i])
             else:
@@ -172,7 +168,7 @@ def plot_temporal_observable(simulation_results, variable, observable):
     ###errors = Desvios estandar de los distintos valores de la variable observada por tiempo por variable analizada (se calcula igual que curves pero usando np.std() en vez de np.mean())
     errors = list(map(lambda variable_list : list(map(lambda time_list: np.std(time_list),variable_list)),observed_variable_per_time_per_variable_list))
     ###legends = Los distintos valores de la variable analizada
-    legends = list(map(lambda dict_key: f"Cantidad de humanos = {dict_key}" if variable=='humans_initial_qty' else f"Velocidad deseada del zombie = {dict_key} m/s",temporal_observable_dict.keys()))
+    legends = list(map(lambda dict_key: f'$N_h = {dict_key}$' if variable=='humans_initial_qty' else f'$V_{"dz"} = {dict_key} m/s$',temporal_observable_dict.keys()))
     
     y_label = temporal_data.value["y_label"]
     x_label = "Tiempo [s]"
