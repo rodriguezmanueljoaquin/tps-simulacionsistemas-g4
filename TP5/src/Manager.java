@@ -13,29 +13,29 @@ public class Manager {
         String extraParametersStr = "";
         new File("results").mkdir();
 
-        double zombieMeanAp = 1500;
+        double zombieMeanAp = 1400;
         double zombieStdAp = 500;
-        double humanMeanAp = 350;
+        double humanMeanAp = 600;
         double humanStdAp = 50;
-        double wallMeanAp = humanMeanAp;
+        double wallMeanAp = 800;
         double wallStdAp = 50;
-        Pair<Double, Double> zombieAPRange = new Pair<>(zombieMeanAp-zombieStdAp , zombieMeanAp+zombieStdAp);
+        Pair<Double, Double> zombieAPRange = new Pair<>(zombieMeanAp - zombieStdAp, zombieMeanAp + zombieStdAp);
         Pair<Double, Double> zombieBPRange = new Pair<>(0.45, 0.55);
-        Pair<Double, Double> humanAPRange = new Pair<>(humanMeanAp-humanStdAp, humanMeanAp+humanStdAp);
+        Pair<Double, Double> humanAPRange = new Pair<>(humanMeanAp - humanStdAp, humanMeanAp + humanStdAp);
         Pair<Double, Double> humanBPRange = new Pair<>(0.45, 0.55);
-        Pair<Double, Double> wallAPRange = new Pair<>(wallMeanAp-wallStdAp, wallMeanAp+wallStdAp);
+        Pair<Double, Double> wallAPRange = new Pair<>(wallMeanAp - wallStdAp, wallMeanAp + wallStdAp);
         Pair<Double, Double> wallBPRange = new Pair<>(0.45, 0.55);
 
-        extraParametersStr = String.format("%.2f", humanAPRange.getLeft()/zombieAPRange.getLeft());
+        extraParametersStr = String.format("%.2f", humanAPRange.getLeft() / zombieAPRange.getLeft());
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
-//        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
-        int deltaTOutputMultiplier = 4; // 0.05s
+        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
+//        int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
-        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320};
-        //Integer[] initialHumansQtyArray = new Integer[]{140};
-        double zombieDesiredVelocity = 4;
+        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
+//        Integer[] initialHumansQtyArray = new Integer[]{320};
+        double zombieDesiredVelocity = 3;
         for (Integer initialHumansQty : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
                     zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));

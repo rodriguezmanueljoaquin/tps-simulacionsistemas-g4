@@ -41,11 +41,11 @@ public class Particle implements Comparable {
     }
 
     public Double calculateDistanceTo(Particle other) {
-       return Math.sqrt(Math.pow(this.getX() - other.getX(), 2)) + Math.pow((this.getY() - other.getY()),2) - this.radius - other.radius;
+        return Math.sqrt(Math.pow(this.getX() - other.getX(), 2)) + Math.pow((this.getY() - other.getY()), 2) - this.radius - other.radius;
     }
 
     public double calculateDistanceToWithoutRadius(double otherX, double otherY) {
-        return Math.sqrt(Math.pow(this.getX() - otherX, 2)) + Math.pow((this.getY() - otherY),2);
+        return Math.sqrt(Math.pow(this.getX() - otherX, 2)) + Math.pow((this.getY() - otherY), 2);
     }
 
     public void updatePosition(double dt) {
@@ -68,7 +68,7 @@ public class Particle implements Comparable {
         double velocity;
         double rx;
         double ry;
-        double distanceToWithoutRadius =  this.calculateDistanceToWithoutRadius(otherX, otherY);
+        double distanceToWithoutRadius = this.calculateDistanceToWithoutRadius(otherX, otherY);
         rx = (otherX - this.x) / distanceToWithoutRadius;
         ry = (otherY - this.y) / distanceToWithoutRadius;
         if (contact) {
@@ -76,8 +76,11 @@ public class Particle implements Comparable {
             rx *= -1;
             ry *= -1;
         }
-        velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
+        if(this.state != ParticleState.ZOMBIE)
+            velocity = vdMax * (Math.pow((radius - Constants.PARTICLE_MIN_RADIUS) /
                 (Constants.PARTICLE_MAX_RADIUS - Constants.PARTICLE_MIN_RADIUS), Constants.b));
+        else velocity = vdMax;
+
         this.xVelocity = velocity * rx;
         this.yVelocity = velocity * ry;
     }

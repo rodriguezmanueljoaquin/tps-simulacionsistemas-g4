@@ -30,12 +30,11 @@ public class Population {
         this.population = new ArrayList<>();
         this.currentTime = 0.;
         this.zombiesQty = 0;
-        Constants.ZOMBIE_DESIRED_VELOCITY = zombieDesiredVelocity;
+        this.zombieDesiredVelocity = zombieDesiredVelocity;
         this.rand = new Random(seed);
         this.zombieAPRange = zombieAPRange;
         this.zombieBPRange = zombieBPRange;
         this.humanAPRange = humanAPRange;
-        System.out.println(humanAPRange);
         this.humanBPRange = humanBPRange;
         this.wallAPRange = wallAPRange;
         this.wallBPRange = wallBPRange;
@@ -170,12 +169,15 @@ public class Population {
         human.setState(ParticleState.HUMAN_INFECTED);
         human.setZombieContactTime(this.currentTime);
         human.setVdMax(0);
+        human.radiusUpdate(true, Population.DELTA_T);
+
         if (zombie.getState() != ParticleState.ZOMBIE_INFECTING) {
             zombie.setState(ParticleState.ZOMBIE_INFECTING);
             this.zombiesQty--;
         }
         zombie.setZombieContactTime(this.currentTime);
         zombie.setVdMax(0);
+        zombie.radiusUpdate(true, Population.DELTA_T);
     }
 
     private void updateCollisionParticles(Map<CollisionType, List<Pair<Particle, Particle>>> collisions) {
@@ -190,7 +192,6 @@ public class Population {
             Particle p = particles.getLeft();
             p.radiusUpdate(true, DELTA_T);
             p.velocityUpdate(true, wall.getX(), wall.getY());
-
         }
 
         // Choques entre particulas
@@ -198,32 +199,37 @@ public class Population {
             Particle p1 = particles.getLeft();
             Particle p2 = particles.getRight();
 
-            if(p1.getState().equals(ParticleState.ZOMBIE) && p2.getState().equals(ParticleState.ZOMBIE) && p2.getXVelocity() == 0.0 && p1.getYVelocity() == 0.0  && p2.getXVelocity() == 0.0  && p2.getYVelocity() == 0.0) {
-                p1.radiusUpdate(false, DELTA_T);
+            int nearZombiesQty = population.stream()
+                    .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE) || particle.getState().equals(ParticleState.ZOMBIE_INFECTING))
+                    .filter(particle -> particle.calculateDistanceTo(p1) <= Constants.HUMAN_SEARCH_RADIUS
+                            || particle.calculateDistanceTo(p2) <= Constants.HUMAN_SEARCH_RADIUS)
+                    .collect(Collectors.toList()).size();
+//            if (p1.getState().equals(ParticleState.ZOMBIE) && p2.getState().equals(ParticleState.ZOMBIE) &&
+//                    p2.getXVelocity() == 0.0 && p1.getYVelocity() == 0.0 &&
+//                    p2.getXVelocity() == 0.0 && p2.getYVelocity() == 0.0) {
+//                p1.radiusUpdate(true, DELTA_T);
+//                p1.radiusUpdate(false, DELTA_T);
+//                p1.velocityUpdate(true, p2.getX(), p2.getY());
+//                p2.radiusUpdate(true, DELTA_T);
+//            } else {
+            // Actualizar solo las que no estan en infección y o tienen un zombie cerca o no estan quietas
+            if (!isInInfection(p1.getState()) && (nearZombiesQty > 0 || (p1.getXVelocity() != 0 || p1.getYVelocity() != 0))) {
+                p1.radiusUpdate(true, DELTA_T);
                 p1.velocityUpdate(true, p2.getX(), p2.getY());
-            }else{
-                // Actualizar solo las que no estan en infección
-                if (!isInInfection(p1.getState())) {
-                    p1.radiusUpdate(true, DELTA_T);
-                    p1.velocityUpdate(true, p2.getX(), p2.getY());
-
-                }
-                if (!isInInfection(p2.getState())) {
-                    p2.radiusUpdate(true, DELTA_T);
-                    p2.velocityUpdate(true, p1.getX(), p1.getY());
-                }
 
             }
-
-
-
+            if (!isInInfection(p2.getState()) && (nearZombiesQty > 0 || (p2.getXVelocity() != 0 || p2.getYVelocity() != 0))) {
+                p2.radiusUpdate(true, DELTA_T);
+                p2.velocityUpdate(true, p1.getX(), p1.getY());
+            }
+//            }
         }
     }
 
     private void updateFreeParticles(List<Particle> freeParticles) {
         for (Particle p : freeParticles) {
             p.radiusUpdate(false, Population.DELTA_T);
-            Double targetX, targetY;
+            double targetX, targetY;
 
             if (p.getState() == ParticleState.ZOMBIE) {
                 // Busca al humano mas cercano a menos de 4m
@@ -239,22 +245,21 @@ public class Population {
                         Pair<Double, Double> randPositions = getRandomPositionInCircle();
                         p.setWanderTarget(randPositions.getLeft(), randPositions.getRight(), this.currentTime);
                     }
-
-
                     targetX = p.getWanderTargetX();
                     targetY = p.getWanderTargetY();
                     p.setVdMax(Constants.ZOMBIE_SEARCH_SPEED);
                 } else {
                     targetX = other.getX();
                     targetY = other.getY();
-                    p.setVdMax(Constants.ZOMBIE_DESIRED_VELOCITY);
+                    p.setVdMax(this.zombieDesiredVelocity);
                     p.setWanderTarget(null, null, this.currentTime);
                 }
             } else {
-                if (population.stream()
+                int nearZombiesQty = population.stream()
                         .filter(particle -> particle.getState().equals(ParticleState.ZOMBIE))
                         .filter(particle -> particle.calculateDistanceTo(p) <= Constants.HUMAN_SEARCH_RADIUS)
-                        .collect(Collectors.toList()).size() == 0) {
+                        .collect(Collectors.toList()).size();
+                if (nearZombiesQty == 0) {
                     // si no hay zombies cerca no se mueve
                     p.setVdMax(0);
                     targetX = targetY = 0.;
@@ -264,7 +269,6 @@ public class Population {
                     targetY = target.getRight();
                     p.setVdMax(Constants.HUMAN_DESIRED_VELOCITY);
                 }
-
             }
             p.velocityUpdate(false, targetX, targetY);
         }

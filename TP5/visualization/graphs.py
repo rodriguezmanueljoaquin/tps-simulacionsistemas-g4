@@ -5,19 +5,26 @@ import matplotlib.pyplot as plt
 import math
 from enum import Enum
 
-def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", errors = None, log_scale = False):
+def plot_curves_with_legend(inputs,curves, legends = None, X_label = "X", Y_label = "Y", errors = None, log_scale = False, temporal_style = False):
     colors = sns.color_palette("hls", len(curves))
+    
     for i in range(len(curves)):
         if(errors is None):
             if(legends is not None):
-                plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i])
+                if(temporal_style):
+                    plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i], marker='o', markersize=3)
+                else:
+                    plt.plot(inputs[i], curves[i], label=legends[i], color=colors[i])
             else:
                 plt.plot(inputs[i], curves[i], color=colors[i])
         else:
             if(legends is not None):
-                plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i],color=colors[i])
+                if(temporal_style):
+                    plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i], color=colors[i], fmt="", linestyle="", capsize=3)
+                else: 
+                    plt.errorbar(inputs[i], curves[i],yerr=errors[i],label=legends[i], color=colors[i])
             else:
-                plt.errorbar(inputs[i], curves[i],yerr=errors[i],color=colors[i])
+                plt.errorbar(inputs[i], curves[i],yerr=errors[i],color=colors[i], capsize=5)
 
     if legends is not None:
         plt.legend()
@@ -171,4 +178,4 @@ def plot_temporal_observable(simulation_results, variable, observable):
     x_label = "Tiempo [s]"
 
     ##Finalmente, realizamos el observable correspondiente
-    plot_curves_with_legend(inputs,curves,legends,x_label,y_label,errors)
+    plot_curves_with_legend(inputs,curves,legends,x_label,y_label,errors, temporal_style=True)
