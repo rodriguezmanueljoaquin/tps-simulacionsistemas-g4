@@ -182,7 +182,7 @@ def plot_temporal_observable(simulation_results, variable, observable):
             map(lambda tuple: tuple[1],
             time_tuples_list)),list(temporal_observable_dict.values())))
 
-    # # relleno los valores que faltan por que cortaron antes
+    # relleno los valores que faltan por que cortaron antes
     for curve in observed_variable_per_time_per_variable_list:
         for executions in curve:
             while len(executions) < simulation_results[0][0].executions_qty:

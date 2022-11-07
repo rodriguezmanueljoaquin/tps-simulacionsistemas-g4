@@ -41,11 +41,11 @@ public class Particle implements Comparable {
     }
 
     public Double calculateDistanceTo(Particle other) {
-        return Math.sqrt(Math.pow(this.getX() - other.getX(), 2)) + Math.pow((this.getY() - other.getY()), 2) - this.radius - other.radius;
+        return calculateDistanceToWithoutRadius(other.getX(), other.getY()) - this.radius - other.radius;
     }
 
     public double calculateDistanceToWithoutRadius(double otherX, double otherY) {
-        return Math.sqrt(Math.pow(this.getX() - otherX, 2)) + Math.pow((this.getY() - otherY), 2);
+        return Math.sqrt(Math.pow(this.getX() - otherX, 2) + Math.pow((this.getY() - otherY), 2));
     }
 
     public void updatePosition(double dt) {
