@@ -397,7 +397,8 @@ public class Population {
         nx /= abs;
         ny /= abs;
 
-        if (Math.sqrt(Math.pow(p.getX() + nx, 2) + Math.pow(p.getY() + ny, 2)) > this.cellHalfLength) {
+        if ((!this.isSquareCell && Math.sqrt(Math.pow(p.getX() + nx, 2) + Math.pow(p.getY() + ny, 2)) > this.cellHalfLength) ||
+                (this.isSquareCell && (Math.abs(p.getX()) > this.cellHalfLength || Math.abs(p.getY()) > this.cellHalfLength))) {
             // el target esta fuera del recinto, lo roto para que no se choque con la pared
             double angle = -Math.PI / 2;
             nx = (nx * Math.cos(angle)) - (ny * Math.sin(angle));
@@ -440,7 +441,8 @@ public class Population {
     }
 
     private void writeOutput(PrintWriter writer) {
-        writer.println(Math.round(this.currentTime));
+        writer.println(this.currentTime);
+//        writer.println(Math.round(this.currentTime));
         for (Particle p : this.population) {
             writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
                     p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), p.getState().ordinal()));

@@ -12,7 +12,7 @@ public class Manager {
         String RESULTS_PATH = "results/";
         String extraParametersStr = "";
         new File("results").mkdir();
-        boolean isSquareCell = false;
+        boolean isSquareCell = true;
 
         double zombieMeanAp = 1400;
         double zombieStdAp = 500;
@@ -30,12 +30,12 @@ public class Manager {
         extraParametersStr = String.format("%.2f", humanAPRange.getLeft() / zombieAPRange.getLeft());
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
-        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
-//        int deltaTOutputMultiplier = 4; // 0.05s
+//        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
+        int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
-        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
-//        Integer[] initialHumansQtyArray = new Integer[]{320};
+//        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
+        Integer[] initialHumansQtyArray = new Integer[]{140};
         double zombieDesiredVelocity = 3;
         for (Integer initialHumansQty : initialHumansQtyArray)
             simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
