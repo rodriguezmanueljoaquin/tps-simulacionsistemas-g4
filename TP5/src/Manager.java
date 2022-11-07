@@ -12,7 +12,7 @@ public class Manager {
         String RESULTS_PATH = "results/";
         String extraParametersStr = "";
         new File("results").mkdir();
-        Boolean isSquareCell = false;
+        boolean isSquareCell = false;
 
         double zombieMeanAp = 1400;
         double zombieStdAp = 500;
@@ -37,15 +37,15 @@ public class Manager {
         Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
 //        Integer[] initialHumansQtyArray = new Integer[]{320};
         double zombieDesiredVelocity = 3;
-//        for (Integer initialHumansQty : initialHumansQtyArray)
-//            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
-//                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
+        for (Integer initialHumansQty : initialHumansQtyArray)
+            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
+                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         //variando velocidad deseada del zombie
-        int initialHumansQty = 140;
+//        int initialHumansQty = 140;
 //        for (zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
-            simulationParameters.add(new SimulationParameters(initialHumansQty, 3., extraParametersStr,
-                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
+//            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
+//                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         //variando velocidad deseada del zombie
 //        int initialHumansQty = 200;

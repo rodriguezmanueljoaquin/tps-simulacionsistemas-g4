@@ -142,11 +142,6 @@ def plot_temporal_observable(simulation_results, variable, observable):
         
         # continue
 
-        
-        
-        
-        
-        
         for execution in experiment:
             ##Tomamos la variable a analizar como clave del diccionario principal
             dict_key = execution.humans_initial_qty if variable=='humans_initial_qty' else execution.zombie_desired_velocity

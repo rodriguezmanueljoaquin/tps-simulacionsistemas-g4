@@ -409,7 +409,7 @@ public class Population {
 
     public void nextIteration() {
         double endIterationTime = this.currentTime + this.deltaTOutput;
-        while (this.currentTime <= endIterationTime && this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
+        while (this.currentTime <= endIterationTime && this.currentTime < Constants.MAX_TIME) {
             // Reviso si alguna infección termino y actualizo posiciones
             checkInfectionsAndUpdatePositions();
 
@@ -440,7 +440,7 @@ public class Population {
     }
 
     private void writeOutput(PrintWriter writer) {
-        writer.println(Math.round(this.currentTime * 10d) / 10d);
+        writer.println(Math.round(this.currentTime));
         for (Particle p : this.population) {
             writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
                     p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), p.getState().ordinal()));
@@ -452,18 +452,10 @@ public class Population {
 
         PrintWriter writer = new PrintWriter(dynamicPath + "/" + outputName, "UTF-8");
         while (this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
-//        while (this.currentTime < Constants.MAX_TIME) {
             writeOutput(writer);
             nextIteration();
 //            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
         }
-
-//        while (this.currentTime < Constants.MAX_TIME) {
-////        while (this.currentTime < Constants.MAX_TIME) {
-//            writeOutput(writer);
-//            this.currentTime += deltaTOutput;
-////            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
-//        }
 
         // last iteration
         writeOutput(writer);
