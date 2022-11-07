@@ -5,13 +5,14 @@ import numpy as np
 
 
 class SimulationResult:
-    def __init__(self, humans_initial_qty, circle_radius, zombie_desired_velocity,delta_t, hap_over_zap_coeff):
+    def __init__(self, humans_initial_qty, circle_radius, zombie_desired_velocity,delta_t, hap_over_zap_coeff,executions_qty):
         self.particles_by_frame = list()
         self.humans_initial_qty = humans_initial_qty
         self.circle_radius = circle_radius
         self.zombie_desired_velocity = zombie_desired_velocity
         self.delta_t = delta_t
         self.hap_over_zap_coeff = hap_over_zap_coeff
+        self.executions_qty = executions_qty
 
     def __str__(self):
         return "SimulationResult: [humans_initial_qty={}, circle_radius={}, zombie_desired_velocity={}, delta_t={}, particles_by_frame={}]".format(
@@ -112,11 +113,14 @@ def __read_static_input_file(static_input_file_path):
     line = file.readline()
     hap_over_zap_coeff = float(line.strip())
     line = file.readline()
+    executions_qty = int(line.strip())
+    line = file.readline()
+
 
     if line: raise Exception("Invalid static input file, there are more arguments than expected")
     file.close()
 
-    return SimulationResult(humans_initial_qty, circle_radius, zombie_desired_velocity,delta_t,hap_over_zap_coeff)
+    return SimulationResult(humans_initial_qty, circle_radius, zombie_desired_velocity,delta_t,hap_over_zap_coeff, executions_qty)
     
 def __read_dynamic_input_file(dynamic_input_file_path, simulation_result):
     read = True

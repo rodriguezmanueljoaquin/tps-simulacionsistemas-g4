@@ -1,6 +1,6 @@
 public class Constants {
     public static final int SIMULATION_REPETITION_TIMES = 10;
-    public static final long RANDOM_SEED = 123456789;
+    public static final long RANDOM_SEED = 1234567892;
     public static final double b = 0.9;
     public static final double PARTICLE_MAX_RADIUS = 0.3;
     public static final double PARTICLE_MIN_RADIUS = 0.1;

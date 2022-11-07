@@ -115,10 +115,12 @@ class TemporalObservableTypeData(Enum):
     ZOMBIE_FRACTION = {
         "get_particles_frame_observable_value": lambda particles_frame: particles_frame.get_zombie_fraction(),
         "y_label": "Fracción de zombies",
+        "max_value": 1,
     }
     CONTAGION_SPEED = {
         "get_particles_frame_observable_value": lambda particles_frame: particles_frame.contagion_speed,
         "y_label": "Velocidad de contagio [z/s]",
+        "max_value": 0,
     }
 
 def plot_temporal_observable(simulation_results, variable, observable):
@@ -131,6 +133,20 @@ def plot_temporal_observable(simulation_results, variable, observable):
     temporal_observable_dict = dict()
     ##Recorremos cada experimento, y por cada uno de ellos las distintas ejecuciones
     for experiment in simulation_results:
+        
+        # if(experiment[0].zombie_desired_velocity==3):
+        #     for execution in experiment:
+        #         fz = [pf.get_zombie_fraction() for pf in execution.particles_by_frame]
+        #         plt.figure('hola')
+        #         plt.plot(fz)
+        
+        # continue
+
+        
+        
+        
+        
+        
         for execution in experiment:
             ##Tomamos la variable a analizar como clave del diccionario principal
             dict_key = execution.humans_initial_qty if variable=='humans_initial_qty' else execution.zombie_desired_velocity
@@ -161,14 +177,30 @@ def plot_temporal_observable(simulation_results, variable, observable):
     inputs = list(map(lambda time_tuples_list: list(map(lambda tuple: tuple[0],time_tuples_list)),list(temporal_observable_dict.values())))
     ###curves = Los valores medios de la variable observada en cada tiempo, por cada valor de variable analizada
     ####Primero, armamos una lista de la variable observada por tiempo, por cada variable analizada (de la forma [ [ [...], [...], [...] ], [ [...], [...], [...] ], ... ])
-    observed_variable_per_time_per_variable_list = list(map(lambda time_tuples_list: list(map(lambda tuple: tuple[1],time_tuples_list)),list(temporal_observable_dict.values())))
+
+    ###[[fzprom_t0_nh0,fzpromt1_nh1,],[]]
+    
+    ###{Nh: [(0,[...]),(50,[...])]}
+    
+    observed_variable_per_time_per_variable_list = list(map(
+        lambda time_tuples_list: list(
+            map(lambda tuple: tuple[1],
+            time_tuples_list)),list(temporal_observable_dict.values())))
+
+    # # relleno los valores que faltan por que cortaron antes
+    for curve in observed_variable_per_time_per_variable_list:
+        for executions in curve:
+            while len(executions) < simulation_results[0][0].executions_qty:
+                executions.append(temporal_data.value["max_value"])
+            
+
     ####Luego, a partir de ella creamos una lista, que por cada variable analizada, tenga la variable observada promedio de cada tiempo (de la forma [ [ observedVariablePromt0, observedVariablePromt5 , ... ], [ observedVariablePromt0, observedVariablePromt5 , ... ], ... ])
     ####Dicha lista sera "curves"
     curves = list(map(lambda variable_list : list(map(lambda time_list: np.mean(time_list),variable_list)),observed_variable_per_time_per_variable_list))
     ###errors = Desvios estandar de los distintos valores de la variable observada por tiempo por variable analizada (se calcula igual que curves pero usando np.std() en vez de np.mean())
     errors = list(map(lambda variable_list : list(map(lambda time_list: np.std(time_list),variable_list)),observed_variable_per_time_per_variable_list))
     ###legends = Los distintos valores de la variable analizada
-    legends = list(map(lambda dict_key: f'$N_h = {dict_key}$' if variable=='humans_initial_qty' else f'$V_{dz} = {dict_key} m/s$',temporal_observable_dict.keys()))
+    legends = list(map(lambda dict_key: f'$N_h = {dict_key}$' if variable=='humans_initial_qty' else f'$V_{"dz"} = {dict_key} m/s$',temporal_observable_dict.keys()))
     
     y_label = temporal_data.value["y_label"]
     x_label = "Tiempo [s]"

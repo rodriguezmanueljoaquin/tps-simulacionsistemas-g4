@@ -30,20 +30,26 @@ public class Manager {
         extraParametersStr = String.format("%.2f", humanAPRange.getLeft() / zombieAPRange.getLeft());
 
         ArrayList<SimulationParameters> simulationParameters = new ArrayList<>();
-//        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
-        int deltaTOutputMultiplier = 4; // 0.05s
+        int deltaTOutputMultiplier = 4 * 20 * 10; // 10s
+//        int deltaTOutputMultiplier = 4; // 0.05s
 
         // variando cantidad de humanos
-//        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
-        Integer[] initialHumansQtyArray = new Integer[]{50};
+        Integer[] initialHumansQtyArray = new Integer[]{2, 10, 40, 80, 140, 200, 260, 320, 400};
+//        Integer[] initialHumansQtyArray = new Integer[]{320};
         double zombieDesiredVelocity = 3;
-        for (Integer initialHumansQty : initialHumansQtyArray)
-            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
+//        for (Integer initialHumansQty : initialHumansQtyArray)
+//            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
+//                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
+
+        //variando velocidad deseada del zombie
+        int initialHumansQty = 140;
+//        for (zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
+            simulationParameters.add(new SimulationParameters(initialHumansQty, 3., extraParametersStr,
                     zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 
         //variando velocidad deseada del zombie
-//        int initialHumansQty = 140;
-//        for (double zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
+//        int initialHumansQty = 200;
+//        for (zombieDesiredVelocity = 1 ; zombieDesiredVelocity <= 5 ; zombieDesiredVelocity+=0.5)
 //            simulationParameters.add(new SimulationParameters(initialHumansQty, zombieDesiredVelocity, extraParametersStr,
 //                    zombieAPRange, zombieBPRange, humanAPRange, humanBPRange, wallAPRange, wallBPRange));
 

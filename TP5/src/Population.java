@@ -433,14 +433,14 @@ public class Population {
         System.out.println("\tCreating static file. . .");
 
         PrintWriter writer = new PrintWriter(outputPath + "/static.txt", "UTF-8");
-        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n%s\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity, Population.DELTA_T * deltaTOutputMultiplier, humanApOverZombieApCoeff));
+        writer.print(String.format(Locale.ENGLISH, "%d\n%f\n%f\n%f\n%s\n%d\n", initialHumansQty, Constants.CIRCLE_RADIUS, zombieDesiredVelocity, Population.DELTA_T * deltaTOutputMultiplier, humanApOverZombieApCoeff,Constants.SIMULATION_REPETITION_TIMES));
         writer.close();
 
         System.out.println("\tStatic file successfully created");
     }
 
     private void writeOutput(PrintWriter writer) {
-        writer.println(this.currentTime);
+        writer.println(Math.round(this.currentTime * 10d) / 10d);
         for (Particle p : this.population) {
             writer.println(String.format(Locale.ENGLISH, "%d;%f;%f;%f;%f;%f;%d",
                     p.getId(), p.getX(), p.getY(), p.getXVelocity(), p.getYVelocity(), p.getRadius(), p.getState().ordinal()));
@@ -452,10 +452,19 @@ public class Population {
 
         PrintWriter writer = new PrintWriter(dynamicPath + "/" + outputName, "UTF-8");
         while (this.currentTime < Constants.MAX_TIME && !areAllZombies()) {
+//        while (this.currentTime < Constants.MAX_TIME) {
             writeOutput(writer);
             nextIteration();
 //            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
         }
+
+//        while (this.currentTime < Constants.MAX_TIME) {
+////        while (this.currentTime < Constants.MAX_TIME) {
+//            writeOutput(writer);
+//            this.currentTime += deltaTOutput;
+////            System.out.println("\t\t" + this.zombiesQty + "/" + (this.initialHumansQty + 1) + " free zombies at " + this.currentTime);
+//        }
+
         // last iteration
         writeOutput(writer);
 
